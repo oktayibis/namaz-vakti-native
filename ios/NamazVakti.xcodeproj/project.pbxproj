@@ -68,7 +68,7 @@
 		AAEFBB30DAA7582817362C6E /* NamazVaktiWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NamazVaktiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC0389C30CF6E6BA30CF2B69 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		CDC1B83252700DC5916F4DE0 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
-		D5DB0CF0103F49F800A8B16C /* NamazVakti.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NamazVakti.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5DB0CF0103F49F800A8B16C /* NamazVakti.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NamazVakti.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0F80456A69A10778917A741 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		EBAD6B2F839A67966CC457CB /* NamazVaktiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NamazVaktiWidget.entitlements; sourceTree = "<group>"; };
 		FD089C1958C789AD8D843505 /* NamazVaktiWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamazVaktiWidget.swift; sourceTree = "<group>"; };
@@ -238,11 +238,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-					51EED641D30DA55751C4CF41 = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = A78099CB5B76DBAB9F9D9D1D /* Build configuration list for PBXProject "NamazVakti" */;
 			developmentRegion = en;
@@ -484,6 +479,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = NamazVakti/NamazVakti/NamazVakti.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 3SN795A9D6;
 				INFOPLIST_FILE = NamazVakti/NamazVakti/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -502,6 +498,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = NamazVakti/NamazVakti/NamazVakti.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 3SN795A9D6;
 				INFOPLIST_FILE = NamazVakti/NamazVakti/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
