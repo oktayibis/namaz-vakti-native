@@ -80,20 +80,31 @@ fun OnboardingScreen(
     
     // Calculation selections
     var selectedMethod by remember { mutableStateOf(13) } // Türkiye (Diyanet)
-    var selectedSchool by remember { mutableStateOf(1) } // Hanafi
     
     val calculationMethods = listOf(
-        13 to "Türkiye (Diyanet)",
-        3 to "Muslim World League",
+        0 to "Kum Leva Enstitüsü (Caferi)",
+        1 to "Karaçi (İslami İlimler)",
         2 to "ISNA (Kuzey Amerika)",
+        3 to "Muslim World League",
         4 to "Umm Al-Qura (Mekke)",
         5 to "Mısır Genel Araştırma",
-        1 to "Karaçi (İslami İlimler)"
-    )
-    
-    val schools = listOf(
-        1 to "Hanefi (Çift Gölge)",
-        0 to "Şafii / Maliki / Hanbeli"
+        7 to "Tahran Üniversitesi (Şii)",
+        8 to "Körfez Bölgesi",
+        9 to "Kuveyt",
+        10 to "Katar",
+        11 to "Singapur (MUIS)",
+        12 to "Fransa (UOIF)",
+        13 to "Türkiye (Diyanet)",
+        14 to "Rusya",
+        15 to "Moonsighting Committee",
+        16 to "Dubai",
+        17 to "Malezya (JAKIM)",
+        18 to "Tunus",
+        19 to "Cezayir",
+        20 to "Endonezya (KEMENAG)",
+        21 to "Fas",
+        22 to "Portekiz (Lizbon)",
+        23 to "Ürdün"
     )
     
     // When location is detected, auto-preselect parameters
@@ -101,7 +112,6 @@ fun OnboardingScreen(
         detectedLocation?.let {
             val defaults = viewModel.determineDefaultParameters(it)
             selectedMethod = defaults.first
-            selectedSchool = defaults.second
         }
     }
     
@@ -376,45 +386,6 @@ fun OnboardingScreen(
                             }
                         }
                         
-                        Spacer(modifier = Modifier.height(24.dp))
-                        
-                        Text(
-                            text = "İkindi Mezhebi",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(SurfaceGlass, shape = RoundedCornerShape(12.dp))
-                                .padding(8.dp)
-                        ) {
-                            schools.forEach { (id, name) ->
-                                val isSelected = selectedSchool == id
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { selectedSchool = id }
-                                        .padding(horizontal = 12.dp, vertical = 10.dp)
-                                ) {
-                                    RadioButton(
-                                        selected = isSelected,
-                                        onClick = { selectedSchool = id },
-                                        colors = RadioButtonDefaults.colors(
-                                            selectedColor = AmberAccent,
-                                            unselectedColor = Color.Gray
-                                        )
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = name, color = Color.White, fontSize = 14.sp)
-                                }
-                            }
-                        }
-                        
                         Spacer(modifier = Modifier.height(30.dp))
                     }
                     
@@ -436,7 +407,6 @@ fun OnboardingScreen(
                                     viewModel.completeOnboarding(
                                         location = loc,
                                         methodId = selectedMethod,
-                                        schoolId = selectedSchool,
                                         onComplete = onFinishOnboarding
                                     )
                                 }

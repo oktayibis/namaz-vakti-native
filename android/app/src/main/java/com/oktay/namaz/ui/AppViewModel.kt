@@ -61,6 +61,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val _progress = MutableStateFlow(0.0)
     val progress: StateFlow<Double> = _progress.asStateFlow()
 
+    private val _hijriDateString = MutableStateFlow("")
+    val hijriDateString: StateFlow<String> = _hijriDateString.asStateFlow()
+
     private val _isDetectingLocation = MutableStateFlow(false)
     val isDetectingLocation: StateFlow<Boolean> = _isDetectingLocation.asStateFlow()
 
@@ -247,7 +250,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
         
         val defaultSchool = when {
-            countryLower.contains("turkey") || countryLower.contains("türkiye") ||
             countryLower.contains("pakistan") || countryLower.contains("india") || countryLower.contains("bangladesh") -> 1 // Hanafi
             else -> 0 // Shafi/Standard
         }
@@ -257,10 +259,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun completeOnboarding(
         location: LocationData,
         methodId: Int,
-        schoolId: Int,
         onComplete: () -> Unit
     ) {
         _onboardingLoading.value = true
+        val schoolId = if (methodId == 1) 1 else 0
         viewModelScope.launch {
             prefs.edit()
                 .putInt("calculation_method", methodId)
@@ -289,7 +291,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setCalculationMethod(methodId: Int) {
-        prefs.edit().putInt("calculation_method", methodId).apply()
+        val schoolId = if (methodId == 1) 1 else 0
+        prefs.edit()
+            .putInt("calculation_method", methodId)
+            .putInt("asr_madhab", schoolId)
+            .apply()
+        
         PrayerCalculator.clearCache(context)
         updateTimes()
         activeLocation.value?.let {
@@ -299,7 +306,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getAsrMadhab(): Int {
-        return prefs.getInt("asr_madhab", 1)
+        if (!prefs.contains("asr_madhab")) {
+            val method = getCalculationMethod()
+            return if (method == 1) 1 else 0
+        }
+        return prefs.getInt("asr_madhab", 0)
     }
 
     fun setAsrMadhab(schoolId: Int) {
@@ -323,6 +334,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(workDispatcher) {
             _todayTimes.value = PrayerCalculator.getPrayerTimesList(context, active, Date())
             _progressInfo.value = PrayerCalculator.getProgressInfo(context, active)
+            _hijriDateString.value = PrayerCalculator.getHijriDateString(context, active, Date()) ?: ""
 
             updateTimerTick()
         }

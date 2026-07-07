@@ -64,6 +64,7 @@ struct AladhanDateInfo: Codable {
     let readable: String
     let timestamp: String
     let gregorian: AladhanGregorianInfo
+    let hijri: AladhanHijriInfo
 }
 
 struct AladhanGregorianInfo: Codable {
@@ -75,6 +76,19 @@ struct AladhanGregorianInfo: Codable {
 struct AladhanMonthInfo: Codable {
     let number: Int
     let en: String
+}
+
+struct AladhanHijriInfo: Codable {
+    let date: String // "20-01-1448"
+    let day: String
+    let month: AladhanHijriMonthInfo
+    let year: String
+}
+
+struct AladhanHijriMonthInfo: Codable {
+    let number: Int
+    let en: String
+    let ar: String
 }
 
 class PrayerCalculator {
@@ -132,13 +146,13 @@ class PrayerCalculator {
         let components = targetCal.dateComponents([.year, .month, .day], from: date)
         
         var methodId = defaults.integer(forKey: "calculation_method")
-        if methodId == 0 {
+        if defaults.object(forKey: "calculation_method") == nil {
             methodId = 13 // Default to Diyanet (approximated)
         }
         
         var schoolId = defaults.integer(forKey: "asr_madhab")
         if defaults.object(forKey: "asr_madhab") == nil {
-            schoolId = 1 // Default to Hanafi
+            schoolId = (methodId == 1) ? 1 : 0
         }
         
         let method: CalculationMethod
@@ -242,13 +256,13 @@ class PrayerCalculator {
         
         queue.async {
             var methodId = self.defaults.integer(forKey: "calculation_method")
-            if methodId == 0 {
-                methodId = 13 // Default to Diyanet
+            if self.defaults.object(forKey: "calculation_method") == nil {
+                methodId = 13 // Default to Diyanet (approximated)
             }
             
             var schoolId = self.defaults.integer(forKey: "asr_madhab")
             if self.defaults.object(forKey: "asr_madhab") == nil {
-                schoolId = 1 // Default to Hanafi
+                schoolId = (methodId == 1) ? 1 : 0
             }
             
             let urlString = "https://api.aladhan.com/v1/calendar/\(year)?latitude=\(location.latitude)&longitude=\(location.longitude)&method=\(methodId)&school=\(schoolId)"
@@ -289,13 +303,13 @@ class PrayerCalculator {
         let cacheKey = "namaz_cache_\(location.id.uuidString)_\(year)"
         
         var methodId = self.defaults.integer(forKey: "calculation_method")
-        if methodId == 0 {
+        if self.defaults.object(forKey: "calculation_method") == nil {
             methodId = 13 // Default to Diyanet
         }
         
         var schoolId = self.defaults.integer(forKey: "asr_madhab")
         if self.defaults.object(forKey: "asr_madhab") == nil {
-            schoolId = 1 // Default to Hanafi
+            schoolId = (methodId == 1) ? 1 : 0
         }
         
         let urlString = "https://api.aladhan.com/v1/calendar/\(year)?latitude=\(location.latitude)&longitude=\(location.longitude)&method=\(methodId)&school=\(schoolId)"
@@ -413,6 +427,39 @@ class PrayerCalculator {
             )
         }
         
+        return nil
+    }
+    
+    func getHijriDateString(for location: LocationData, date: Date) -> String? {
+        guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
+        
+        let cal = Calendar(identifier: .gregorian)
+        var targetCal = cal
+        targetCal.timeZone = tz
+        
+        let components = targetCal.dateComponents([.year, .month, .day], from: date)
+        guard let day = components.day, let month = components.month, let year = components.year else {
+            return nil
+        }
+        
+        let cacheKey = "namaz_cache_\(location.id.uuidString)_\(year)"
+        
+        guard let response = loadAnnualCache(forKey: cacheKey),
+              let data = response.data else {
+            return nil
+        }
+        
+        let monthKey = String(month)
+        if let monthList = data[monthKey] {
+            let dayStr = String(format: "%02d", day)
+            let monthStr = String(format: "%02d", month)
+            let dateKey = "\(dayStr)-\(monthStr)-\(year)"
+            
+            if let dayData = monthList.first(where: { $0.date.gregorian.date == dateKey }) {
+                let h = dayData.date.hijri
+                return "\(h.day) \(h.month.en) \(h.year)"
+            }
+        }
         return nil
     }
     

@@ -10,20 +10,31 @@ struct OnboardingView: View {
     @State private var isSearching = false
     
     @State private var selectedMethod = 13
-    @State private var selectedSchool = 1
     
     let calculationMethods = [
-        (13, "Türkiye (Diyanet)"),
-        (3, "Muslim World League"),
+        (0, "Kum Leva Enstitüsü (Caferi)"),
+        (1, "Karaçi (İslami İlimler)"),
         (2, "ISNA (Kuzey Amerika)"),
+        (3, "Muslim World League"),
         (4, "Umm Al-Qura (Mekke)"),
         (5, "Mısır Genel Araştırma"),
-        (1, "Karaçi (İslami İlimler)")
-    ]
-    
-    let schools = [
-        (1, "Hanefi (Çift Gölge)"),
-        (0, "Şafii / Maliki / Hanbeli")
+        (7, "Tahran Üniversitesi (Şii)"),
+        (8, "Körfez Bölgesi"),
+        (9, "Kuveyt"),
+        (10, "Katar"),
+        (11, "Singapur (MUIS)"),
+        (12, "Fransa (UOIF)"),
+        (13, "Türkiye (Diyanet)"),
+        (14, "Rusya"),
+        (15, "Moonsighting Committee"),
+        (16, "Dubai"),
+        (17, "Malezya (JAKIM)"),
+        (18, "Tunus"),
+        (19, "Cezayir"),
+        (20, "Endonezya (KEMENAG)"),
+        (21, "Fas"),
+        (22, "Portekiz (Lizbon)"),
+        (23, "Ürdün")
     ]
     
     var body: some View {
@@ -97,7 +108,6 @@ struct OnboardingView: View {
                                     // Auto-preselect parameters
                                     let defaults = viewModel.determineDefaultParameters(for: detected)
                                     selectedMethod = defaults.0
-                                    selectedSchool = defaults.1
                                 }
                                 
                                 Spacer()
@@ -244,37 +254,6 @@ struct OnboardingView: View {
                                     }
                                     .cornerRadius(16)
                                     .padding(.horizontal)
-                                    
-                                    Text("İkindi Mezhebi")
-                                        .font(.system(.headline, design: .rounded))
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal)
-                                        .padding(.top, 10)
-                                    
-                                    VStack(spacing: 0) {
-                                        ForEach(schools, id: \.0) { item in
-                                            HStack {
-                                                Text(item.1)
-                                                    .font(.system(.body, design: .rounded))
-                                                    .foregroundColor(.white)
-                                                Spacer()
-                                                if selectedSchool == item.0 {
-                                                    Image(systemName: "checkmark")
-                                                        .foregroundColor(.amberColor)
-                                                }
-                                            }
-                                            .padding()
-                                            .background(Color.white.opacity(selectedSchool == item.0 ? 0.08 : 0.02))
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                selectedSchool = item.0
-                                            }
-                                            
-                                            Divider().background(Color.white.opacity(0.05))
-                                        }
-                                    }
-                                    .cornerRadius(16)
-                                    .padding(.horizontal)
                                 }
                             }
                             
@@ -289,7 +268,7 @@ struct OnboardingView: View {
                                 
                                 Button(action: {
                                     if let loc = viewModel.detectedLocation {
-                                        viewModel.completeOnboarding(location: loc, methodId: selectedMethod, schoolId: selectedSchool) {
+                                        viewModel.completeOnboarding(location: loc, methodId: selectedMethod) {
                                             onFinished()
                                         }
                                     }

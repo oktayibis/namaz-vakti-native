@@ -78,20 +78,30 @@ fun SettingsScreen(
     val offsetOptions = listOf(0, 5, 10, 15, 20, 30, 45, 60)
     
     var showMethodDialog by remember { mutableStateOf(false) }
-    var showMadhabDialog by remember { mutableStateOf(false) }
-    
     val calculationMethods = listOf(
-        13 to "Türkiye (Diyanet)",
-        3 to "Muslim World League (Dünya İslam Birliği)",
+        0 to "Kum Leva Enstitüsü (Caferi)",
+        1 to "Karaçi (İslami İlimler Üni.)",
         2 to "ISNA (Kuzey Amerika)",
+        3 to "Muslim World League (Dünya İslam Birliği)",
         4 to "Umm Al-Qura (Mekke)",
         5 to "Mısır Genel Araştırma Kurumu",
-        1 to "Karaçi (İslami İlimler Üni.)"
-    )
-    
-    val schools = listOf(
-        1 to "Hanefi (Çift Gölge)",
-        0 to "Şafii / Maliki / Hanbeli (Tek Gölge)"
+        7 to "Tahran Üniversitesi (Şii)",
+        8 to "Körfez Bölgesi",
+        9 to "Kuveyt",
+        10 to "Katar",
+        11 to "Singapur (MUIS)",
+        12 to "Fransa (UOIF)",
+        13 to "Türkiye (Diyanet)",
+        14 to "Rusya",
+        15 to "Moonsighting Committee",
+        16 to "Dubai",
+        17 to "Malezya (JAKIM)",
+        18 to "Tunus",
+        19 to "Cezayir",
+        20 to "Endonezya (KEMENAG)",
+        21 to "Fas",
+        22 to "Portekiz (Lizbon)",
+        23 to "Ürdün"
     )
     
     fun saveChanges() {
@@ -362,34 +372,6 @@ fun SettingsScreen(
                     }
                 }
                 
-                Divider(color = Color.White.copy(alpha = 0.1f))
-                
-                // 2. Asr Madhab Row
-                val currentSchoolId = viewModel.getAsrMadhab()
-                val schoolName = schools.firstOrNull { it.first == currentSchoolId }?.second ?: "Şafii / Maliki / Hanbeli"
-                
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showMadhabDialog = true }
-                        .padding(horizontal = 16.dp, vertical = 16.dp)
-                ) {
-                    Column {
-                        Text(
-                            text = "İkindi Vakti Mezhebi",
-                            color = Color.White,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = schoolName,
-                            color = AmberAccent,
-                            fontSize = 13.sp
-                        )
-                    }
-                }
             }
         }
     }
@@ -453,7 +435,7 @@ fun SettingsScreen(
             onDismissRequest = { showMethodDialog = false },
             title = { Text("Hesaplama Metodu Seçin", fontWeight = FontWeight.Bold) },
             text = {
-                Column {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     calculationMethods.forEach { (id, name) ->
                         val isSelected = viewModel.getCalculationMethod() == id
                         Row(
@@ -480,46 +462,6 @@ fun SettingsScreen(
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = { showMethodDialog = false }) {
-                    Text("Kapat", color = Color.White)
-                }
-            },
-            containerColor = Color(0xFF1E1E2E)
-        )
-    }
-    
-    // Asr Madhab dialog
-    if (showMadhabDialog) {
-        AlertDialog(
-            onDismissRequest = { showMadhabDialog = false },
-            title = { Text("İkindi Vakti Mezhebi Seçin", fontWeight = FontWeight.Bold) },
-            text = {
-                Column {
-                    schools.forEach { (id, name) ->
-                        val isSelected = viewModel.getAsrMadhab() == id
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    viewModel.setAsrMadhab(id)
-                                    showMadhabDialog = false
-                                }
-                                .padding(vertical = 12.dp)
-                        ) {
-                            Text(
-                                text = name,
-                                color = if (isSelected) AmberAccent else Color.White,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                fontSize = 15.sp
-                            )
-                        }
-                        Divider(color = Color.White.copy(alpha = 0.05f))
-                    }
-                }
-            },
-            confirmButton = {},
-            dismissButton = {
-                TextButton(onClick = { showMadhabDialog = false }) {
                     Text("Kapat", color = Color.White)
                 }
             },

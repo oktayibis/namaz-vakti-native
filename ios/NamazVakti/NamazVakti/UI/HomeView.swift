@@ -71,12 +71,19 @@ struct HomeView: View {
                             
                             // Today's Prayer Times Card
                             VStack(spacing: 0) {
-                                Text("Bugün Vakitler")
-                                    .font(.system(.headline, design: .rounded))
-                                    .foregroundColor(.white.opacity(0.9))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.horizontal)
-                                    .padding(.vertical, 14)
+                                HStack {
+                                    Text("Bugün Vakitler")
+                                        .font(.system(.headline, design: .rounded))
+                                        .foregroundColor(.white.opacity(0.9))
+                                    Spacer()
+                                    if let hijriDate = viewModel.hijriDateString {
+                                        Text(hijriDate)
+                                            .font(.system(.subheadline, design: .rounded))
+                                            .foregroundColor(.white.opacity(0.6))
+                                    }
+                                }
+                                .padding(.horizontal)
+                                .padding(.vertical, 14)
                                 
                                 Divider()
                                     .background(Color.white.opacity(0.15))

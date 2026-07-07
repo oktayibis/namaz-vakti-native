@@ -15,6 +15,7 @@ class AppViewModel: ObservableObject {
     @Published var progressInfo: PrayerProgressInfo? = nil
     @Published var timeRemainingString: String = "00:00:00"
     @Published var progress: Double = 0.0
+    @Published var hijriDateString: String? = nil
     
     @Published var isDetectingLocation = false
     @Published var showFirstLaunchLocationRequest = false
@@ -171,10 +172,11 @@ class AppViewModel: ObservableObject {
         }
     }
     
-    func completeOnboarding(location: LocationData, methodId: Int, schoolId: Int, completion: @escaping () -> Void) {
+    func completeOnboarding(location: LocationData, methodId: Int, completion: @escaping () -> Void) {
         onboardingLoading = true
         
         defaults.set(methodId, forKey: "calculation_method")
+        let schoolId = (methodId == 1) ? 1 : 0
         defaults.set(schoolId, forKey: "asr_madhab")
         
         PrayerCalculator.shared.clearCache()
@@ -243,8 +245,7 @@ class AppViewModel: ObservableObject {
         }
         
         let defaultSchool: Int
-        if countryLower.contains("turkey") || countryLower.contains("türkiye") ||
-            countryLower.contains("pakistan") || countryLower.contains("india") || countryLower.contains("bangladesh") {
+        if countryLower.contains("pakistan") || countryLower.contains("india") || countryLower.contains("bangladesh") {
             defaultSchool = 1 // Hanafi
         } else {
             defaultSchool = 0 // Shafi/Standard
@@ -254,12 +255,17 @@ class AppViewModel: ObservableObject {
     }
     
     func getCalculationMethod() -> Int {
-        let val = defaults.integer(forKey: "calculation_method")
-        return val == 0 ? 13 : val
+        if defaults.object(forKey: "calculation_method") == nil {
+            return 13 // Default to Diyanet
+        }
+        return defaults.integer(forKey: "calculation_method")
     }
     
     func setCalculationMethod(_ methodId: Int) {
         defaults.set(methodId, forKey: "calculation_method")
+        let schoolId = (methodId == 1) ? 1 : 0
+        defaults.set(schoolId, forKey: "asr_madhab")
+        
         PrayerCalculator.shared.clearCache()
         updateTimes()
         saveLocations()
@@ -270,7 +276,8 @@ class AppViewModel: ObservableObject {
     
     func getAsrMadhab() -> Int {
         if defaults.object(forKey: "asr_madhab") == nil {
-            return 1 // Hanafi default
+            let method = getCalculationMethod()
+            return method == 1 ? 1 : 0
         }
         return defaults.integer(forKey: "asr_madhab")
     }
@@ -290,6 +297,7 @@ class AppViewModel: ObservableObject {
         
         todayTimes = PrayerCalculator.shared.getPrayerTimesList(for: active, date: Date())
         progressInfo = PrayerCalculator.shared.getProgressInfo(for: active)
+        hijriDateString = PrayerCalculator.shared.getHijriDateString(for: active, date: Date())
         
         updateTimerTick()
     }

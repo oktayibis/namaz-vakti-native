@@ -3,8 +3,9 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var notificationManager = NotificationManager.shared
-    @StateObject private var appViewModel = AppViewModel.shared
+    private var appViewModel = AppViewModel.shared
     
+    @State private var selectedMethod = 13
     @State private var enabledPrayers: Set<PrayerType> = []
     @State private var reminderOffsets: [Int] = []
     @State private var showingAddReminderSheet = false
@@ -118,24 +119,35 @@ struct SettingsView: View {
                     // Calculation Parameters Section
                     Section(header: Text("Hesaplama Ayarları").foregroundColor(.gray)) {
                         Picker("Hesaplama Metodu", selection: Binding(
-                            get: { appViewModel.getCalculationMethod() },
-                            set: { appViewModel.setCalculationMethod($0) }
+                            get: { selectedMethod },
+                            set: { newValue in
+                                selectedMethod = newValue
+                                appViewModel.setCalculationMethod(newValue)
+                            }
                         )) {
-                            Text("Türkiye (Diyanet)").tag(13)
-                            Text("Muslim World League").tag(3)
+                            Text("Kum Leva Enstitüsü (Caferi)").tag(0)
+                            Text("Karaçi (İslami İlimler)").tag(1)
                             Text("ISNA (Kuzey Amerika)").tag(2)
+                            Text("Muslim World League").tag(3)
                             Text("Umm Al-Qura (Mekke)").tag(4)
                             Text("Mısır Genel Araştırma").tag(5)
-                            Text("Karaçi (İslami İlimler)").tag(1)
-                        }
-                        .foregroundColor(.white)
-                        
-                        Picker("İkindi Vakti Mezhebi", selection: Binding(
-                            get: { appViewModel.getAsrMadhab() },
-                            set: { appViewModel.setAsrMadhab($0) }
-                        )) {
-                            Text("Hanefi (Çift Gölge)").tag(1)
-                            Text("Şafii / Maliki / Hanbeli").tag(0)
+                            Text("Tahran Üniversitesi (Şii)").tag(7)
+                            Text("Körfez Bölgesi").tag(8)
+                            Text("Kuveyt").tag(9)
+                            Text("Katar").tag(10)
+                            Text("Singapur (MUIS)").tag(11)
+                            Text("Fransa (UOIF)").tag(12)
+                            Text("Türkiye (Diyanet)").tag(13)
+                            Text("Rusya").tag(14)
+                            Text("Moonsighting Committee").tag(15)
+                            Text("Dubai").tag(16)
+                            Text("Malezya (JAKIM)").tag(17)
+                            Text("Tunus").tag(18)
+                            Text("Cezayir").tag(19)
+                            Text("Endonezya (KEMENAG)").tag(20)
+                            Text("Fas").tag(21)
+                            Text("Portekiz (Lizbon)").tag(22)
+                            Text("Ürdün").tag(23)
                         }
                         .foregroundColor(.white)
                     }
@@ -215,6 +227,7 @@ struct SettingsView: View {
     private func loadSettings() {
         enabledPrayers = notificationManager.getEnabledPrayers()
         reminderOffsets = notificationManager.getReminderOffsets()
+        selectedMethod = appViewModel.getCalculationMethod()
     }
     
     private func addOffset(_ offset: Int) {

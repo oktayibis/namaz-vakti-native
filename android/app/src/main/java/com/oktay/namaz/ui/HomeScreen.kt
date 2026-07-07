@@ -232,13 +232,29 @@ fun HomeScreen(
                         .background(SurfaceGlass, shape = RoundedCornerShape(20.dp))
                         .border(1.5.dp, BorderGlass, shape = RoundedCornerShape(20.dp))
                 ) {
-                    Text(
-                        text = "Bugün Vakitler",
-                        color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                    ) {
+                        Text(
+                            text = "Bugün Vakitler",
+                            color = Color.White.copy(alpha = 0.9f),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        val hijriDate by viewModel.hijriDateString.collectAsState()
+                        if (hijriDate.isNotEmpty()) {
+                            Text(
+                                text = hijriDate,
+                                color = Color.White.copy(alpha = 0.6f),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
+                    }
                     
                     Divider(color = Color.White.copy(alpha = 0.15f))
                     

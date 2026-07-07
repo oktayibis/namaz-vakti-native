@@ -63,7 +63,8 @@ data class AladhanDayData(
 data class AladhanDate(
     val readable: String,
     val timestamp: String,
-    val gregorian: AladhanGregorian
+    val gregorian: AladhanGregorian,
+    val hijri: AladhanHijri
 )
 
 data class AladhanGregorian(
@@ -75,6 +76,19 @@ data class AladhanGregorian(
 data class AladhanMonth(
     val number: Int,
     val en: String
+)
+
+data class AladhanHijri(
+    val date: String, // "20-01-1448"
+    val day: String,
+    val month: AladhanHijriMonth,
+    val year: String
+)
+
+data class AladhanHijriMonth(
+    val number: Int,
+    val en: String,
+    val ar: String
 )
 
 object PrayerCalculator {
@@ -126,7 +140,7 @@ object PrayerCalculator {
         
         val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
         val methodId = prefs.getInt("calculation_method", 13) // Default to Diyanet (approximated)
-        val schoolId = prefs.getInt("asr_madhab", 1) // Default to Hanafi
+        val schoolId = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (methodId == 1) 1 else 0)
         
         val method = when (methodId) {
             13, 3 -> CalculationMethod.MUSLIM_WORLD_LEAGUE
@@ -235,7 +249,7 @@ object PrayerCalculator {
         scope.launch {
             try {
                 val method = prefs.getInt("calculation_method", 13)
-                val school = prefs.getInt("asr_madhab", 1)
+                val school = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (method == 1) 1 else 0)
                 
                 val urlString = "https://api.aladhan.com/v1/calendar/${year}?latitude=${location.latitude}&longitude=${location.longitude}&method=${method}&school=${school}"
                 val url = URL(urlString)
@@ -276,7 +290,7 @@ object PrayerCalculator {
         val cacheFile = File(context.cacheDir, cacheFilename)
         val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
         val method = prefs.getInt("calculation_method", 13)
-        val school = prefs.getInt("asr_madhab", 1)
+        val school = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (method == 1) 1 else 0)
         
         return withContext(Dispatchers.IO) {
             try {
@@ -402,6 +416,31 @@ object PrayerCalculator {
         }
         
         return null
+    }
+
+    fun getHijriDateString(context: Context, location: LocationData, date: Date): String? {
+        val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
+        val calendar = Calendar.getInstance(tz)
+        calendar.time = date
+        
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val year = calendar.get(Calendar.YEAR)
+        
+        val cacheFilename = "namaz_cache_${location.id}_${year}.json"
+        val response = loadAnnualCache(context, cacheFilename) ?: return null
+        val data = response.data ?: return null
+        
+        val monthKey = month.toString()
+        val monthList = data[monthKey] ?: return null
+        
+        val dayStr = String.format("%02d", day)
+        val monthStr = String.format("%02d", month)
+        val dateKey = "$dayStr-$monthStr-$year"
+        
+        val dayData = monthList.firstOrNull { it.date.gregorian.date == dateKey } ?: return null
+        val h = dayData.date.hijri
+        return "${h.day} ${h.month.en} ${h.year}"
     }
 
     fun clearCache(context: Context) {
