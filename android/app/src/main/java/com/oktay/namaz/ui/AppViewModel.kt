@@ -64,6 +64,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val _hijriDateString = MutableStateFlow("")
     val hijriDateString: StateFlow<String> = _hijriDateString.asStateFlow()
 
+    private val _gregorianDateString = MutableStateFlow("")
+    val gregorianDateString: StateFlow<String> = _gregorianDateString.asStateFlow()
+
     private val _isDetectingLocation = MutableStateFlow(false)
     val isDetectingLocation: StateFlow<Boolean> = _isDetectingLocation.asStateFlow()
 
@@ -78,40 +81,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private var timerJob: Job? = null
 
-    // Prayer-time math reads/parses the annual calendar cache and talks to
-    // AlarmManager; run all of it serially off the main thread so taps and
-    // recompositions never wait on it.
+    // Serial dispatcher for prayer-time calculations and alarm scheduling
     private val workDispatcher = Dispatchers.Default.limitedParallelism(1)
-
-    private val cacheReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "com.oktay.namaz.ACTION_CACHE_UPDATED") {
-                updateTimes()
-                saveLocations()
-            }
-        }
-    }
 
     init {
         loadData()
         startTimer()
-        
-        // Register receiver for background cache updates
-        val filter = IntentFilter("com.oktay.namaz.ACTION_CACHE_UPDATED")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(cacheReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            context.registerReceiver(cacheReceiver, filter)
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        try {
-            context.unregisterReceiver(cacheReceiver)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     fun loadData() {
@@ -261,7 +236,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         methodId: Int,
         onComplete: () -> Unit
     ) {
-        _onboardingLoading.value = true
         val schoolId = if (methodId == 1) 1 else 0
         viewModelScope.launch {
             prefs.edit()
@@ -269,17 +243,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 .putInt("asr_madhab", schoolId)
                 .apply()
             
-            // Clear any old cache files
             PrayerCalculator.clearCache(context)
             
-            // Attempt to pre-fetch the annual calendar
-            val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-            PrayerCalculator.fetchYearCalendar(context, location, currentYear)
-            
-            _onboardingLoading.value = false
-            
-            // Add location and complete onboarding even if offline fetch fails,
-            // fallback mathematical calculations will be used.
             addLocation(location)
             _showFirstLaunchLocationRequest.value = false
             onComplete()
@@ -334,7 +299,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(workDispatcher) {
             _todayTimes.value = PrayerCalculator.getPrayerTimesList(context, active, Date())
             _progressInfo.value = PrayerCalculator.getProgressInfo(context, active)
-            _hijriDateString.value = PrayerCalculator.getHijriDateString(context, active, Date()) ?: ""
+            _hijriDateString.value = PrayerCalculator.getHijriDateString(context, active, Date())
+            _gregorianDateString.value = PrayerCalculator.getGregorianDateString(context, active, Date())
 
             updateTimerTick()
         }

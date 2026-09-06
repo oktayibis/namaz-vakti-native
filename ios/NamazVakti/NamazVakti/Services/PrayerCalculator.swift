@@ -48,106 +48,17 @@ struct PrayerProgressInfo {
     let nextPrayerDate: Date
 }
 
-// Aladhan API DTOs (Annual Response)
-struct AladhanApiResponse: Codable {
-    let code: Int
-    let status: String
-    let data: [String: [AladhanDayData]]? // Key is month string "1" to "12"
-}
-
-struct AladhanDayData: Codable {
-    let timings: [String: String]
-    let date: AladhanDateInfo
-}
-
-struct AladhanDateInfo: Codable {
-    let readable: String
-    let timestamp: String
-    let gregorian: AladhanGregorianInfo
-    let hijri: AladhanHijriInfo
-}
-
-struct AladhanGregorianInfo: Codable {
-    let date: String // "04-07-2026"
-    let month: AladhanMonthInfo
-    let year: String
-}
-
-struct AladhanMonthInfo: Codable {
-    let number: Int
-    let en: String
-}
-
-struct AladhanHijriInfo: Codable {
-    let date: String // "20-01-1448"
-    let day: String
-    let month: AladhanHijriMonthInfo
-    let year: String
-}
-
-struct AladhanHijriMonthInfo: Codable {
-    let number: Int
-    let en: String
-    let ar: String
-}
-
 class PrayerCalculator {
     static let shared = PrayerCalculator()
     
     private let defaults = UserDefaults(suiteName: "group.com.oktay.namaz") ?? UserDefaults.standard
-    private let queue = DispatchQueue(label: "com.oktay.namaz.calculator", qos: .background)
-
-    // In-memory copy of the parsed annual calendar; the raw JSON is 1-2 MB and
-    // callers (widget timeline, notification scheduling, countdown) would otherwise
-    // re-decode it from UserDefaults on every single call.
-    private let cacheLock = NSLock()
-    private var memoryCache: [String: AladhanApiResponse] = [:]
 
     private init() {}
 
-    private func loadAnnualCache(forKey cacheKey: String) -> AladhanApiResponse? {
-        cacheLock.lock()
-        if let cached = memoryCache[cacheKey] {
-            cacheLock.unlock()
-            return cached
-        }
-        cacheLock.unlock()
-
-        guard let jsonString = defaults.string(forKey: cacheKey),
-              let jsonData = jsonString.data(using: .utf8),
-              let response = try? JSONDecoder().decode(AladhanApiResponse.self, from: jsonData),
-              response.code == 200, response.data != nil else {
-            return nil
-        }
-
-        cacheLock.lock()
-        memoryCache[cacheKey] = response
-        cacheLock.unlock()
-        return response
-    }
-
-    private func invalidateMemoryCache(forKey key: String? = nil) {
-        cacheLock.lock()
-        if let key = key {
-            memoryCache.removeValue(forKey: key)
-        } else {
-            memoryCache.removeAll()
-        }
-        cacheLock.unlock()
-    }
-    
-    func calculateLocalPrayerTimes(for location: LocationData, date: Date) -> [PrayerType: Date]? {
-        let coordinates = Coordinates(latitude: location.latitude, longitude: location.longitude)
-        
-        let cal = Calendar(identifier: .gregorian)
-        guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
-        var targetCal = cal
-        targetCal.timeZone = tz
-        let components = targetCal.dateComponents([.year, .month, .day], from: date)
-        
+    private func getCalculationParameters(latitude: Double = 39.0) -> CalculationParameters {
         var methodId = defaults.integer(forKey: "calculation_method")
         if defaults.object(forKey: "calculation_method") == nil {
-            methodId = 13 // Default to Diyanet (approximated)
+            methodId = 13 // Default to Diyanet
         }
         
         var schoolId = defaults.integer(forKey: "asr_madhab")
@@ -155,18 +66,61 @@ class PrayerCalculator {
             schoolId = (methodId == 1) ? 1 : 0
         }
         
-        let method: CalculationMethod
+        var params: CalculationParameters
         switch methodId {
-        case 13, 3: method = .muslimWorldLeague
-        case 2: method = .northAmerica
-        case 4: method = .ummAlQura
-        case 5: method = .egyptian
-        case 1: method = .karachi
-        default: method = .muslimWorldLeague
+        case 13:
+            // Türkiye Diyanet İşleri Başkanlığı:
+            if latitude > 48.0 {
+                // Avrupa / İskandinavya (Yüksek enlem): Diyanet 16.0° Yatsı açısı ve özel temkinler kullanır
+                params = CalculationMethod.other.params
+                params.fajrAngle = 18.0
+                params.ishaAngle = 16.0
+                params.adjustments = PrayerAdjustments(fajr: -1, sunrise: -7, dhuhr: 5, asr: 5, maghrib: 9, isha: 3)
+                params.highLatitudeRule = .twilightAngle
+            } else {
+                params = CalculationMethod.turkey.params
+                params.adjustments = PrayerAdjustments(asr: 1, maghrib: 1, isha: 2)
+                params.highLatitudeRule = .twilightAngle
+            }
+        case 1:
+            params = CalculationMethod.karachi.params
+        case 2:
+            params = CalculationMethod.northAmerica.params
+        case 4:
+            params = CalculationMethod.ummAlQura.params
+        case 5:
+            params = CalculationMethod.egyptian.params
+        case 8, 16:
+            params = CalculationMethod.dubai.params
+        case 9:
+            params = CalculationMethod.kuwait.params
+        case 10:
+            params = CalculationMethod.qatar.params
+        case 11:
+            params = CalculationMethod.singapore.params
+        case 15:
+            params = CalculationMethod.moonsightingCommittee.params
+        default:
+            params = CalculationMethod.muslimWorldLeague.params
         }
         
-        var params = method.params
         params.madhab = (schoolId == 1) ? .hanafi : .shafi
+        return params
+    }
+    
+    /**
+     Tamamen çevrimdışı, anlık (0 ms) ve yüksek hassasiyetli namaz vakti hesaplama motoru.
+     Ağ bağımlılığı olmadan verilen koordinat, saat dilimi ve tarihe göre vakitleri üretir.
+     */
+    func calculatePrayerTimes(for location: LocationData, date: Date) -> [PrayerType: Date]? {
+        let coordinates = Coordinates(latitude: location.latitude, longitude: location.longitude)
+        
+        guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
+        var targetCal = Calendar(identifier: .gregorian)
+        targetCal.timeZone = tz
+        let components = targetCal.dateComponents([.year, .month, .day], from: date)
+        
+        let params = getCalculationParameters(latitude: location.latitude)
         
         guard let prayerTimes = PrayerTimes(coordinates: coordinates, date: components, calculationParameters: params) else {
             return nil
@@ -181,168 +135,11 @@ class PrayerCalculator {
             .isha: prayerTimes.isha
         ]
     }
-    
-    func calculatePrayerTimes(for location: LocationData, date: Date) -> [PrayerType: Date]? {
-        guard let tz = TimeZone(identifier: location.timezoneIdentifier) else {
-            return calculateLocalPrayerTimes(for: location, date: date)
-        }
-        
-        let cal = Calendar(identifier: .gregorian)
-        var targetCal = cal
-        targetCal.timeZone = tz
-        
-        let components = targetCal.dateComponents([.year, .month, .day], from: date)
-        guard let day = components.day, let month = components.month, let year = components.year else {
-            return calculateLocalPrayerTimes(for: location, date: date)
-        }
-        
-        let cacheKey = "namaz_cache_\(location.id.uuidString)_\(year)"
-        
-        if let response = loadAnnualCache(forKey: cacheKey),
-           let data = response.data {
-            let monthKey = String(month)
-            if let monthList = data[monthKey] {
-                let dayStr = String(format: "%02d", day)
-                let monthStr = String(format: "%02d", month)
-                let dateKey = "\(dayStr)-\(monthStr)-\(year)"
 
-                if let dayData = monthList.first(where: { $0.date.gregorian.date == dateKey }) {
-                    var parsedTimes: [PrayerType: Date] = [:]
-
-                    let formatter = DateFormatter()
-                    formatter.dateFormat = "dd-MM-yyyy HH:mm"
-                    formatter.timeZone = tz
-                    formatter.locale = Locale(identifier: "en_US_POSIX")
-
-                    let keyMapping: [PrayerType: String] = [
-                        .fajr: "Fajr",
-                        .sunrise: "Sunrise",
-                        .dhuhr: "Dhuhr",
-                        .asr: "Asr",
-                        .maghrib: "Maghrib",
-                        .isha: "Isha"
-                    ]
-
-                    for (type, apiKey) in keyMapping {
-                        if let rawTime = dayData.timings[apiKey] {
-                            let cleanTime = rawTime.components(separatedBy: " ")[0]
-                            let fullDateStr = "\(dateKey) \(cleanTime)"
-                            if let parsedDate = formatter.date(from: fullDateStr) {
-                                parsedTimes[type] = parsedDate
-                            }
-                        }
-                    }
-
-                    if parsedTimes.count == 6 {
-                        return parsedTimes
-                    }
-                }
-            }
-        }
-        
-        // Trigger background fetch if not already in cache
-        triggerCacheFetch(for: location, year: year)
-        
-        // Fallback to local offline calculation
-        return calculateLocalPrayerTimes(for: location, date: date)
+    func calculateLocalPrayerTimes(for location: LocationData, date: Date) -> [PrayerType: Date]? {
+        return calculatePrayerTimes(for: location, date: date)
     }
-    
-    private func triggerCacheFetch(for location: LocationData, year: Int) {
-        let cacheKey = "namaz_cache_\(location.id.uuidString)_\(year)"
-        let fetchingKey = "fetching_\(location.id.uuidString)_\(year)"
-        
-        if defaults.bool(forKey: fetchingKey) { return }
-        defaults.set(true, forKey: fetchingKey)
-        
-        queue.async {
-            var methodId = self.defaults.integer(forKey: "calculation_method")
-            if self.defaults.object(forKey: "calculation_method") == nil {
-                methodId = 13 // Default to Diyanet (approximated)
-            }
-            
-            var schoolId = self.defaults.integer(forKey: "asr_madhab")
-            if self.defaults.object(forKey: "asr_madhab") == nil {
-                schoolId = (methodId == 1) ? 1 : 0
-            }
-            
-            let urlString = "https://api.aladhan.com/v1/calendar/\(year)?latitude=\(location.latitude)&longitude=\(location.longitude)&method=\(methodId)&school=\(schoolId)"
-            guard let url = URL(string: urlString) else {
-                self.defaults.removeObject(forKey: fetchingKey)
-                return
-            }
-            
-            let task = URLSession.shared.dataTask(with: url) { data, response, error in
-                defer {
-                    self.defaults.removeObject(forKey: fetchingKey)
-                }
-                
-                guard let data = data, error == nil else { return }
-                
-                do {
-                    let responseObj = try JSONDecoder().decode(AladhanApiResponse.self, from: data)
-                    if responseObj.code == 200, responseObj.data != nil {
-                        if let jsonString = String(data: data, encoding: .utf8) {
-                            self.defaults.set(jsonString, forKey: cacheKey)
-                            self.invalidateMemoryCache(forKey: cacheKey)
 
-                            // Notify AppViewModel on Main Queue
-                            DispatchQueue.main.async {
-                                NotificationCenter.default.post(name: Notification.Name("com.oktay.namaz.ACTION_CACHE_UPDATED"), object: nil)
-                            }
-                        }
-                    }
-                } catch {
-                    print("Failed to parse network Aladhan response: \(error)")
-                }
-            }
-            task.resume()
-        }
-    }
-    
-    func fetchYearCalendar(for location: LocationData, year: Int, completion: @escaping (Bool) -> Void) {
-        let cacheKey = "namaz_cache_\(location.id.uuidString)_\(year)"
-        
-        var methodId = self.defaults.integer(forKey: "calculation_method")
-        if self.defaults.object(forKey: "calculation_method") == nil {
-            methodId = 13 // Default to Diyanet
-        }
-        
-        var schoolId = self.defaults.integer(forKey: "asr_madhab")
-        if self.defaults.object(forKey: "asr_madhab") == nil {
-            schoolId = (methodId == 1) ? 1 : 0
-        }
-        
-        let urlString = "https://api.aladhan.com/v1/calendar/\(year)?latitude=\(location.latitude)&longitude=\(location.longitude)&method=\(methodId)&school=\(schoolId)"
-        guard let url = URL(string: urlString) else {
-            completion(false)
-            return
-        }
-        
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else {
-                completion(false)
-                return
-            }
-            
-            do {
-                let responseObj = try JSONDecoder().decode(AladhanApiResponse.self, from: data)
-                if responseObj.code == 200, responseObj.data != nil {
-                    if let jsonString = String(data: data, encoding: .utf8) {
-                        self.defaults.set(jsonString, forKey: cacheKey)
-                        self.invalidateMemoryCache(forKey: cacheKey)
-                        completion(true)
-                        return
-                    }
-                }
-                completion(false)
-            } catch {
-                print("Failed to parse network response in onboarding: \(error)")
-                completion(false)
-            }
-        }
-        task.resume()
-    }
-    
     func getPrayerTimesList(for location: LocationData, date: Date) -> [PrayerTimeItem] {
         guard let times = calculatePrayerTimes(for: location, date: date),
               let tz = TimeZone(identifier: location.timezoneIdentifier) else {
@@ -430,37 +227,39 @@ class PrayerCalculator {
         return nil
     }
     
-    func getHijriDateString(for location: LocationData, date: Date) -> String? {
+    /**
+     Diyanet takvimiyle uyumlu Türkçe Hicri tarih üretimi (örn: "24 Rebiülevvel 1448").
+     */
+    func getHijriDateString(for location: LocationData, date: Date = Date()) -> String? {
         guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
         
-        let cal = Calendar(identifier: .gregorian)
-        var targetCal = cal
-        targetCal.timeZone = tz
+        var cal = Calendar(identifier: .islamicUmmAlQura)
+        cal.timeZone = tz
         
-        let components = targetCal.dateComponents([.year, .month, .day], from: date)
+        let components = cal.dateComponents([.day, .month, .year], from: date)
         guard let day = components.day, let month = components.month, let year = components.year else {
             return nil
         }
         
-        let cacheKey = "namaz_cache_\(location.id.uuidString)_\(year)"
-        
-        guard let response = loadAnnualCache(forKey: cacheKey),
-              let data = response.data else {
-            return nil
-        }
-        
-        let monthKey = String(month)
-        if let monthList = data[monthKey] {
-            let dayStr = String(format: "%02d", day)
-            let monthStr = String(format: "%02d", month)
-            let dateKey = "\(dayStr)-\(monthStr)-\(year)"
-            
-            if let dayData = monthList.first(where: { $0.date.gregorian.date == dateKey }) {
-                let h = dayData.date.hijri
-                return "\(h.day) \(h.month.en) \(h.year)"
-            }
-        }
-        return nil
+        let turkishHijriMonths = [
+            "Muharrem", "Safer", "Rebiülevvel", "Rebiülahir",
+            "Cemaziyelevvel", "Cemaziyelahir", "Recep", "Şaban",
+            "Ramazan", "Şevval", "Zilkade", "Zilhicce"
+        ]
+        let monthName = (month >= 1 && month <= 12) ? turkishHijriMonths[month - 1] : ""
+        return "\(day) \(monthName) \(year)"
+    }
+    
+    /**
+     Türkçe Miladi tarih formatı (örn: "6 Eylül 2026, Pazar").
+     */
+    func getGregorianDateString(for location: LocationData, date: Date = Date()) -> String? {
+        guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM yyyy, EEEE"
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.timeZone = tz
+        return formatter.string(from: date)
     }
     
     func clearCache() {
@@ -470,6 +269,11 @@ class PrayerCalculator {
                 defaults.removeObject(forKey: key)
             }
         }
-        invalidateMemoryCache()
+    }
+
+    func fetchYearCalendar(for location: LocationData, year: Int, completion: @escaping (Bool) -> Void) {
+        DispatchQueue.main.async {
+            completion(true)
+        }
     }
 }

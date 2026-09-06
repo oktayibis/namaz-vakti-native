@@ -138,8 +138,7 @@ struct OnboardingView: View {
                                             Text("Mevcut Konumu Kullan")
                                         }
                                     }
-                                    .font(.system(.headline, design: .rounded))
-                                    .fontWeight(.bold)
+                                    .font(.system(.headline, design: .rounded).weight(.bold))
                                     .foregroundColor(.black)
                                     .frame(maxWidth: .infinity)
                                     .padding()

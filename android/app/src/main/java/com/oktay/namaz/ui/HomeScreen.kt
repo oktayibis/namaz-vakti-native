@@ -236,22 +236,33 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .padding(horizontal = 16.dp, vertical = 14.dp)
                     ) {
-                        Text(
-                            text = "Bugün Vakitler",
-                            color = Color.White.copy(alpha = 0.9f),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Column {
+                            Text(
+                                text = "Bugün Vakitler",
+                                color = Color.White.copy(alpha = 0.95f),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            val gregorianDate by viewModel.gregorianDateString.collectAsState()
+                            if (gregorianDate.isNotEmpty()) {
+                                Text(
+                                    text = gregorianDate,
+                                    color = Color.White.copy(alpha = 0.65f),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Normal
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.weight(1f))
                         val hijriDate by viewModel.hijriDateString.collectAsState()
                         if (hijriDate.isNotEmpty()) {
                             Text(
                                 text = hijriDate,
-                                color = Color.White.copy(alpha = 0.6f),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Normal
+                                color = AmberAccent.copy(alpha = 0.95f),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }

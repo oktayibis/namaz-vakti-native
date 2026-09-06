@@ -72,14 +72,22 @@ struct HomeView: View {
                             // Today's Prayer Times Card
                             VStack(spacing: 0) {
                                 HStack {
-                                    Text("Bugün Vakitler")
-                                        .font(.system(.headline, design: .rounded))
-                                        .foregroundColor(.white.opacity(0.9))
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Bugün Vakitler")
+                                            .font(.system(.headline, design: .rounded))
+                                            .foregroundColor(.white.opacity(0.95))
+                                        if let gregorianDate = viewModel.gregorianDateString {
+                                            Text(gregorianDate)
+                                                .font(.system(.caption, design: .rounded))
+                                                .foregroundColor(.white.opacity(0.65))
+                                        }
+                                    }
                                     Spacer()
                                     if let hijriDate = viewModel.hijriDateString {
                                         Text(hijriDate)
                                             .font(.system(.subheadline, design: .rounded))
-                                            .foregroundColor(.white.opacity(0.6))
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.amberColor)
                                     }
                                 }
                                 .padding(.horizontal)

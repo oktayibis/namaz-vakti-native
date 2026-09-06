@@ -16,6 +16,7 @@ class AppViewModel: ObservableObject {
     @Published var timeRemainingString: String = "00:00:00"
     @Published var progress: Double = 0.0
     @Published var hijriDateString: String? = nil
+    @Published var gregorianDateString: String? = nil
     
     @Published var isDetectingLocation = false
     @Published var showFirstLaunchLocationRequest = false
@@ -29,25 +30,6 @@ class AppViewModel: ObservableObject {
     private init() {
         loadData()
         startTimer()
-        
-        // Listen for background Aladhan API cache updates
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(cacheUpdated),
-            name: Notification.Name("com.oktay.namaz.ACTION_CACHE_UPDATED"),
-            object: nil
-        )
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    @objc private func cacheUpdated() {
-        DispatchQueue.main.async {
-            self.updateTimes()
-            self.saveLocations()
-        }
     }
     
     func loadData() {
@@ -298,6 +280,7 @@ class AppViewModel: ObservableObject {
         todayTimes = PrayerCalculator.shared.getPrayerTimesList(for: active, date: Date())
         progressInfo = PrayerCalculator.shared.getProgressInfo(for: active)
         hijriDateString = PrayerCalculator.shared.getHijriDateString(for: active, date: Date())
+        gregorianDateString = PrayerCalculator.shared.getGregorianDateString(for: active, date: Date())
         
         updateTimerTick()
     }

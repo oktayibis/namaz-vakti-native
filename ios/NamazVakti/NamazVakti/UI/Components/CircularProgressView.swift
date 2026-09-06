@@ -43,11 +43,18 @@ struct CircularProgressView: View {
                     .foregroundColor(.white.opacity(0.7))
                     .tracking(0.5)
                 
-                Text(timeRemaining)
-                    .font(.system(size: 38, weight: .bold, design: .monospaced))
-                    .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.2), radius: 2)
-                    .contentTransition(.numericText()) // Smooth digital transition in iOS 17
+                if #available(iOS 16.0, *) {
+                    Text(timeRemaining)
+                        .font(.system(size: 38, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.2), radius: 2)
+                        .contentTransition(.numericText())
+                } else {
+                    Text(timeRemaining)
+                        .font(.system(size: 38, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.2), radius: 2)
+                }
             }
             .padding(25)
         }
