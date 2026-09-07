@@ -150,6 +150,7 @@ struct HomeView: View {
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
             viewModel.updateTimes()
+            AnalyticsService.shared.logScreen(name: "HomeView")
         }
     }
     

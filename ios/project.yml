@@ -7,6 +7,9 @@ packages:
   Adhan:
     url: https://github.com/batoulapps/Adhan-Swift
     from: 1.2.0
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 11.0.0
 
 settings:
   base:
@@ -14,6 +17,32 @@ settings:
     CURRENT_PROJECT_VERSION: 1
     SWIFT_VERSION: 5.9
     DEVELOPMENT_TEAM: "2ZG8A6RT9F"
+    DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+    # Automatic signing resolves Development vs. Distribution at build/export time.
+    # Without these, XcodeGen injects the legacy "iPhone Developer" identity into
+    # Release as well, which blocks a distribution archive.
+    CODE_SIGN_STYLE: Automatic
+  configs:
+    debug:
+      CODE_SIGN_IDENTITY: "Apple Development"
+    release:
+      CODE_SIGN_IDENTITY: "Apple Distribution"
+
+schemes:
+  NamazVakti:
+    build:
+      targets:
+        NamazVakti: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
 
 targets:
   NamazVakti:
@@ -26,9 +55,34 @@ targets:
       base:
         INFOPLIST_FILE: NamazVakti/NamazVakti/Info.plist
         CODE_SIGN_ENTITLEMENTS: NamazVakti/NamazVakti/NamazVakti.entitlements
+      # XcodeGen's application preset injects the legacy "iPhone Developer"
+      # identity at target level, which outranks the project-level setting above.
+      configs:
+        debug:
+          CODE_SIGN_IDENTITY: "Apple Development"
+        release:
+          CODE_SIGN_IDENTITY: "Apple Distribution"
     dependencies:
       - package: Adhan
+      - package: Firebase
+        product: FirebaseAnalytics
+      - package: Firebase
+        product: FirebaseCrashlytics
       - target: NamazVaktiWidget
+    postBuildScripts:
+      - script: |
+          RUN_SCRIPT="${BUILD_DIR%Build/*}SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run"
+          if [ -f "$RUN_SCRIPT" ]; then
+            "$RUN_SCRIPT"
+          fi
+        name: "[Crashlytics] Run Script"
+        inputFiles:
+          - "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}"
+          - "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}"
+          - "${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist"
+          - "$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist"
+          - "$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)"
+        basedOnDependencyAnalysis: false
 
   NamazVaktiWidget:
     type: app-extension
@@ -38,6 +92,11 @@ targets:
       - path: NamazVaktiWidget
       - path: NamazVakti/NamazVakti/Models/LocationData.swift
       - path: NamazVakti/NamazVakti/Services/PrayerCalculator.swift
+      # The app's .lproj bundles, so the widget can localize its gallery entry and
+      # prayer names from its own Bundle.main instead of shipping Turkish literals.
+      # LanguageManager itself is deliberately NOT compiled here: it depends on
+      # AnalyticsService/Firebase, which must not be pulled into the extension.
+      - path: NamazVakti/NamazVakti/Resources
     settings:
       base:
         INFOPLIST_FILE: NamazVaktiWidget/Info.plist

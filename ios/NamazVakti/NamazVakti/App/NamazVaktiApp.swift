@@ -1,6 +1,7 @@
 import SwiftUI
 import BackgroundTasks
 import WidgetKit
+import FirebaseCore
 
 @main
 struct NamazVaktiApp: App {
@@ -11,6 +12,9 @@ struct NamazVaktiApp: App {
     static let refreshTaskId = "com.okib.NamazVakti.refresh"
 
     init() {
+        // Initialize Firebase Analytics and Crashlytics
+        FirebaseApp.configure()
+
         // Customize appearance for dark UI
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).overrideUserInterfaceStyle = .dark
 

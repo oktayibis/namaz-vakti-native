@@ -6,6 +6,8 @@
 	<string>Namaz Vakti</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +17,9 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için konumunuza ihtiyaç duyuyoruz.</string>
+	<string>Bulunduğunuz şehrin namaz vakitlerini doğru hesaplayabilmek için konumunuza ihtiyaç duyuyoruz.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

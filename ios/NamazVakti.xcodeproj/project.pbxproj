@@ -8,15 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		158771C3B2BFC0F6F276C574 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D4EE2273B167D58A5B32F /* NotificationManager.swift */; };
+		16FE8E602C3B220BF2F8C923 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 594C7941C59F4009A58FB621 /* FirebaseAnalytics */; };
 		17E92DF4EE19FA9917A78AD6 /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F696707DAACB0582D17DF0 /* LocationData.swift */; };
+		186DB6D7E730458840A32AA3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 18FFEE211A626A6E12B44A7D /* InfoPlist.strings */; };
 		1D00C0A32F786980E3A0594D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B822C367FBBB455B936AFCA /* Assets.xcassets */; };
 		1DE499D38DED0807803644C4 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AE7350DB02C44B751685117A /* Localizable.strings */; };
+		234CB37DF01C054A606D0EF6 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBE0EBF1E3F5C1401E45CB2 /* LanguageManager.swift */; };
 		29728A080E2C5D516A045C03 /* NamazVaktiWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAEFBB30DAA7582817362C6E /* NamazVaktiWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3C3B661AB64A9F14DAF922FF /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC1B83252700DC5916F4DE0 /* LocationManager.swift */; };
 		4339B0740D02801588BCCB87 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBE0EBF1E3F5C1401E45CB2 /* LanguageManager.swift */; };
 		51D86F9F646200A829B5DA4C /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F80456A69A10778917A741 /* AppViewModel.swift */; };
 		77592738EF2CDCD457CF08CE /* Gradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9A7FE9D22A14485EA1A0AD /* Gradients.swift */; };
+		7B626C496A4FF4CEA1C4BBAA /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = AB00671C012A10326F127C2D /* FirebaseCrashlytics */; };
 		87DB2567452D4EE4DBCDE727 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = B256C97EDF1CF24C10C7C344 /* Adhan */; };
+		98701841383AD10A0C2D67E8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4694B963D2EFCF2403C91379 /* GoogleService-Info.plist */; };
+		9D7C42E26AAAAF2B02B7DFBC /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 701B6303363787E6BCEC82D2 /* AnalyticsService.swift */; };
+		9DA99155E6E5D6293D6953DB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 14EDACC8D6382A5B4157794A /* PrivacyInfo.xcprivacy */; };
 		9FDA3087E34B62DA3453A903 /* LocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786A941015363EDBE0194F1C /* LocationView.swift */; };
 		A0854D8EF5CABA6AD715AD49 /* NamazVaktiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 208032D5AE74C517A0A24C29 /* NamazVaktiApp.swift */; };
 		A2AE68FA89CD108445E1A60D /* NamazVaktiWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD089C1958C789AD8D843505 /* NamazVaktiWidget.swift */; };
@@ -27,6 +34,7 @@
 		B739F824106C5BA9EB6F4972 /* CalculationMethodRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99C6C15E7ABC48EBA0BC8B6F /* CalculationMethodRegistry.swift */; };
 		B74581A9B6E92D4B935645AE /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 8A0924ED36C8860079D2C7A7 /* Adhan */; };
 		C2D818AB7127970DB5749EF3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFD136E73B0D5708316CA0A /* HomeView.swift */; };
+		D2B79C47E072E76676D828DB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AE7350DB02C44B751685117A /* Localizable.strings */; };
 		D62C0C7F5CC8CC6F7EE387AE /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B4B2A6490F2D05E3E82AD2 /* OnboardingView.swift */; };
 		E15FF3AC254FDB3171AFF858 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D73E07C1C6778E855907B308 /* PrivacyInfo.xcprivacy */; };
 		E35CB7C3B9DD3904F167052E /* PrayerCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFDF97A4D661BCDCBB7F9ED /* PrayerCalculator.swift */; };
@@ -62,15 +70,18 @@
 		09F696707DAACB0582D17DF0 /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
 		0AF865227CA2DE5C7255942B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0B822C367FBBB455B936AFCA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		14EDACC8D6382A5B4157794A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		208032D5AE74C517A0A24C29 /* NamazVaktiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamazVaktiApp.swift; sourceTree = "<group>"; };
 		243BE1D87466D1B48C61FFC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2D9A7FE9D22A14485EA1A0AD /* Gradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gradients.swift; sourceTree = "<group>"; };
 		3BD9B010CB0ADF68FB98E5CB /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
+		4694B963D2EFCF2403C91379 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		543D4EE2273B167D58A5B32F /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		57B4B2A6490F2D05E3E82AD2 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		5A8C956A44F4D3D6033469D2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		684009ED3E4E6A3950FC2926 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FFD136E73B0D5708316CA0A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		701B6303363787E6BCEC82D2 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		786A941015363EDBE0194F1C /* LocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationView.swift; sourceTree = "<group>"; };
 		86092AE5761047ADC98D1945 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9050E5EC777B3E00354752E1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -107,6 +118,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B74581A9B6E92D4B935645AE /* Adhan in Frameworks */,
+				16FE8E602C3B220BF2F8C923 /* FirebaseAnalytics in Frameworks */,
+				7B626C496A4FF4CEA1C4BBAA /* FirebaseCrashlytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +132,7 @@
 				977D8625CFE97B4F3B03ED88 /* Info.plist */,
 				EBAD6B2F839A67966CC457CB /* NamazVaktiWidget.entitlements */,
 				FD089C1958C789AD8D843505 /* NamazVaktiWidget.swift */,
+				14EDACC8D6382A5B4157794A /* PrivacyInfo.xcprivacy */,
 			);
 			path = NamazVaktiWidget;
 			sourceTree = "<group>";
@@ -126,6 +140,7 @@
 		31775666E97EF765517BD6C0 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				701B6303363787E6BCEC82D2 /* AnalyticsService.swift */,
 				E0F80456A69A10778917A741 /* AppViewModel.swift */,
 				FFBE0EBF1E3F5C1401E45CB2 /* LanguageManager.swift */,
 				CDC1B83252700DC5916F4DE0 /* LocationManager.swift */,
@@ -157,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				0B822C367FBBB455B936AFCA /* Assets.xcassets */,
+				4694B963D2EFCF2403C91379 /* GoogleService-Info.plist */,
 				243BE1D87466D1B48C61FFC7 /* Info.plist */,
 				0100669DA5F19177131DBE63 /* NamazVakti.entitlements */,
 				D73E07C1C6778E855907B308 /* PrivacyInfo.xcprivacy */,
@@ -228,6 +244,7 @@
 				129E75A5669AB08959DDAB87 /* Resources */,
 				9389DF427958D15D875CEC0F /* Frameworks */,
 				7E7D8DBC1CF7CF0F17F5492F /* Embed Foundation Extensions */,
+				33480C276E3BFC0EA074005D /* [Crashlytics] Run Script */,
 			);
 			buildRules = (
 			);
@@ -237,6 +254,8 @@
 			name = NamazVakti;
 			packageProductDependencies = (
 				8A0924ED36C8860079D2C7A7 /* Adhan */,
+				594C7941C59F4009A58FB621 /* FirebaseAnalytics */,
+				AB00671C012A10326F127C2D /* FirebaseCrashlytics */,
 			);
 			productName = NamazVakti;
 			productReference = D5DB0CF0103F49F800A8B16C /* NamazVakti.app */;
@@ -247,6 +266,7 @@
 			buildConfigurationList = ACB2CB69769D232A0D02F822 /* Build configuration list for PBXNativeTarget "NamazVaktiWidget" */;
 			buildPhases = (
 				B4BF29920DB871191339AE0F /* Sources */,
+				5A46C3F0B3AD6BD6249EAE06 /* Resources */,
 				316B725B665186777B93304D /* Frameworks */,
 			);
 			buildRules = (
@@ -272,9 +292,11 @@
 				TargetAttributes = {
 					51EED641D30DA55751C4CF41 = {
 						DevelopmentTeam = 2ZG8A6RT9F;
+						ProvisioningStyle = Automatic;
 					};
 					E6A7199ADC080381D34FB6F5 = {
 						DevelopmentTeam = 2ZG8A6RT9F;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -293,6 +315,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				BB50D33F8C9F0D551C99C098 /* XCRemoteSwiftPackageReference "Adhan-Swift" */,
+				F111C4D9A9C8B3C8B6D576CB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A00AFB31F21DA97F4A7F1FC2 /* Products */;
@@ -311,19 +334,58 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D00C0A32F786980E3A0594D /* Assets.xcassets in Resources */,
+				98701841383AD10A0C2D67E8 /* GoogleService-Info.plist in Resources */,
 				FB00AACDE8F97ED049EF91B2 /* InfoPlist.strings in Resources */,
 				1DE499D38DED0807803644C4 /* Localizable.strings in Resources */,
 				E15FF3AC254FDB3171AFF858 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A46C3F0B3AD6BD6249EAE06 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				186DB6D7E730458840A32AA3 /* InfoPlist.strings in Resources */,
+				D2B79C47E072E76676D828DB /* Localizable.strings in Resources */,
+				9DA99155E6E5D6293D6953DB /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		33480C276E3BFC0EA074005D /* [Crashlytics] Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "[Crashlytics] Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "RUN_SCRIPT=\"${BUILD_DIR%Build/*}SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\nif [ -f \"$RUN_SCRIPT\" ]; then\n  \"$RUN_SCRIPT\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B4BF29920DB871191339AE0F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				234CB37DF01C054A606D0EF6 /* LanguageManager.swift in Sources */,
 				A2B144156C73A91CAE8C4D33 /* LocationData.swift in Sources */,
 				A2AE68FA89CD108445E1A60D /* NamazVaktiWidget.swift in Sources */,
 				B553967EA2B56D5397A25E9E /* PrayerCalculator.swift in Sources */,
@@ -334,6 +396,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D7C42E26AAAAF2B02B7DFBC /* AnalyticsService.swift in Sources */,
 				51D86F9F646200A829B5DA4C /* AppViewModel.swift in Sources */,
 				B739F824106C5BA9EB6F4972 /* CalculationMethodRegistry.swift in Sources */,
 				B1C67CBAAE9CBF3B71FA2D3F /* CircularProgressView.swift in Sources */,
@@ -422,6 +485,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -497,9 +562,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 2ZG8A6RT9F;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -551,7 +618,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = NamazVakti/NamazVakti/NamazVakti.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Distribution";
 				INFOPLIST_FILE = NamazVakti/NamazVakti/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -569,7 +636,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = NamazVakti/NamazVakti/NamazVakti.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				INFOPLIST_FILE = NamazVakti/NamazVakti/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -623,13 +690,31 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		F111C4D9A9C8B3C8B6D576CB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		594C7941C59F4009A58FB621 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F111C4D9A9C8B3C8B6D576CB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
 		8A0924ED36C8860079D2C7A7 /* Adhan */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BB50D33F8C9F0D551C99C098 /* XCRemoteSwiftPackageReference "Adhan-Swift" */;
 			productName = Adhan;
+		};
+		AB00671C012A10326F127C2D /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F111C4D9A9C8B3C8B6D576CB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 		B256C97EDF1CF24C10C7C344 /* Adhan */ = {
 			isa = XCSwiftPackageProductDependency;

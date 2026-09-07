@@ -105,6 +105,7 @@ class AppViewModel: ObservableObject {
         saveLocations()
         
         NotificationManager.shared.scheduleAllNotifications(for: location)
+        AnalyticsService.shared.logLocationSelected(cityName: location.name, country: location.country)
     }
     
     func addLocation(_ location: LocationData) {
@@ -286,6 +287,7 @@ class AppViewModel: ObservableObject {
         LanguageManager.shared.currentLanguage = code
         updateTimes()
         saveLocations()
+        AnalyticsService.shared.logLanguageChanged(language: code)
     }
     
     func updateTimes() {
