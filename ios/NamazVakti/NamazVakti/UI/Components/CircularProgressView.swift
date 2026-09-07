@@ -4,6 +4,15 @@ struct CircularProgressView: View {
     let progress: Double // 0.0 to 1.0
     let timeRemaining: String
     let nextPrayerName: String
+    var size: CGFloat = 250
+    
+    private var strokeWidth: CGFloat {
+        max(size * 0.04, 6)
+    }
+    
+    private var timeFontSize: CGFloat {
+        size * 0.152
+    }
     
     var body: some View {
         ZStack {
@@ -18,7 +27,7 @@ struct CircularProgressView: View {
             
             // Progress Track
             Circle()
-                .stroke(Color.white.opacity(0.15), lineWidth: 10)
+                .stroke(Color.white.opacity(0.15), lineWidth: strokeWidth)
             
             // Progress Fill with gradient and glow
             Circle()
@@ -30,35 +39,36 @@ struct CircularProgressView: View {
                         startAngle: .degrees(0),
                         endAngle: .degrees(360)
                     ),
-                    style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                    style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round)
                 )
                 .rotationEffect(Angle(degrees: -90))
                 .animation(.easeInOut(duration: 0.8), value: progress)
                 .shadow(color: .white.opacity(0.3), radius: 5)
             
             // Inside text info
-            VStack(spacing: 8) {
+            VStack(spacing: size < 200 ? 4 : 8) {
                 Text(nextPrayerName)
-                    .font(.system(.subheadline, design: .rounded))
+                    .font(.system(size: size < 200 ? 11 : 14, weight: .regular, design: .rounded))
                     .foregroundColor(.white.opacity(0.7))
                     .tracking(0.5)
+                    .lineLimit(1)
                 
                 if #available(iOS 16.0, *) {
                     Text(timeRemaining)
-                        .font(.system(size: 38, weight: .bold, design: .monospaced))
+                        .font(.system(size: timeFontSize, weight: .bold, design: .monospaced))
                         .foregroundColor(.white)
                         .shadow(color: .black.opacity(0.2), radius: 2)
                         .contentTransition(.numericText())
                 } else {
                     Text(timeRemaining)
-                        .font(.system(size: 38, weight: .bold, design: .monospaced))
+                        .font(.system(size: timeFontSize, weight: .bold, design: .monospaced))
                         .foregroundColor(.white)
                         .shadow(color: .black.opacity(0.2), radius: 2)
                 }
             }
-            .padding(25)
+            .padding(size * 0.1)
         }
-        .frame(width: 250, height: 250)
+        .frame(width: size, height: size)
     }
 }
 

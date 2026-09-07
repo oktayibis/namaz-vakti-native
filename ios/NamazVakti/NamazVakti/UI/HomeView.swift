@@ -43,7 +43,7 @@ struct HomeView: View {
                             
                             if isPhoneLandscape {
                                 // Dedicated Landscape / Desk Clock (StandBy) Mode
-                                landscapeDeskClockView(currentTime: currentTime)
+                                landscapeDeskClockView(currentTime: currentTime, insets: geometry.safeAreaInsets)
                             } else {
                                 // Portrait / Tablet Layout
                                 ScrollView(showsIndicators: false) {
@@ -155,9 +155,14 @@ struct HomeView: View {
     
     // Dedicated Landscape / Desk Clock (StandBy) Mode
     @ViewBuilder
-    private func landscapeDeskClockView(currentTime: String) -> some View {
-        VStack(spacing: 10) {
-            // Minimalist Top Bar
+    private func landscapeDeskClockView(currentTime: String, insets: EdgeInsets) -> some View {
+        let leadingInset = max(insets.leading, 24)
+        let trailingInset = max(insets.trailing, 24)
+        let topInset = max(insets.top, 10)
+        let bottomInset = max(insets.bottom, 10)
+        
+        VStack(spacing: 0) {
+            // Minimalist Top Bar (honoring safe area insets to clear Dynamic Island / Notch)
             HStack {
                 Button(action: { showLocations = true }) {
                     HStack(spacing: 6) {
@@ -196,24 +201,27 @@ struct HomeView: View {
                         .clipShape(Circle())
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 8)
+            .padding(.leading, leadingInset)
+            .padding(.trailing, trailingInset)
+            .padding(.top, topInset)
             
-            // 3-Column Desk Dashboard
-            HStack(alignment: .center, spacing: 12) {
-                // Column 1: Big Digital Clock & Dates
+            Spacer(minLength: 6)
+            
+            // 3-Column Desk Dashboard (Vertically Centered with generous breathing room)
+            HStack(alignment: .center, spacing: 14) {
+                // Column 1: Big Digital Clock & Dates & Active Prayer Badge
                 VStack(alignment: .leading, spacing: 6) {
                     Text(currentTime)
-                        .font(.system(size: 46, weight: .bold, design: .monospaced))
+                        .font(.system(size: 44, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundColor(.white)
-                        .minimumScaleFactor(0.8)
+                        .minimumScaleFactor(0.65)
                         .lineLimit(1)
                     
                     if let gregorianDate = viewModel.gregorianDateString {
                         Text(gregorianDate)
                             .font(.system(.subheadline, design: .rounded))
                             .fontWeight(.medium)
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(.white.opacity(0.85))
                             .lineLimit(1)
                     }
                     
@@ -230,25 +238,21 @@ struct HomeView: View {
                         }
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(Color.amberColor.opacity(0.15))
+                        .background(Color.amberColor.opacity(0.18))
                         .cornerRadius(12)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 12)
                 
-                // Column 2: Compact Circular Progress Countdown
+                // Column 2: Native Sharp Circular Progress Countdown
                 if let progressInfo = viewModel.progressInfo {
                     let nextName = progressInfo.nextPrayer.localizedName(for: languageManager.effectiveLanguageCode)
-                    VStack {
-                        CircularProgressView(
-                            progress: viewModel.progress,
-                            timeRemaining: viewModel.timeRemainingString,
-                            nextPrayerName: tr("time_remaining_label", nextName)
-                        )
-                        .scaleEffect(0.76)
-                        .frame(width: 155, height: 155)
-                    }
+                    CircularProgressView(
+                        progress: viewModel.progress,
+                        timeRemaining: viewModel.timeRemainingString,
+                        nextPrayerName: tr("time_remaining_label", nextName),
+                        size: 165
+                    )
                 }
                 
                 // Column 3: 2x3 Grid of Prayer Times
@@ -268,13 +272,14 @@ struct HomeView: View {
                         }
                     }
                 }
-                .padding(.trailing, 12)
             }
-            .padding(.horizontal, 12)
-            .padding(.top, 4)
+            .padding(.leading, leadingInset)
+            .padding(.trailing, trailingInset)
             
-            Spacer(minLength: 0)
+            Spacer(minLength: 6)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.bottom, bottomInset)
     }
     
     @ViewBuilder
