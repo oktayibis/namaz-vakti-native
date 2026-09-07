@@ -1,0 +1,79 @@
+/* French Localizable.strings */
+
+/* Prayers */
+"prayer_fajr" = "Fajr";
+"prayer_sunrise" = "Lever du soleil";
+"prayer_dhuhr" = "Dhuhr";
+"prayer_asr" = "Asr";
+"prayer_maghrib" = "Maghrib";
+"prayer_isha" = "Icha";
+
+/* Home Screen */
+"select_location" = "Sélectionner un lieu";
+"no_location_title" = "Aucun lieu ajouté";
+"no_location_desc" = "Veuillez ajouter un lieu pour calculer des horaires de prière précis.";
+"use_current_location" = "Utiliser la position actuelle";
+"search_city" = "Rechercher une ville";
+"today_prayers" = "Prières d'aujourd'hui";
+"time_until" = "%@ dans %@";
+"time_remaining_label" = "Temps restant jusqu'à %@";
+
+/* Location Screen */
+"location_management" = "Gestion des lieux";
+"search_city_placeholder" = "Rechercher une ville...";
+"detect_location" = "Détecter ma position";
+"detecting_location" = "Détection de la position...";
+"saved_locations" = "Lieux enregistrés";
+"no_saved_locations" = "Aucun lieu enregistré pour le moment.";
+"active" = "Actif";
+"delete" = "Supprimer";
+
+/* Settings Screen */
+"settings" = "Paramètres";
+"notifications" = "Notifications";
+"prayer_notifications" = "Rappels de prière";
+"notification_timing" = "Moment du rappel";
+"reminder_times" = "Heures de rappel";
+"reminder_times_footer" = "Vous pouvez ajouter jusqu'à 3 rappels différents (ex. 30 min avant et à l'heure exacte).";
+"add_reminder" = "Ajouter un rappel";
+"new_reminder_duration" = "Nouveau moment de rappel";
+"add" = "Ajouter";
+"exact_time" = "À l'heure de la prière (0 min)";
+"mins_before" = "%d minutes avant";
+"notification_permission_required" = "Autorisation de notification requise";
+"notification_permission_desc" = "Veuillez activer les autorisations de notification dans les réglages système afin de recevoir vos rappels de prière à temps.";
+"open_settings" = "Ouvrir les paramètres";
+
+/* Calculation Settings */
+"calculation_settings" = "Paramètres de calcul";
+"calculation_method" = "Méthode de calcul";
+"calculation_method_desc" = "Sélectionnée en fonction de votre zone géographique";
+"asr_madhab" = "Méthode pour l'Asr (Madhab)";
+"madhab_standard" = "Standard (Chaféite, Mâlikite, Hanbalite)";
+"madhab_hanafi" = "Hanafite (Ombre doublée)";
+
+/* Language Settings */
+"app_language" = "Langue de l'application";
+"language_system" = "Par défaut du système";
+"language_tr" = "Türkçe";
+"language_en" = "English";
+"language_de" = "Deutsch";
+"language_ar" = "العربية";
+"language_fr" = "Français";
+
+/* Onboarding */
+"setup_wizard" = "Assistant d'installation";
+"onboarding_step1_desc" = "Choisissez un lieu pour calculer les horaires de prière.";
+"or_search_city" = "ou recherchez une ville :";
+"onboarding_step2_desc" = "Paramètres de calcul par défaut appliqués selon votre position. Personnalisez si nécessaire :";
+"calculation_method_source" = "Méthode de calcul (Autorité)";
+"continue_btn" = "Continuer";
+"back_btn" = "Retour";
+"get_started" = "Commencer";
+"change" = "Modifier";
+"cancel" = "Annuler";
+"close" = "Fermer";
+
+/* About & Privacy */
+"about" = "À propos";
+"about_desc" = "Heures de Prière est une application 100% hors ligne, sans publicité et respectueuse de votre vie privée.";

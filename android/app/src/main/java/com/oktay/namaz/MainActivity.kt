@@ -64,11 +64,13 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            NamazVaktiTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MidnightBg
-                ) {
+            val currentLanguage by viewModel.appLanguage.collectAsState()
+            com.oktay.namaz.ui.theme.ProvideAppLanguage(languageCode = currentLanguage) {
+                NamazVaktiTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MidnightBg
+                    ) {
                     val navController = rememberNavController()
 
                     // Tracks notification permission state
@@ -147,6 +149,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 
     private fun requestLocationPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

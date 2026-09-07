@@ -1,0 +1,79 @@
+/* Arabic Localizable.strings */
+
+/* Prayers */
+"prayer_fajr" = "الفجر";
+"prayer_sunrise" = "الشروق";
+"prayer_dhuhr" = "الظهر";
+"prayer_asr" = "العصر";
+"prayer_maghrib" = "المغرب";
+"prayer_isha" = "العشاء";
+
+/* Home Screen */
+"select_location" = "اختر موقعاً";
+"no_location_title" = "لم تتم إضافة موقع";
+"no_location_desc" = "يرجى إضافة موقع لحساب أوقات الصلاة بدقة.";
+"use_current_location" = "استخدام الموقع الحالي";
+"search_city" = "البحث عن مدينة";
+"today_prayers" = "أوقات صلاة اليوم";
+"time_until" = "%@ بعد %@";
+"time_remaining_label" = "الوقت المتبقي حتى صلاة %@";
+
+/* Location Screen */
+"location_management" = "إدارة المواقع";
+"search_city_placeholder" = "ابحث عن مدينة...";
+"detect_location" = "تحديد موقعي تلقائياً";
+"detecting_location" = "جارٍ تحديد الموقع...";
+"saved_locations" = "المواقع المحفوظة";
+"no_saved_locations" = "لا توجد مواقع محفوظة بعد.";
+"active" = "نشط";
+"delete" = "حذف";
+
+/* Settings Screen */
+"settings" = "الإعدادات";
+"notifications" = "الإشعارات";
+"prayer_notifications" = "تنبيهات الصلاة";
+"notification_timing" = "وقت التنبيه";
+"reminder_times" = "أوقات التذكير";
+"reminder_times_footer" = "يمكنك إضافة ما يصل إلى 3 تنبيهات مختلفة (مثلاً: قبل 30 دقيقة وفي وقت الصلاة).";
+"add_reminder" = "إضافة تذكير";
+"new_reminder_duration" = "مدة التذكير الجديد";
+"add" = "إضافة";
+"exact_time" = "في وقت الصلاة تماماً (0 دقيقة)";
+"mins_before" = "قبل %d دقيقة";
+"notification_permission_required" = "إذن الإشعارات مطلوب";
+"notification_permission_desc" = "يرجى منح إذن الإشعارات في إعدادات النظام لتلقي تنبيهات أوقات الصلاة في حينها.";
+"open_settings" = "فتح الإعدادات";
+
+/* Calculation Settings */
+"calculation_settings" = "إعدادات الحساب";
+"calculation_method" = "طريقة الحساب";
+"calculation_method_desc" = "محددة وفقاً لمنطقتك الجغرافية";
+"asr_madhab" = "طريقة حساب العصر (المذهب)";
+"madhab_standard" = "قياسي (شافعي، مالكي، حنبلي)";
+"madhab_hanafi" = "حنفي (ظل مضاعف)";
+
+/* Language Settings */
+"app_language" = "لغة التطبيق";
+"language_system" = "افتراضي النظام";
+"language_tr" = "Türkçe";
+"language_en" = "English";
+"language_de" = "Deutsch";
+"language_ar" = "العربية";
+"language_fr" = "Français";
+
+/* Onboarding */
+"setup_wizard" = "معالج الإعداد";
+"onboarding_step1_desc" = "اختر موقعاً لحساب أوقات الصلاة بدقة.";
+"or_search_city" = "أو ابحث عن مدينة:";
+"onboarding_step2_desc" = "تم تطبيق إعدادات الحساب الافتراضية وفقاً لموقعك. يمكنك تخصيصها إذا أردت:";
+"calculation_method_source" = "طريقة الحساب (الهيئة المعنية)";
+"continue_btn" = "متابعة";
+"back_btn" = "رجوع";
+"get_started" = "ابدأ الآن";
+"change" = "تغيير";
+"cancel" = "إلغاء";
+"close" = "إغلاق";
+
+/* About & Privacy */
+"about" = "حول التطبيق";
+"about_desc" = "تطبيق أوقات الصلاة يعمل بنسبة 100% دون اتصال بالإنترنت، بخصوصية تامة وخالٍ تماماً من الإعلانات.";

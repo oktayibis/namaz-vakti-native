@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Gebetszeiten</string>
+    <string name="widget_name">Gebetszeiten Widget</string>
+
+    <!-- Gebete -->
+    <string name="prayer_fajr">Fadschr</string>
+    <string name="prayer_sunrise">Sonnenaufgang</string>
+    <string name="prayer_dhuhr">Zuhr</string>
+    <string name="prayer_asr">Asr</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Ischa</string>
+
+    <!-- Startseite -->
+    <string name="select_location">Ort wählen</string>
+    <string name="no_location_title">Kein Ort hinzugefügt</string>
+    <string name="no_location_desc">Bitte fügen Sie einen Ort hinzu, um genaue Gebetszeiten zu berechnen.</string>
+    <string name="use_current_location">Aktuellen Standort verwenden</string>
+    <string name="search_city">Stadt suchen</string>
+    <string name="today_prayers">Heutige Gebete</string>
+    <string name="time_until">%1$s in %2$s</string>
+    <string name="time_remaining_label">Verbleibende Zeit bis %1$s</string>
+
+    <!-- Standortverwaltung -->
+    <string name="location_management">Standortverwaltung</string>
+    <string name="search_city_placeholder">Stadt suchen...</string>
+    <string name="detect_location">Standort automatisch ermitteln</string>
+    <string name="detecting_location">Standort wird ermittelt...</string>
+    <string name="saved_locations">Gespeicherte Orte</string>
+    <string name="active">Aktiv</string>
+    <string name="delete">Löschen</string>
+
+    <!-- Einstellungen -->
+    <string name="settings">Einstellungen</string>
+    <string name="notifications">Benachrichtigungen</string>
+    <string name="prayer_notifications">Gebetserinnerungen</string>
+    <string name="notification_timing">Erinnerungszeitpunkt</string>
+    <string name="exact_time">Pünktlich (0 Min.)</string>
+    <string name="mins_before">%1$d Minuten vorher</string>
+    <string name="notification_permission_required">Benachrichtigungsberechtigung erforderlich</string>
+    <string name="notification_permission_desc">Bitte erteilen Sie in den Systemeinstellungen die Benachrichtigungsberechtigung, um Gebetszeiten rechtzeitig zu erhalten.</string>
+    <string name="open_settings">Einstellungen öffnen</string>
+
+    <!-- Berechnungseinstellungen -->
+    <string name="calculation_settings">Berechnungseinstellungen</string>
+    <string name="calculation_method">Berechnungsmethode</string>
+    <string name="calculation_method_desc">Ausgewählt basierend auf Ihrer geografischen Region</string>
+    <string name="asr_madhab">Asr-Methode (Madhab)</string>
+    <string name="madhab_standard">Standard (Schafi\'i, Maliki, Hanbali)</string>
+    <string name="madhab_hanafi">Hanafi (Späteres Asr)</string>
+
+    <!-- Spracheinstellungen -->
+    <string name="app_language">App-Sprache</string>
+    <string name="language_system">Systemstandard</string>
+    <string name="language_tr">Türkçe</string>
+    <string name="language_en">English</string>
+    <string name="language_de">Deutsch</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_fr">Français</string>
+
+    <!-- Einrichtungsassistent -->
+    <string name="setup_wizard">Einrichtungsassistent</string>
+    <string name="onboarding_step1_desc">Wählen Sie einen Ort aus, um Gebetszeiten zu berechnen.</string>
+    <string name="or_search_city">oder nach einer Stadt suchen:</string>
+    <string name="onboarding_step2_desc">Standardeinstellungen basierend auf Ihrem Standort ausgewählt. Passen Sie diese bei Bedarf an:</string>
+    <string name="calculation_method_source">Berechnungsmethode (Behörde)</string>
+    <string name="continue_btn">Weiter</string>
+    <string name="back_btn">Zurück</string>
+    <string name="get_started">Loslegen</string>
+    <string name="change">Ändern</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="close">Schließen</string>
+
+    <!-- Über & Datenschutz -->
+    <string name="about">Über</string>
+    <string name="about_desc">Gebetszeiten ist eine 100% offlinefähige, datenschutzorientierte und werbefreie Gebetszeiten-App.</string>
+</resources>

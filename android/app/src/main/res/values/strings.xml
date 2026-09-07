@@ -1,5 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Namaz Vakti</string>
-    <string name="widget_name">Namaz Vakitleri Widget</string>
+    <string name="app_name">Prayer Times</string>
+    <string name="widget_name">Prayer Times Widget</string>
+
+    <!-- Prayers -->
+    <string name="prayer_fajr">Fajr</string>
+    <string name="prayer_sunrise">Sunrise</string>
+    <string name="prayer_dhuhr">Dhuhr</string>
+    <string name="prayer_asr">Asr</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Isha</string>
+
+    <!-- Home Screen -->
+    <string name="select_location">Select Location</string>
+    <string name="no_location_title">No Location Added</string>
+    <string name="no_location_desc">Please add a location to calculate accurate prayer times.</string>
+    <string name="use_current_location">Use Current Location</string>
+    <string name="search_city">Search City</string>
+    <string name="today_prayers">Today\'s Prayers</string>
+    <string name="time_until">%1$s in %2$s</string>
+    <string name="time_remaining_label">Time remaining until %1$s</string>
+
+    <!-- Location Screen -->
+    <string name="location_management">Location Management</string>
+    <string name="search_city_placeholder">Search city...</string>
+    <string name="detect_location">Auto-Detect Location</string>
+    <string name="detecting_location">Detecting location...</string>
+    <string name="saved_locations">Saved Locations</string>
+    <string name="active">Active</string>
+    <string name="delete">Delete</string>
+
+    <!-- Settings Screen -->
+    <string name="settings">Settings</string>
+    <string name="notifications">Notifications</string>
+    <string name="prayer_notifications">Prayer Reminders</string>
+    <string name="notification_timing">Reminder Timing</string>
+    <string name="exact_time">At prayer time (0 min)</string>
+    <string name="mins_before">%1$d minutes before</string>
+    <string name="notification_permission_required">Notification Permission Required</string>
+    <string name="notification_permission_desc">Please grant notification permissions in system settings to receive timely prayer alerts.</string>
+    <string name="open_settings">Open Settings</string>
+
+    <!-- Calculation Settings -->
+    <string name="calculation_settings">Calculation Settings</string>
+    <string name="calculation_method">Calculation Method</string>
+    <string name="calculation_method_desc">Selected based on your geographical region</string>
+    <string name="asr_madhab">Asr Juristic Method</string>
+    <string name="madhab_standard">Standard (Shafi, Maliki, Hanbali)</string>
+    <string name="madhab_hanafi">Hanafi (Later Asr)</string>
+
+    <!-- Language Settings -->
+    <string name="app_language">App Language</string>
+    <string name="language_system">System Default</string>
+    <string name="language_tr">Türkçe</string>
+    <string name="language_en">English</string>
+    <string name="language_de">Deutsch</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_fr">Français</string>
+
+    <!-- Onboarding -->
+    <string name="setup_wizard">Setup Wizard</string>
+    <string name="onboarding_step1_desc">Choose a location to calculate prayer times.</string>
+    <string name="or_search_city">or search for a city:</string>
+    <string name="onboarding_step2_desc">Default calculation settings applied based on your location. Customize if needed:</string>
+    <string name="calculation_method_source">Calculation Method (Authority)</string>
+    <string name="continue_btn">Continue</string>
+    <string name="back_btn">Back</string>
+    <string name="get_started">Get Started</string>
+    <string name="change">Change</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+
+    <!-- About & Privacy -->
+    <string name="about">About</string>
+    <string name="about_desc">Prayer Times is a 100% offline, privacy-first, ad-free prayer times application.</string>
 </resources>

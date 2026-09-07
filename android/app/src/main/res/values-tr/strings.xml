@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Namaz Vakti</string>
+    <string name="widget_name">Namaz Vakitleri Widget</string>
+
+    <!-- Vakitler -->
+    <string name="prayer_fajr">İmsak</string>
+    <string name="prayer_sunrise">Güneş</string>
+    <string name="prayer_dhuhr">Öğle</string>
+    <string name="prayer_asr">İkindi</string>
+    <string name="prayer_maghrib">Akşam</string>
+    <string name="prayer_isha">Yatsı</string>
+
+    <!-- Ana Ekran -->
+    <string name="select_location">Konum Seçin</string>
+    <string name="no_location_title">Konum Yok</string>
+    <string name="no_location_desc">Namaz vakitlerini görüntülemek için lütfen bir konum ekleyin.</string>
+    <string name="use_current_location">Mevcut Konumu Kullan</string>
+    <string name="search_city">Şehir Arama</string>
+    <string name="today_prayers">Bugün Vakitler</string>
+    <string name="time_until">%1$s vaktine %2$s kaldı</string>
+    <string name="time_remaining_label">%1$s vaktine kalan</string>
+
+    <!-- Konum Ekranı -->
+    <string name="location_management">Konum Yönetimi</string>
+    <string name="search_city_placeholder">Şehir Ara...</string>
+    <string name="detect_location">Konumumu Otomatik Bul</string>
+    <string name="detecting_location">Konum belirleniyor...</string>
+    <string name="saved_locations">Kayıtlı Konumlar</string>
+    <string name="active">Aktif</string>
+    <string name="delete">Sil</string>
+
+    <!-- Ayarlar Ekranı -->
+    <string name="settings">Ayarlar</string>
+    <string name="notifications">Bildirimler</string>
+    <string name="prayer_notifications">Vakit Bildirimleri</string>
+    <string name="notification_timing">Bildirim Zamanı</string>
+    <string name="exact_time">Vaktinde (0 dk)</string>
+    <string name="mins_before">%1$d dakika önce</string>
+    <string name="notification_permission_required">Bildirim İzni Gerekli</string>
+    <string name="notification_permission_desc">Ezan ve vakit bildirimlerini zamanında alabilmek için sistem ayarlarından bildirim izni vermeniz gerekmektedir.</string>
+    <string name="open_settings">Ayarları Aç</string>
+
+    <!-- Hesaplama Ayarları -->
+    <string name="calculation_settings">Hesaplama Ayarları</string>
+    <string name="calculation_method">Hesaplama Metodu</string>
+    <string name="calculation_method_desc">Coğrafi bölgenize göre seçilmiştir</string>
+    <string name="asr_madhab">İkindi Vakti Hesabı (Mezhep)</string>
+    <string name="madhab_standard">Standart (Şafii, Maliki, Hanbeli)</string>
+    <string name="madhab_hanafi">Hanefi (İkindi 2. gölge)</string>
+
+    <!-- Dil Ayarları -->
+    <string name="app_language">Uygulama Dili</string>
+    <string name="language_system">Sistem Dili</string>
+    <string name="language_tr">Türkçe</string>
+    <string name="language_en">English</string>
+    <string name="language_de">Deutsch</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_fr">Français</string>
+
+    <!-- Kurulum Sihirbazı -->
+    <string name="setup_wizard">Kurulum Sihirbazı</string>
+    <string name="onboarding_step1_desc">Namaz vakitlerini hesaplamak için bir konum seçin.</string>
+    <string name="or_search_city">veya şehir arayın:</string>
+    <string name="onboarding_step2_desc">Konumunuza göre varsayılan hesaplama ayarları seçildi. Değiştirmek isterseniz düzenleyin:</string>
+    <string name="calculation_method_source">Hesaplama Metodu (Kaynak)</string>
+    <string name="continue_btn">Devam Et</string>
+    <string name="back_btn">Geri</string>
+    <string name="get_started">Başlayalım</string>
+    <string name="change">Değiştir</string>
+    <string name="cancel">İptal</string>
+    <string name="close">Kapat</string>
+
+    <!-- Hakkında & Gizlilik -->
+    <string name="about">Hakkında</string>
+    <string name="about_desc">Namaz Vakti, %100 çevrimdışı, gizlilik odaklı ve reklamsız bir namaz vakti uygulamasıdır.</string>
+</resources>

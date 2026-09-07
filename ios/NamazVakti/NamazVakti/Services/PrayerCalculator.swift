@@ -17,13 +17,56 @@ enum PrayerType: String, CaseIterable, Codable {
     case isha = "Yatsı"
     
     var turkishName: String {
-        switch self {
-        case .fajr: return "İmsak"
-        case .sunrise: return "Güneş"
-        case .dhuhr: return "Öğle"
-        case .asr: return "İkindi"
-        case .maghrib: return "Akşam"
-        case .isha: return "Yatsı"
+        return localizedName(for: "tr")
+    }
+    
+    func localizedName(for langCode: String = "tr") -> String {
+        let code = langCode.lowercased()
+        if code.hasPrefix("tr") {
+            switch self {
+            case .fajr: return "İmsak"
+            case .sunrise: return "Güneş"
+            case .dhuhr: return "Öğle"
+            case .asr: return "İkindi"
+            case .maghrib: return "Akşam"
+            case .isha: return "Yatsı"
+            }
+        } else if code.hasPrefix("ar") {
+            switch self {
+            case .fajr: return "الفجر"
+            case .sunrise: return "الشروق"
+            case .dhuhr: return "الظهر"
+            case .asr: return "العصر"
+            case .maghrib: return "المغرب"
+            case .isha: return "العشاء"
+            }
+        } else if code.hasPrefix("de") {
+            switch self {
+            case .fajr: return "Fadschr"
+            case .sunrise: return "Sonnenaufgang"
+            case .dhuhr: return "Zuhr"
+            case .asr: return "Asr"
+            case .maghrib: return "Maghrib"
+            case .isha: return "Ischa"
+            }
+        } else if code.hasPrefix("fr") {
+            switch self {
+            case .fajr: return "Fajr"
+            case .sunrise: return "Lever du soleil"
+            case .dhuhr: return "Dhuhr"
+            case .asr: return "Asr"
+            case .maghrib: return "Maghrib"
+            case .isha: return "Icha"
+            }
+        } else {
+            switch self {
+            case .fajr: return "Fajr"
+            case .sunrise: return "Sunrise"
+            case .dhuhr: return "Dhuhr"
+            case .asr: return "Asr"
+            case .maghrib: return "Maghrib"
+            case .isha: return "Isha"
+            }
         }
     }
     
@@ -228,9 +271,9 @@ class PrayerCalculator {
     }
     
     /**
-     Diyanet takvimiyle uyumlu Türkçe Hicri tarih üretimi (örn: "24 Rebiülevvel 1448").
+     Hicri tarih üretimi (örn: Türkçe "24 Rebiülevvel 1448", İngilizce "24 Rabi' al-Awwal 1448", Arapça "٢٤ ربيع الأول ١٤٤٨").
      */
-    func getHijriDateString(for location: LocationData, date: Date = Date()) -> String? {
+    func getHijriDateString(for location: LocationData, date: Date = Date(), locale: Locale = Locale(identifier: "tr")) -> String? {
         guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
         
         var cal = Calendar(identifier: .islamicUmmAlQura)
@@ -241,23 +284,46 @@ class PrayerCalculator {
             return nil
         }
         
-        let turkishHijriMonths = [
-            "Muharrem", "Safer", "Rebiülevvel", "Rebiülahir",
-            "Cemaziyelevvel", "Cemaziyelahir", "Recep", "Şaban",
-            "Ramazan", "Şevval", "Zilkade", "Zilhicce"
-        ]
-        let monthName = (month >= 1 && month <= 12) ? turkishHijriMonths[month - 1] : ""
-        return "\(day) \(monthName) \(year)"
+        let lang = locale.language.languageCode?.identifier.lowercased() ?? locale.identifier.lowercased()
+        if lang.hasPrefix("ar") {
+            let arabicHijriMonths = [
+                "المحرم", "صفر", "ربيع الأول", "ربيع الآخر",
+                "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان",
+                "رمضان", "شوال", "ذو القعدة", "ذو الحجة"
+            ]
+            let monthName = (month >= 1 && month <= 12) ? arabicHijriMonths[month - 1] : ""
+            let numberFormatter = NumberFormatter()
+            numberFormatter.locale = Locale(identifier: "ar")
+            let dStr = numberFormatter.string(from: NSNumber(value: day)) ?? "\(day)"
+            let yStr = numberFormatter.string(from: NSNumber(value: year)) ?? "\(year)"
+            return "\(dStr) \(monthName) \(yStr)"
+        } else if lang.hasPrefix("tr") {
+            let turkishHijriMonths = [
+                "Muharrem", "Safer", "Rebiülevvel", "Rebiülahir",
+                "Cemaziyelevvel", "Cemaziyelahir", "Recep", "Şaban",
+                "Ramazan", "Şevval", "Zilkade", "Zilhicce"
+            ]
+            let monthName = (month >= 1 && month <= 12) ? turkishHijriMonths[month - 1] : ""
+            return "\(day) \(monthName) \(year)"
+        } else {
+            let englishHijriMonths = [
+                "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
+                "Jumada al-Awwal", "Jumada al-Thani", "Rajab", "Sha'ban",
+                "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"
+            ]
+            let monthName = (month >= 1 && month <= 12) ? englishHijriMonths[month - 1] : ""
+            return "\(day) \(monthName) \(year)"
+        }
     }
     
     /**
-     Türkçe Miladi tarih formatı (örn: "6 Eylül 2026, Pazar").
+     Lokalize Miladi tarih formatı (örn: "6 Eylül 2026, Pazar" veya "September 6, 2026, Sunday").
      */
-    func getGregorianDateString(for location: LocationData, date: Date = Date()) -> String? {
+    func getGregorianDateString(for location: LocationData, date: Date = Date(), locale: Locale = Locale(identifier: "tr")) -> String? {
         guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMMM yyyy, EEEE"
-        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.locale = locale
         formatter.timeZone = tz
         return formatter.string(from: date)
     }

@@ -2,40 +2,14 @@ import SwiftUI
 
 struct OnboardingView: View {
     @ObservedObject var viewModel: AppViewModel
+    @StateObject private var languageManager = LanguageManager.shared
     var onFinished: () -> Void
     
     @State private var currentStep = 1 // 1: Location, 2: Parameters
     @State private var searchQuery = ""
     @State private var searchResults: [LocationData] = []
     @State private var isSearching = false
-    
     @State private var selectedMethod = 13
-    
-    let calculationMethods = [
-        (0, "Kum Leva Enstitüsü (Caferi)"),
-        (1, "Karaçi (İslami İlimler)"),
-        (2, "ISNA (Kuzey Amerika)"),
-        (3, "Muslim World League"),
-        (4, "Umm Al-Qura (Mekke)"),
-        (5, "Mısır Genel Araştırma"),
-        (7, "Tahran Üniversitesi (Şii)"),
-        (8, "Körfez Bölgesi"),
-        (9, "Kuveyt"),
-        (10, "Katar"),
-        (11, "Singapur (MUIS)"),
-        (12, "Fransa (UOIF)"),
-        (13, "Türkiye (Diyanet)"),
-        (14, "Rusya"),
-        (15, "Moonsighting Committee"),
-        (16, "Dubai"),
-        (17, "Malezya (JAKIM)"),
-        (18, "Tunus"),
-        (19, "Cezayir"),
-        (20, "Endonezya (KEMENAG)"),
-        (21, "Fas"),
-        (22, "Portekiz (Lizbon)"),
-        (23, "Ürdün")
-    ]
     
     var body: some View {
         ZStack {
@@ -47,7 +21,7 @@ struct OnboardingView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: .amberColor))
                         .scaleEffect(1.5)
                     
-                    Text("Namaz takvimi hazırlanıyor...\nTüm yıl çevrimdışı kullanım için indiriliyor.")
+                    Text(tr("no_location_desc"))
                         .font(.system(.body, design: .rounded))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -57,7 +31,7 @@ struct OnboardingView: View {
                 VStack(spacing: 24) {
                     // Header progress indicator
                     HStack {
-                        Text("Kurulum Sihirbazı")
+                        Text(tr("setup_wizard"))
                             .font(.system(.title3, design: .rounded))
                             .fontWeight(.bold)
                             .foregroundColor(.white)
@@ -73,7 +47,7 @@ struct OnboardingView: View {
                     if currentStep == 1 {
                         // Step 1: Choose Location
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Namaz vakitlerini hesaplamak için bir konum seçin.")
+                            Text(tr("onboarding_step1_desc"))
                                 .font(.system(.body, design: .rounded))
                                 .foregroundColor(.gray)
                                 .padding(.horizontal)
@@ -113,7 +87,7 @@ struct OnboardingView: View {
                                 Spacer()
                                 
                                 Button(action: { currentStep = 2 }) {
-                                    Text("Devam Et")
+                                    Text(tr("continue_btn"))
                                         .font(.system(.headline, design: .rounded))
                                         .fontWeight(.bold)
                                         .foregroundColor(.black)
@@ -135,7 +109,7 @@ struct OnboardingView: View {
                                                 .progressViewStyle(CircularProgressViewStyle(tint: .black))
                                         } else {
                                             Image(systemName: "location.fill")
-                                            Text("Mevcut Konumu Kullan")
+                                            Text(tr("use_current_location"))
                                         }
                                     }
                                     .font(.system(.headline, design: .rounded).weight(.bold))
@@ -148,7 +122,7 @@ struct OnboardingView: View {
                                 .disabled(viewModel.isDetectingLocation)
                                 .padding(.horizontal)
                                 
-                                Text("veya şehir arayın:")
+                                Text(tr("or_search_city"))
                                     .font(.system(.subheadline, design: .rounded))
                                     .foregroundColor(.gray)
                                     .frame(maxWidth: .infinity, alignment: .center)
@@ -158,7 +132,7 @@ struct OnboardingView: View {
                                 HStack {
                                     Image(systemName: "magnifyingglass")
                                         .foregroundColor(.gray)
-                                    TextField("Şehir Ara...", text: $searchQuery)
+                                    TextField(tr("search_city_placeholder"), text: $searchQuery)
                                         .foregroundColor(.white)
                                         .autocorrectionDisabled()
                                     if !searchQuery.isEmpty {
@@ -217,35 +191,40 @@ struct OnboardingView: View {
                     } else {
                         // Step 2: Settings Configuration
                         VStack(alignment: .leading, spacing: 20) {
-                            Text("Konumunuza göre varsayılan hesaplama ayarları seçildi. Dilerseniz düzenleyebilirsiniz:")
+                            Text(tr("onboarding_step2_desc"))
                                 .font(.system(.body, design: .rounded))
                                 .foregroundColor(.gray)
                                 .padding(.horizontal)
                             
                             ScrollView {
                                 VStack(alignment: .leading, spacing: 20) {
-                                    Text("Hesaplama Metodu (Kaynak)")
+                                    Text(tr("calculation_method_source"))
                                         .font(.system(.headline, design: .rounded))
                                         .foregroundColor(.white)
                                         .padding(.horizontal)
                                     
                                     VStack(spacing: 0) {
-                                        ForEach(calculationMethods, id: \.0) { item in
+                                        ForEach(CalculationMethodRegistry.methods) { item in
                                             HStack {
-                                                Text(item.1)
-                                                    .font(.system(.body, design: .rounded))
-                                                    .foregroundColor(.white)
+                                                VStack(alignment: .leading, spacing: 2) {
+                                                    Text(item.name)
+                                                        .font(.system(.body, design: .rounded))
+                                                        .foregroundColor(.white)
+                                                    Text(item.region)
+                                                        .font(.system(.caption, design: .rounded))
+                                                        .foregroundColor(.gray)
+                                                }
                                                 Spacer()
-                                                if selectedMethod == item.0 {
+                                                if selectedMethod == item.id {
                                                     Image(systemName: "checkmark")
                                                         .foregroundColor(.amberColor)
                                                 }
                                             }
                                             .padding()
-                                            .background(Color.white.opacity(selectedMethod == item.0 ? 0.08 : 0.02))
+                                            .background(Color.white.opacity(selectedMethod == item.id ? 0.08 : 0.02))
                                             .contentShape(Rectangle())
                                             .onTapGesture {
-                                                selectedMethod = item.0
+                                                selectedMethod = item.id
                                             }
                                             
                                             Divider().background(Color.white.opacity(0.05))
@@ -258,7 +237,7 @@ struct OnboardingView: View {
                             
                             HStack(spacing: 16) {
                                 Button(action: { currentStep = 1 }) {
-                                    Text("Geri")
+                                    Text(tr("back_btn"))
                                         .font(.system(.body, design: .rounded))
                                         .fontWeight(.bold)
                                         .foregroundColor(.white)
@@ -272,7 +251,7 @@ struct OnboardingView: View {
                                         }
                                     }
                                 }) {
-                                    Text("Başlayalım")
+                                    Text(tr("get_started"))
                                         .font(.system(.headline, design: .rounded))
                                         .fontWeight(.bold)
                                         .foregroundColor(.black)

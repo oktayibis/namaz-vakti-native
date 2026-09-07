@@ -3,6 +3,7 @@ import SwiftUI
 struct LocationView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel = AppViewModel.shared
+    @StateObject private var languageManager = LanguageManager.shared
     @State private var searchQuery = ""
     @State private var searchResults: [LocationData] = []
     @State private var isSearching = false
@@ -18,7 +19,7 @@ struct LocationView: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.gray)
                         
-                        TextField("Şehir Ara...", text: $searchQuery)
+                        TextField(tr("search_city_placeholder"), text: $searchQuery)
                             .foregroundColor(.white)
                             .autocorrectionDisabled()
                             .onChange(of: searchQuery) { newValue in
@@ -68,7 +69,7 @@ struct LocationView: View {
                     } else {
                         // Saved Locations List
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Kaydedilen Konumlar")
+                            Text(tr("saved_locations"))
                                 .font(.system(.subheadline, design: .rounded))
                                 .fontWeight(.bold)
                                 .foregroundColor(.gray)
@@ -81,7 +82,7 @@ struct LocationView: View {
                                     Image(systemName: "mappin.slash")
                                         .font(.system(size: 40))
                                         .foregroundColor(.gray)
-                                    Text("Henüz kaydedilmiş bir konum yok.")
+                                    Text(tr("no_saved_locations"))
                                         .font(.system(.body, design: .rounded))
                                         .foregroundColor(.gray)
                                         .multilineTextAlignment(.center)
@@ -99,7 +100,7 @@ struct LocationView: View {
                                         HStack {
                                             Image(systemName: "location.fill")
                                                 .foregroundColor(.amberColor)
-                                            Text("Mevcut Konumu Kullan")
+                                            Text(tr("use_current_location"))
                                                 .font(.system(.body, design: .rounded))
                                                 .fontWeight(.semibold)
                                                 .foregroundColor(.white)
@@ -146,12 +147,12 @@ struct LocationView: View {
                         }
                     }
                 }
-                .navigationTitle("Konum Yönetimi")
+                .navigationTitle(tr("location_management"))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button(action: { dismiss() }) {
-                            Text("Kapat")
+                            Text(tr("close"))
                                 .foregroundColor(.white)
                                 .fontWeight(.semibold)
                         }

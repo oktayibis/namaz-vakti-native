@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppViewModel(application: Application) : AndroidViewModel(application) {
@@ -78,6 +79,24 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _detectedLocation = MutableStateFlow<LocationData?>(null)
     val detectedLocation: StateFlow<LocationData?> = _detectedLocation.asStateFlow()
+
+    private val _appLanguage = MutableStateFlow(prefs.getString("app_language", "system") ?: "system")
+    val appLanguage: StateFlow<String> = _appLanguage.asStateFlow()
+
+    fun getCurrentLocale(): Locale {
+        val lang = _appLanguage.value
+        return if (lang == "system" || lang.isEmpty()) {
+            Locale.getDefault()
+        } else {
+            Locale(lang)
+        }
+    }
+
+    fun setAppLanguage(languageCode: String) {
+        prefs.edit().putString("app_language", languageCode).apply()
+        _appLanguage.value = languageCode
+        updateTimes()
+    }
 
     private var timerJob: Job? = null
 
@@ -219,14 +238,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             countryLower.contains("turkey") || countryLower.contains("türkiye") -> 13 // Diyanet
             countryLower.contains("saudi") || countryLower.contains("arabia") || countryLower.contains("makkah") -> 4 // Umm Al-Qura
             countryLower.contains("egypt") -> 5 // Egyptian General Authority
-            countryLower.contains("pakistan") || countryLower.contains("india") || countryLower.contains("bangladesh") -> 1 // Karachi
+            countryLower.contains("pakistan") || countryLower.contains("india") || countryLower.contains("bangladesh") || countryLower.contains("afghanistan") -> 1 // Karachi
             countryLower.contains("united states") || countryLower.contains("canada") || countryLower.contains("america") -> 2 // ISNA
-            else -> 3 // Muslim World League
+            countryLower.contains("emirates") || countryLower.contains("dubai") || countryLower.contains("uae") -> 16 // Dubai
+            countryLower.contains("singapore") -> 11 // Singapore (MUIS)
+            countryLower.contains("kuwait") -> 9 // Kuwait
+            countryLower.contains("qatar") -> 10 // Qatar
+            else -> 3 // Muslim World League (Europe & Global default)
         }
         
         val defaultSchool = when {
-            countryLower.contains("pakistan") || countryLower.contains("india") || countryLower.contains("bangladesh") -> 1 // Hanafi
-            else -> 0 // Shafi/Standard
+            countryLower.contains("pakistan") || countryLower.contains("india") || countryLower.contains("bangladesh") || countryLower.contains("afghanistan") -> 1 // Hanafi
+            else -> 0 // Standard (Shafi/Maliki/Hanbali)
         }
         return Pair(defaultMethod, defaultSchool)
     }
@@ -297,10 +320,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val active = _activeLocation.value ?: return
 
         viewModelScope.launch(workDispatcher) {
+            val locale = getCurrentLocale()
             _todayTimes.value = PrayerCalculator.getPrayerTimesList(context, active, Date())
             _progressInfo.value = PrayerCalculator.getProgressInfo(context, active)
-            _hijriDateString.value = PrayerCalculator.getHijriDateString(context, active, Date())
-            _gregorianDateString.value = PrayerCalculator.getGregorianDateString(context, active, Date())
+            _hijriDateString.value = PrayerCalculator.getHijriDateString(context, active, Date(), locale)
+            _gregorianDateString.value = PrayerCalculator.getGregorianDateString(context, active, Date(), locale)
 
             updateTimerTick()
         }

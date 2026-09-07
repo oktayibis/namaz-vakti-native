@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Heures de Prière</string>
+    <string name="widget_name">Widget Heures de Prière</string>
+
+    <!-- Prières -->
+    <string name="prayer_fajr">Fajr</string>
+    <string name="prayer_sunrise">Lever du soleil</string>
+    <string name="prayer_dhuhr">Dhuhr</string>
+    <string name="prayer_asr">Asr</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Icha</string>
+
+    <!-- Écran d'accueil -->
+    <string name="select_location">Sélectionner un lieu</string>
+    <string name="no_location_title">Aucun lieu ajouté</string>
+    <string name="no_location_desc">Veuillez ajouter un lieu pour calculer des horaires de prière précis.</string>
+    <string name="use_current_location">Utiliser la position actuelle</string>
+    <string name="search_city">Rechercher une ville</string>
+    <string name="today_prayers">Prières d\'aujourd\'hui</string>
+    <string name="time_until">%1$s dans %2$s</string>
+    <string name="time_remaining_label">Temps restant jusqu\'à %1$s</string>
+
+    <!-- Écran de gestion des lieux -->
+    <string name="location_management">Gestion des lieux</string>
+    <string name="search_city_placeholder">Rechercher une ville...</string>
+    <string name="detect_location">Détecter ma position</string>
+    <string name="detecting_location">Détection de la position...</string>
+    <string name="saved_locations">Lieux enregistrés</string>
+    <string name="active">Actif</string>
+    <string name="delete">Supprimer</string>
+
+    <!-- Paramètres -->
+    <string name="settings">Paramètres</string>
+    <string name="notifications">Notifications</string>
+    <string name="prayer_notifications">Rappels de prière</string>
+    <string name="notification_timing">Moment du rappel</string>
+    <string name="exact_time">À l\'heure de la prière (0 min)</string>
+    <string name="mins_before">%1$d minutes avant</string>
+    <string name="notification_permission_required">Autorisation de notification requise</string>
+    <string name="notification_permission_desc">Veuillez activer les autorisations de notification dans les réglages système afin de recevoir vos rappels de prière à temps.</string>
+    <string name="open_settings">Ouvrir les paramètres</string>
+
+    <!-- Paramètres de calcul -->
+    <string name="calculation_settings">Paramètres de calcul</string>
+    <string name="calculation_method">Méthode de calcul</string>
+    <string name="calculation_method_desc">Sélectionnée en fonction de votre zone géographique</string>
+    <string name="asr_madhab">Méthode pour l\'Asr (Madhab)</string>
+    <string name="madhab_standard">Standard (Chaféite, Mâlikite, Hanbalite)</string>
+    <string name="madhab_hanafi">Hanafite (Ombre doublée)</string>
+
+    <!-- Paramètres de langue -->
+    <string name="app_language">Langue de l\'application</string>
+    <string name="language_system">Par défaut du système</string>
+    <string name="language_tr">Türkçe</string>
+    <string name="language_en">English</string>
+    <string name="language_de">Deutsch</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_fr">Français</string>
+
+    <!-- Assistant d'installation -->
+    <string name="setup_wizard">Assistant d\'installation</string>
+    <string name="onboarding_step1_desc">Choisissez un lieu pour calculer les horaires de prière.</string>
+    <string name="or_search_city">ou recherchez une ville :</string>
+    <string name="onboarding_step2_desc">Paramètres de calcul par défaut appliqués selon votre position. Personnalisez si nécessaire :</string>
+    <string name="calculation_method_source">Méthode de calcul (Autorité)</string>
+    <string name="continue_btn">Continuer</string>
+    <string name="back_btn">Retour</string>
+    <string name="get_started">Commencer</string>
+    <string name="change">Modifier</string>
+    <string name="cancel">Annuler</string>
+    <string name="close">Fermer</string>
+
+    <!-- À propos et confidentialité -->
+    <string name="about">À propos</string>
+    <string name="about_desc">Heures de Prière est une application 100% hors ligne, sans publicité et respectueuse de votre vie privée.</string>
+</resources>

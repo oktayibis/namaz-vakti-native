@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
@@ -47,10 +46,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.oktay.namaz.R
+import com.oktay.namaz.model.CalculationMethodRegistry
 import com.oktay.namaz.model.LocationData
 import com.oktay.namaz.service.LocationManager
 import com.oktay.namaz.ui.theme.AmberAccent
@@ -67,11 +69,12 @@ fun OnboardingScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val detectedLocation by viewModel.detectedLocation.collectAsState()
     val isDetecting by viewModel.isDetectingLocation.collectAsState()
     val onboardingLoading by viewModel.onboardingLoading.collectAsState()
-    val detectedLocation by viewModel.detectedLocation.collectAsState()
     
-    var currentStep by remember { mutableStateOf(1) } // 1: Location, 2: Settings
+    var currentStep by remember { mutableStateOf(1) }
+    
     var searchQuery by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf<List<LocationData>>(emptyList()) }
     var isSearching by remember { mutableStateOf(false) }
@@ -79,33 +82,7 @@ fun OnboardingScreen(
     val locationManager = remember { LocationManager(context) }
     
     // Calculation selections
-    var selectedMethod by remember { mutableStateOf(13) } // Türkiye (Diyanet)
-    
-    val calculationMethods = listOf(
-        0 to "Kum Leva Enstitüsü (Caferi)",
-        1 to "Karaçi (İslami İlimler)",
-        2 to "ISNA (Kuzey Amerika)",
-        3 to "Muslim World League",
-        4 to "Umm Al-Qura (Mekke)",
-        5 to "Mısır Genel Araştırma",
-        7 to "Tahran Üniversitesi (Şii)",
-        8 to "Körfez Bölgesi",
-        9 to "Kuveyt",
-        10 to "Katar",
-        11 to "Singapur (MUIS)",
-        12 to "Fransa (UOIF)",
-        13 to "Türkiye (Diyanet)",
-        14 to "Rusya",
-        15 to "Moonsighting Committee",
-        16 to "Dubai",
-        17 to "Malezya (JAKIM)",
-        18 to "Tunus",
-        19 to "Cezayir",
-        20 to "Endonezya (KEMENAG)",
-        21 to "Fas",
-        22 to "Portekiz (Lizbon)",
-        23 to "Ürdün"
-    )
+    var selectedMethod by remember { mutableStateOf(13) }
     
     // When location is detected, auto-preselect parameters
     LaunchedEffect(detectedLocation) {
@@ -142,7 +119,7 @@ fun OnboardingScreen(
                 CircularProgressIndicator(color = AmberAccent, modifier = Modifier.size(50.dp))
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Namaz takvimi hazırlanıyor...\nTüm yıl çevrimdışı kullanım için indiriliyor.",
+                    text = stringResource(R.string.detecting_location),
                     color = Color.White,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
@@ -163,7 +140,7 @@ fun OnboardingScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Kurulum Sihirbazı",
+                        text = stringResource(R.string.setup_wizard),
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -180,7 +157,7 @@ fun OnboardingScreen(
                 if (currentStep == 1) {
                     // Step 1: Location Setup
                     Text(
-                        text = "Namaz vakitlerini hesaplamak için bir konum seçin.",
+                        text = stringResource(R.string.onboarding_step1_desc),
                         color = Color.Gray,
                         fontSize = 15.sp,
                         modifier = Modifier.padding(bottom = 20.dp)
@@ -197,7 +174,7 @@ fun OnboardingScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.LocationOn,
-                                    contentDescription = "Konum",
+                                    contentDescription = stringResource(R.string.select_location),
                                     tint = AmberAccent,
                                     modifier = Modifier.size(28.dp)
                                 )
@@ -219,7 +196,7 @@ fun OnboardingScreen(
                                 IconButton(onClick = { viewModel.setDetectedLocation(null) }) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = "Değiştir",
+                                        contentDescription = stringResource(R.string.change),
                                         tint = Color.Gray
                                     )
                                 }
@@ -236,7 +213,7 @@ fun OnboardingScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                         ) {
-                            Text("Devam Et", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text(stringResource(R.string.continue_btn), color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     } else {
                         // GPS Request Button
@@ -253,18 +230,18 @@ fun OnboardingScreen(
                             } else {
                                 Icon(
                                     imageVector = Icons.Default.MyLocation,
-                                    contentDescription = "GPS",
+                                    contentDescription = stringResource(R.string.detect_location),
                                     tint = Color.Black
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Konumumu Otomatik Bul", color = Color.Black, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.detect_location), color = Color.Black, fontWeight = FontWeight.Bold)
                             }
                         }
                         
                         Spacer(modifier = Modifier.height(16.dp))
                         
                         Text(
-                            text = "veya şehir arayın:",
+                            text = stringResource(R.string.or_search_city),
                             color = Color.Gray,
                             fontSize = 14.sp,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -276,11 +253,11 @@ fun OnboardingScreen(
                         OutlinedTextField(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
-                            placeholder = { Text("Şehir Ara...", color = Color.Gray) },
+                            placeholder = { Text(stringResource(R.string.search_city_placeholder), color = Color.Gray) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Search,
-                                    contentDescription = "Ara",
+                                    contentDescription = stringResource(R.string.search_city),
                                     tint = Color.Gray
                                 )
                             },
@@ -320,7 +297,7 @@ fun OnboardingScreen(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.LocationOn,
-                                            contentDescription = "Şehir",
+                                            contentDescription = stringResource(R.string.select_location),
                                             tint = Color.Gray,
                                             modifier = Modifier.size(20.dp)
                                         )
@@ -343,14 +320,14 @@ fun OnboardingScreen(
                             .verticalScroll(rememberScrollState())
                     ) {
                         Text(
-                            text = "Konumunuza göre varsayılan hesaplama ayarları seçildi. Değiştirmek isterseniz düzenleyin:",
+                            text = stringResource(R.string.onboarding_step2_desc),
                             color = Color.Gray,
                             fontSize = 15.sp,
                             modifier = Modifier.padding(bottom = 20.dp)
                         )
                         
                         Text(
-                            text = "Hesaplama Metodu (Kaynak)",
+                            text = stringResource(R.string.calculation_method_source),
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
@@ -363,25 +340,28 @@ fun OnboardingScreen(
                                 .background(SurfaceGlass, shape = RoundedCornerShape(12.dp))
                                 .padding(8.dp)
                         ) {
-                            calculationMethods.forEach { (id, name) ->
-                                val isSelected = selectedMethod == id
+                            CalculationMethodRegistry.methods.forEach { method ->
+                                val isSelected = selectedMethod == method.id
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { selectedMethod = id }
+                                        .clickable { selectedMethod = method.id }
                                         .padding(horizontal = 12.dp, vertical = 10.dp)
                                 ) {
                                     RadioButton(
                                         selected = isSelected,
-                                        onClick = { selectedMethod = id },
+                                        onClick = { selectedMethod = method.id },
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = AmberAccent,
                                             unselectedColor = Color.Gray
                                         )
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = name, color = Color.White, fontSize = 14.sp)
+                                    Column {
+                                        Text(text = method.name, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                        Text(text = method.region, color = Color.Gray, fontSize = 12.sp)
+                                    }
                                 }
                             }
                         }
@@ -398,7 +378,7 @@ fun OnboardingScreen(
                             onClick = { currentStep = 1 },
                             modifier = Modifier.height(50.dp)
                         ) {
-                            Text("Geri", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.back_btn), color = Color.White, fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         Button(
@@ -417,7 +397,7 @@ fun OnboardingScreen(
                                 .weight(1f)
                                 .height(50.dp)
                         ) {
-                            Text("Başlayalım", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text(stringResource(R.string.get_started), color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     }
                 }

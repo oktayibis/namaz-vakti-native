@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">أوقات الصلاة</string>
+    <string name="widget_name">ودجت أوقات الصلاة</string>
+
+    <!-- الصلوات -->
+    <string name="prayer_fajr">الفجر</string>
+    <string name="prayer_sunrise">الشروق</string>
+    <string name="prayer_dhuhr">الظهر</string>
+    <string name="prayer_asr">العصر</string>
+    <string name="prayer_maghrib">المغرب</string>
+    <string name="prayer_isha">العشاء</string>
+
+    <!-- الشاشة الرئيسية -->
+    <string name="select_location">اختر موقعاً</string>
+    <string name="no_location_title">لم تتم إضافة موقع</string>
+    <string name="no_location_desc">يرجى إضافة موقع لحساب أوقات الصلاة بدقة.</string>
+    <string name="use_current_location">استخدام الموقع الحالي</string>
+    <string name="search_city">البحث عن مدينة</string>
+    <string name="today_prayers">أوقات صلاة اليوم</string>
+    <string name="time_until">%1$s بعد %2$s</string>
+    <string name="time_remaining_label">الوقت المتبقي حتى صلاة %1$s</string>
+
+    <!-- شاشة المواقع -->
+    <string name="location_management">إدارة المواقع</string>
+    <string name="search_city_placeholder">ابحث عن مدينة...</string>
+    <string name="detect_location">تحديد موقعي تلقائياً</string>
+    <string name="detecting_location">جارٍ تحديد الموقع...</string>
+    <string name="saved_locations">المواقع المحفوظة</string>
+    <string name="active">نشط</string>
+    <string name="delete">حذف</string>
+
+    <!-- الإعدادات -->
+    <string name="settings">الإعدادات</string>
+    <string name="notifications">الإشعارات</string>
+    <string name="prayer_notifications">تنبيهات الصلاة</string>
+    <string name="notification_timing">وقت التنبيه</string>
+    <string name="exact_time">في وقت الصلاة تماماً (0 دقيقة)</string>
+    <string name="mins_before">قبل %1$d دقيقة</string>
+    <string name="notification_permission_required">إذن الإشعارات مطلوب</string>
+    <string name="notification_permission_desc">يرجى منح إذن الإشعارات في إعدادات النظام لتلقي تنبيهات أوقات الصلاة في حينها.</string>
+    <string name="open_settings">فتح الإعدادات</string>
+
+    <!-- إعدادات الحساب -->
+    <string name="calculation_settings">إعدادات الحساب</string>
+    <string name="calculation_method">طريقة الحساب</string>
+    <string name="calculation_method_desc">محددة وفقاً لمنطقتك الجغرافية</string>
+    <string name="asr_madhab">طريقة حساب العصر (المذهب)</string>
+    <string name="madhab_standard">قياسي (شافعي، مالكي، حنبلي)</string>
+    <string name="madhab_hanafi">حنفي (ظل مضاعف)</string>
+
+    <!-- إعدادات اللغة -->
+    <string name="app_language">لغة التطبيق</string>
+    <string name="language_system">افتراضي النظام</string>
+    <string name="language_tr">Türkçe</string>
+    <string name="language_en">English</string>
+    <string name="language_de">Deutsch</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_fr">Français</string>
+
+    <!-- معالج الإعداد -->
+    <string name="setup_wizard">معالج الإعداد</string>
+    <string name="onboarding_step1_desc">اختر موقعاً لحساب أوقات الصلاة بدقة.</string>
+    <string name="or_search_city">أو ابحث عن مدينة:</string>
+    <string name="onboarding_step2_desc">تم تطبيق إعدادات الحساب الافتراضية وفقاً لموقعك. يمكنك تخصيصها إذا أردت:</string>
+    <string name="calculation_method_source">طريقة الحساب (الهيئة المعنية)</string>
+    <string name="continue_btn">متابعة</string>
+    <string name="back_btn">رجوع</string>
+    <string name="get_started">ابدأ الآن</string>
+    <string name="change">تغيير</string>
+    <string name="cancel">إلغاء</string>
+    <string name="close">إغلاق</string>
+
+    <!-- حول التطبيق والخصوصية -->
+    <string name="about">حول التطبيق</string>
+    <string name="about_desc">تطبيق أوقات الصلاة يعمل بنسبة 100% دون اتصال بالإنترنت، بخصوصية تامة وخالٍ تماماً من الإعلانات.</string>
+</resources>

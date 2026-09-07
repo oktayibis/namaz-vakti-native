@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel = AppViewModel.shared
+    @StateObject private var languageManager = LanguageManager.shared
     @State private var showSettings = false
     @State private var showLocations = false
     
@@ -32,7 +33,7 @@ struct HomeView: View {
                                 Button(action: { showLocations = true }) {
                                     HStack(spacing: 6) {
                                         Image(systemName: "mappin.and.ellipse")
-                                        Text(viewModel.activeLocation?.name ?? "Konum Seçin")
+                                        Text(viewModel.activeLocation?.name ?? tr("select_location"))
                                             .font(.system(.headline, design: .rounded))
                                             .fontWeight(.semibold)
                                         Image(systemName: "chevron.down")
@@ -61,10 +62,11 @@ struct HomeView: View {
                             
                             // Countdown Ring Section
                             if let progressInfo = viewModel.progressInfo {
+                                let prayerName = progressInfo.nextPrayer.localizedName(for: languageManager.effectiveLanguageCode)
                                 CircularProgressView(
                                     progress: viewModel.progress,
                                     timeRemaining: viewModel.timeRemainingString,
-                                    nextPrayerName: "\(progressInfo.nextPrayer.turkishName) vaktine kalan"
+                                    nextPrayerName: tr("time_remaining_label", prayerName)
                                 )
                                 .padding(.vertical, 10)
                             }
@@ -73,7 +75,7 @@ struct HomeView: View {
                             VStack(spacing: 0) {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text("Bugün Vakitler")
+                                        Text(tr("today_prayers"))
                                             .font(.system(.headline, design: .rounded))
                                             .foregroundColor(.white.opacity(0.95))
                                         if let gregorianDate = viewModel.gregorianDateString {
@@ -98,6 +100,7 @@ struct HomeView: View {
                                 
                                 ForEach(viewModel.todayTimes) { item in
                                     let isActive = viewModel.progressInfo?.currentPrayer == item.type
+                                    let prayerName = item.type.localizedName(for: languageManager.effectiveLanguageCode)
                                     
                                     HStack {
                                         HStack(spacing: 12) {
@@ -106,7 +109,7 @@ struct HomeView: View {
                                                 .foregroundColor(isActive ? .amberColor : .white.opacity(0.7))
                                                 .frame(width: 24)
                                             
-                                            Text(item.type.turkishName)
+                                            Text(prayerName)
                                                 .font(.system(.body, design: .rounded))
                                                 .fontWeight(isActive ? .bold : .regular)
                                                 .foregroundColor(isActive ? .white : .white.opacity(0.85))
@@ -120,7 +123,7 @@ struct HomeView: View {
                                             .foregroundColor(isActive ? .white : .white.opacity(0.85))
                                         
                                         if isActive {
-                                            Image(systemName: "chevron.left")
+                                            Image(systemName: languageManager.isRTL ? "chevron.right" : "chevron.left")
                                                 .font(.caption2)
                                                 .foregroundColor(.amberColor)
                                                 .padding(.leading, 6)

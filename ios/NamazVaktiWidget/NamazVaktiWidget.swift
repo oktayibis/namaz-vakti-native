@@ -32,12 +32,27 @@ struct Provider: TimelineProvider {
         return nil
     }
     
+    private func getLanguageCode() -> String {
+        let raw = defaults.string(forKey: "app_language") ?? "system"
+        if raw == "system" {
+            let preferred = Locale.preferredLanguages.first?.lowercased() ?? "tr"
+            if preferred.hasPrefix("tr") { return "tr" }
+            if preferred.hasPrefix("de") { return "de" }
+            if preferred.hasPrefix("ar") { return "ar" }
+            if preferred.hasPrefix("fr") { return "fr" }
+            if preferred.hasPrefix("en") { return "en" }
+            return "tr"
+        }
+        return raw
+    }
+    
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(
             date: Date(),
             location: LocationData(name: "İstanbul", country: "Türkiye", latitude: 41.0082, longitude: 28.9784, timezoneIdentifier: "Europe/Istanbul"),
             todayTimes: dummyTimes(),
-            progressInfo: nil
+            progressInfo: nil,
+            languageCode: "tr"
         )
     }
 
@@ -45,18 +60,20 @@ struct Provider: TimelineProvider {
         let location = getActiveLocation()
         let todayTimes = location.map { PrayerCalculator.shared.getPrayerTimesList(for: $0, date: Date()) } ?? dummyTimes()
         let progressInfo = location.flatMap { PrayerCalculator.shared.getProgressInfo(for: $0, at: Date()) }
+        let lang = getLanguageCode()
         
-        let entry = SimpleEntry(date: Date(), location: location, todayTimes: todayTimes, progressInfo: progressInfo)
+        let entry = SimpleEntry(date: Date(), location: location, todayTimes: todayTimes, progressInfo: progressInfo, languageCode: lang)
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
         var entries: [SimpleEntry] = []
         let currentDate = Date()
+        let lang = getLanguageCode()
         
         guard let location = getActiveLocation() else {
             // No location selected yet
-            let entry = SimpleEntry(date: currentDate, location: nil, todayTimes: [], progressInfo: nil)
+            let entry = SimpleEntry(date: currentDate, location: nil, todayTimes: [], progressInfo: nil, languageCode: lang)
             let timeline = Timeline(entries: [entry], policy: .after(currentDate.addingTimeInterval(3600))) // retry in an hour
             completion(timeline)
             return
@@ -67,7 +84,7 @@ struct Provider: TimelineProvider {
         let progressInfo = PrayerCalculator.shared.getProgressInfo(for: location, at: currentDate)
         
         // Add immediate entry
-        entries.append(SimpleEntry(date: currentDate, location: location, todayTimes: todayTimes, progressInfo: progressInfo))
+        entries.append(SimpleEntry(date: currentDate, location: location, todayTimes: todayTimes, progressInfo: progressInfo, languageCode: lang))
         
         // Schedule reloads at each upcoming prayer time of today
         let calendar = Calendar.current
@@ -85,7 +102,8 @@ struct Provider: TimelineProvider {
                     date: prayerDate,
                     location: location,
                     todayTimes: todayTimes,
-                    progressInfo: upcomingProgress
+                    progressInfo: upcomingProgress,
+                    languageCode: lang
                 ))
             }
         }
@@ -99,7 +117,8 @@ struct Provider: TimelineProvider {
                 date: midnight,
                 location: location,
                 todayTimes: midnightTimes,
-                progressInfo: midnightProgress
+                progressInfo: midnightProgress,
+                languageCode: lang
             ))
         }
         
@@ -125,6 +144,7 @@ struct SimpleEntry: TimelineEntry {
     let location: LocationData?
     let todayTimes: [PrayerTimeItem]
     let progressInfo: PrayerProgressInfo?
+    let languageCode: String
 }
 
 struct NamazVaktiWidgetEntryView : View {
@@ -143,15 +163,33 @@ struct NamazVaktiWidgetEntryView : View {
                     MediumWidgetView(location: location, entry: entry)
                 }
             } else {
+                let noLocText: String = {
+                    switch entry.languageCode {
+                    case "en": return "No Location Selected"
+                    case "de": return "Kein Ort gewählt"
+                    case "ar": return "لم يتم تحديد موقع"
+                    case "fr": return "Aucun lieu sélectionné"
+                    default: return "Konum Seçilmedi"
+                    }
+                }()
+                let openAppText: String = {
+                    switch entry.languageCode {
+                    case "en": return "Please open the app"
+                    case "de": return "Bitte App öffnen"
+                    case "ar": return "يرجى فتح التطبيق"
+                    case "fr": return "Veuillez ouvrir l'application"
+                    default: return "Lütfen uygulamayı açın"
+                    }
+                }()
                 VStack(spacing: 8) {
                     Image(systemName: "mappin.slash")
                         .font(.title2)
                         .foregroundColor(.white.opacity(0.6))
-                    Text("Konum Seçilmedi")
+                    Text(noLocText)
                         .font(.system(.caption, design: .rounded))
                         .fontWeight(.bold)
                         .foregroundColor(.white)
-                    Text("Lütfen uygulamayı açın")
+                    Text(openAppText)
                         .font(.system(size: 10, design: .rounded))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -234,7 +272,17 @@ struct SmallWidgetView: View {
             Spacer()
             
             if let next = entry.progressInfo?.nextPrayer {
-                Text("\(next.turkishName) Vakti")
+                let nextName = next.localizedName(for: entry.languageCode)
+                let nextLabel: String = {
+                    switch entry.languageCode {
+                    case "en": return "\(nextName) Time"
+                    case "de": return "\(nextName)-Zeit"
+                    case "ar": return "وقت \(nextName)"
+                    case "fr": return "Heure de \(nextName)"
+                    default: return "\(nextName) Vakti"
+                    }
+                }()
+                Text(nextLabel)
                     .font(.system(.caption2, design: .rounded))
                     .foregroundColor(.white.opacity(0.7))
                 
@@ -250,7 +298,17 @@ struct SmallWidgetView: View {
             // Show upcoming times summary
             if let current = entry.progressInfo?.currentPrayer,
                let currentTime = entry.todayTimes.first(where: { $0.type == current }) {
-                Text("Şu an: \(current.turkishName) (\(currentTime.formattedTime))")
+                let currentName = current.localizedName(for: entry.languageCode)
+                let nowLabel: String = {
+                    switch entry.languageCode {
+                    case "en": return "Now: \(currentName)"
+                    case "de": return "Jetzt: \(currentName)"
+                    case "ar": return "الآن: \(currentName)"
+                    case "fr": return "Actuellement : \(currentName)"
+                    default: return "Şu an: \(currentName)"
+                    }
+                }()
+                Text("\(nowLabel) (\(currentTime.formattedTime))")
                     .font(.system(size: 9, weight: .medium, design: .rounded))
                     .foregroundColor(.white.opacity(0.6))
             }
@@ -282,7 +340,17 @@ struct MediumWidgetView: View {
                 Spacer()
                 
                 if let next = entry.progressInfo?.nextPrayer {
-                    Text("Sıradaki: \(next.turkishName)")
+                    let nextName = next.localizedName(for: entry.languageCode)
+                    let nextLabel: String = {
+                        switch entry.languageCode {
+                        case "en": return "Next: \(nextName)"
+                        case "de": return "Nächstes: \(nextName)"
+                        case "ar": return "التالي: \(nextName)"
+                        case "fr": return "Prochaine : \(nextName)"
+                        default: return "Sıradaki: \(nextName)"
+                        }
+                    }()
+                    Text(nextLabel)
                         .font(.system(.caption2, design: .rounded))
                         .foregroundColor(.white.opacity(0.7))
                     
@@ -296,7 +364,17 @@ struct MediumWidgetView: View {
                 Spacer()
                 
                 if let current = entry.progressInfo?.currentPrayer {
-                    Text("Şu an: \(current.turkishName)")
+                    let currentName = current.localizedName(for: entry.languageCode)
+                    let nowLabel: String = {
+                        switch entry.languageCode {
+                        case "en": return "Now: \(currentName)"
+                        case "de": return "Jetzt: \(currentName)"
+                        case "ar": return "الآن: \(currentName)"
+                        case "fr": return "Actuellement : \(currentName)"
+                        default: return "Şu an: \(currentName)"
+                        }
+                    }()
+                    Text(nowLabel)
                         .font(.system(size: 10, design: .rounded))
                         .foregroundColor(.white.opacity(0.6))
                 }
@@ -314,6 +392,7 @@ struct MediumWidgetView: View {
                 // Show 5 main prayers in right column (fajr, dhuhr, asr, maghrib, isha)
                 ForEach(entry.todayTimes.filter { $0.type != .sunrise }) { item in
                     let isActive = entry.progressInfo?.currentPrayer == item.type
+                    let prayerName = item.type.localizedName(for: entry.languageCode)
                     
                     HStack(spacing: 8) {
                         Image(systemName: item.type.iconName)
@@ -321,7 +400,7 @@ struct MediumWidgetView: View {
                             .foregroundColor(isActive ? .amberColor : .white.opacity(0.6))
                             .frame(width: 12)
                         
-                        Text(item.type.turkishName)
+                        Text(prayerName)
                             .font(.system(size: 11, design: .rounded))
                             .fontWeight(isActive ? .bold : .regular)
                             .foregroundColor(isActive ? .white : .white.opacity(0.7))

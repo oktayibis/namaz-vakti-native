@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -46,9 +47,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.oktay.namaz.R
+import com.oktay.namaz.model.CalculationMethodRegistry
 import com.oktay.namaz.service.AlarmScheduler
 import com.oktay.namaz.service.PrayerType
 import com.oktay.namaz.ui.theme.AmberAccent
@@ -66,6 +70,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val activeLocation by viewModel.activeLocation.collectAsState()
+    val appLanguage by viewModel.appLanguage.collectAsState()
     
     val alarmScheduler = remember { AlarmScheduler(context) }
     
@@ -74,40 +79,24 @@ fun SettingsScreen(
     
     var showOffsetDialog by remember { mutableStateOf(false) }
     var selectedOffsetIndex by remember { mutableStateOf(4) } // Default to 30 mins
-    
     val offsetOptions = listOf(0, 5, 10, 15, 20, 30, 45, 60)
     
     var showMethodDialog by remember { mutableStateOf(false) }
-    val calculationMethods = listOf(
-        0 to "Kum Leva Enstitüsü (Caferi)",
-        1 to "Karaçi (İslami İlimler Üni.)",
-        2 to "ISNA (Kuzey Amerika)",
-        3 to "Muslim World League (Dünya İslam Birliği)",
-        4 to "Umm Al-Qura (Mekke)",
-        5 to "Mısır Genel Araştırma Kurumu",
-        7 to "Tahran Üniversitesi (Şii)",
-        8 to "Körfez Bölgesi",
-        9 to "Kuveyt",
-        10 to "Katar",
-        11 to "Singapur (MUIS)",
-        12 to "Fransa (UOIF)",
-        13 to "Türkiye (Diyanet)",
-        14 to "Rusya",
-        15 to "Moonsighting Committee",
-        16 to "Dubai",
-        17 to "Malezya (JAKIM)",
-        18 to "Tunus",
-        19 to "Cezayir",
-        20 to "Endonezya (KEMENAG)",
-        21 to "Fas",
-        22 to "Portekiz (Lizbon)",
-        23 to "Ürdün"
+    var showMadhabDialog by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
+
+    val languages = listOf(
+        "system" to stringResource(R.string.language_system),
+        "tr" to stringResource(R.string.language_tr),
+        "en" to stringResource(R.string.language_en),
+        "de" to stringResource(R.string.language_de),
+        "ar" to stringResource(R.string.language_ar),
+        "fr" to stringResource(R.string.language_fr)
     )
     
     fun saveChanges() {
         alarmScheduler.setEnabledPrayers(enabledPrayers)
         alarmScheduler.setReminderOffsets(reminderOffsets)
-
         viewModel.rescheduleAlarms()
     }
     
@@ -119,7 +108,7 @@ fun SettingsScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "Bildirim Ayarları",
+                    text = stringResource(R.string.settings),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -129,7 +118,7 @@ fun SettingsScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Geri",
+                        contentDescription = stringResource(R.string.back_btn),
                         tint = Color.White
                     )
                 }
@@ -155,12 +144,12 @@ fun SettingsScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
-                            contentDescription = "Uyarı",
+                            contentDescription = stringResource(R.string.notifications),
                             tint = Color.Red
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Bildirim İzni Devre Dışı",
+                            text = stringResource(R.string.notification_permission_required),
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp
@@ -168,7 +157,7 @@ fun SettingsScreen(
                     }
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "Namaz vakitlerinde hatırlatıcı alabilmek için lütfen bildirim izni verin.",
+                        text = stringResource(R.string.notification_permission_desc),
                         color = Color.Gray,
                         fontSize = 13.sp
                     )
@@ -184,22 +173,68 @@ fun SettingsScreen(
                                 context.startActivity(intent)
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = AmberAccent),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.height(36.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red.copy(alpha = 0.8f)),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("İzin Ver", color = Color.Black, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.open_settings), color = Color.White)
                     }
                 }
             }
             
-            // Prayers Selection Section
+            // 1. Language Section
             Text(
-                text = "Vakit Seçimi",
+                text = stringResource(R.string.app_language),
                 color = Color.Gray,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .background(SurfaceGlass, shape = RoundedCornerShape(12.dp))
+            ) {
+                val currentLangLabel = languages.firstOrNull { it.first == appLanguage }?.second ?: stringResource(R.string.language_system)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showLanguageDialog = true }
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Language,
+                        contentDescription = stringResource(R.string.app_language),
+                        tint = AmberAccent,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.app_language),
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = currentLangLabel,
+                            color = AmberAccent,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
+
+            // 2. Prayer Notifications Switch Section
+            Text(
+                text = stringResource(R.string.prayer_notifications),
+                color = Color.Gray,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp)
             )
             
             Column(
@@ -209,14 +244,14 @@ fun SettingsScreen(
                     .background(SurfaceGlass, shape = RoundedCornerShape(12.dp))
             ) {
                 val list = listOf(
-                    PrayerType.FAJR to "imsak",
-                    PrayerType.DHUHR to "dhuhr",
-                    PrayerType.ASR to "asr",
-                    PrayerType.MAGHRIB to "maghrib",
-                    PrayerType.ISHA to "isha"
+                    PrayerType.FAJR,
+                    PrayerType.DHUHR,
+                    PrayerType.ASR,
+                    PrayerType.MAGHRIB,
+                    PrayerType.ISHA
                 )
                 
-                list.forEachIndexed { index, (prayer, _) ->
+                list.forEachIndexed { index, prayer ->
                     val isChecked = enabledPrayers.contains(prayer)
                     
                     Row(
@@ -226,7 +261,7 @@ fun SettingsScreen(
                             .padding(horizontal = 16.dp, vertical = 10.dp)
                     ) {
                         Text(
-                            text = prayer.turkishName,
+                            text = prayer.getLocalizedName(context),
                             color = Color.White,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium
@@ -257,9 +292,9 @@ fun SettingsScreen(
                 }
             }
             
-            // Reminder Offsets Section
+            // 3. Reminder Timing Section
             Text(
-                text = "Hatırlatıcı Zamanları",
+                text = stringResource(R.string.notification_timing),
                 color = Color.Gray,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
@@ -280,7 +315,7 @@ fun SettingsScreen(
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         Text(
-                            text = if (offset == 0) "Namaz Vaktinde" else "$offset dakika önce",
+                            text = if (offset == 0) stringResource(R.string.exact_time) else stringResource(R.string.mins_before, offset),
                             color = Color.White,
                             fontSize = 15.sp
                         )
@@ -293,7 +328,7 @@ fun SettingsScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Sil",
+                                contentDescription = stringResource(R.string.delete),
                                 tint = Color.Red.copy(alpha = 0.8f)
                             )
                         }
@@ -316,12 +351,12 @@ fun SettingsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Ekle",
+                            contentDescription = stringResource(R.string.continue_btn),
                             tint = AmberAccent
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Hatırlatıcı Ekle",
+                            text = stringResource(R.string.notification_timing),
                             color = AmberAccent,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold
@@ -330,9 +365,9 @@ fun SettingsScreen(
                 }
             }
             
-            // Calculation Parameters Section
+            // 4. Calculation Parameters Section
             Text(
-                text = "Hesaplama Ayarları",
+                text = stringResource(R.string.calculation_settings),
                 color = Color.Gray,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
@@ -345,9 +380,10 @@ fun SettingsScreen(
                     .padding(horizontal = 16.dp)
                     .background(SurfaceGlass, shape = RoundedCornerShape(12.dp))
             ) {
-                // 1. Calculation Method Row
+                // Method Row
                 val currentMethodId = viewModel.getCalculationMethod()
-                val methodName = calculationMethods.firstOrNull { it.first == currentMethodId }?.second ?: "Muslim World League"
+                val currentMethod = CalculationMethodRegistry.methods.firstOrNull { it.id == currentMethodId }
+                    ?: CalculationMethodRegistry.methods.first { it.id == 3 }
                 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -358,34 +394,130 @@ fun SettingsScreen(
                 ) {
                     Column {
                         Text(
-                            text = "Hesaplama Metodu",
+                            text = stringResource(R.string.calculation_method),
                             color = Color.White,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = methodName,
+                            text = "${currentMethod.name} — ${currentMethod.region}",
                             color = AmberAccent,
                             fontSize = 13.sp
                         )
                     }
                 }
-                
+
+                Divider(color = Color.White.copy(alpha = 0.1f))
+
+                // Asr Madhab Row
+                val currentMadhabId = viewModel.getAsrMadhab()
+                val madhabLabel = if (currentMadhabId == 1) stringResource(R.string.madhab_hanafi) else stringResource(R.string.madhab_standard)
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showMadhabDialog = true }
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.asr_madhab),
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = madhabLabel,
+                            color = AmberAccent,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
+
+            // 5. About & Privacy Section
+            Text(
+                text = stringResource(R.string.about),
+                color = Color.Gray,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .background(SurfaceGlass, shape = RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.app_name) + " v1.0",
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.about_desc),
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp
+                )
             }
         }
     }
     
-    // Add offset dialog
+    // Dialog: App Language
+    if (showLanguageDialog) {
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = { Text(stringResource(R.string.app_language), fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    languages.forEach { (code, label) ->
+                        val isSelected = appLanguage == code
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.setAppLanguage(code)
+                                    showLanguageDialog = false
+                                }
+                                .padding(vertical = 12.dp)
+                        ) {
+                            Text(
+                                text = label,
+                                color = if (isSelected) AmberAccent else Color.White,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                fontSize = 16.sp
+                            )
+                        }
+                        Divider(color = Color.White.copy(alpha = 0.05f))
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showLanguageDialog = false }) {
+                    Text(stringResource(R.string.close), color = Color.White)
+                }
+            },
+            containerColor = Color(0xFF1E1E2E)
+        )
+    }
+
+    // Dialog: Add Offset
     if (showOffsetDialog) {
         AlertDialog(
             onDismissRequest = { showOffsetDialog = false },
-            title = { Text("Hatırlatıcı Süresi Ekle", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.notification_timing), fontWeight = FontWeight.Bold) },
             text = {
                 Column {
-                    Text("Namaz vaktinden ne kadar önce hatırlatıcı almak istersiniz?", fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
                     offsetOptions.forEachIndexed { index, option ->
                         val isSelected = selectedOffsetIndex == index
                         Row(
@@ -396,7 +528,7 @@ fun SettingsScreen(
                                 .padding(vertical = 10.dp)
                         ) {
                             Text(
-                                text = if (option == 0) "Namaz Vaktinde" else "$option dakika önce",
+                                text = if (option == 0) stringResource(R.string.exact_time) else stringResource(R.string.mins_before, option),
                                 color = if (isSelected) AmberAccent else Color.White,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 15.sp
@@ -417,39 +549,90 @@ fun SettingsScreen(
                     }
                     showOffsetDialog = false
                 }) {
-                    Text("Ekle", color = AmberAccent)
+                    Text(stringResource(R.string.continue_btn), color = AmberAccent)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showOffsetDialog = false }) {
-                    Text("İptal", color = Color.White)
+                    Text(stringResource(R.string.cancel), color = Color.White)
                 }
             },
             containerColor = Color(0xFF1E1E2E)
         )
     }
     
-    // Calculation Method dialog
+    // Dialog: Calculation Method
     if (showMethodDialog) {
         AlertDialog(
             onDismissRequest = { showMethodDialog = false },
-            title = { Text("Hesaplama Metodu Seçin", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.calculation_method), fontWeight = FontWeight.Bold) },
             text = {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    calculationMethods.forEach { (id, name) ->
-                        val isSelected = viewModel.getCalculationMethod() == id
+                    CalculationMethodRegistry.methods.forEach { method ->
+                        val isSelected = viewModel.getCalculationMethod() == method.id
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    viewModel.setCalculationMethod(id)
+                                    viewModel.setCalculationMethod(method.id)
                                     showMethodDialog = false
                                 }
                                 .padding(vertical = 12.dp)
                         ) {
+                            Column {
+                                Text(
+                                    text = method.name,
+                                    color = if (isSelected) AmberAccent else Color.White,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 15.sp
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = method.region,
+                                    color = Color.Gray,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                        Divider(color = Color.White.copy(alpha = 0.05f))
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showMethodDialog = false }) {
+                    Text(stringResource(R.string.close), color = Color.White)
+                }
+            },
+            containerColor = Color(0xFF1E1E2E)
+        )
+    }
+
+    // Dialog: Asr Madhab
+    if (showMadhabDialog) {
+        AlertDialog(
+            onDismissRequest = { showMadhabDialog = false },
+            title = { Text(stringResource(R.string.asr_madhab), fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    listOf(
+                        0 to stringResource(R.string.madhab_standard),
+                        1 to stringResource(R.string.madhab_hanafi)
+                    ).forEach { (id, label) ->
+                        val isSelected = viewModel.getAsrMadhab() == id
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.setAsrMadhab(id)
+                                    showMadhabDialog = false
+                                }
+                                .padding(vertical = 12.dp)
+                        ) {
                             Text(
-                                text = name,
+                                text = label,
                                 color = if (isSelected) AmberAccent else Color.White,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 15.sp
@@ -461,8 +644,8 @@ fun SettingsScreen(
             },
             confirmButton = {},
             dismissButton = {
-                TextButton(onClick = { showMethodDialog = false }) {
-                    Text("Kapat", color = Color.White)
+                TextButton(onClick = { showMadhabDialog = false }) {
+                    Text(stringResource(R.string.close), color = Color.White)
                 }
             },
             containerColor = Color(0xFF1E1E2E)

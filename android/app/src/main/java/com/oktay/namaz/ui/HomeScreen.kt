@@ -45,6 +45,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import com.oktay.namaz.R
 import com.oktay.namaz.service.PrayerType
 import com.oktay.namaz.ui.components.CircularProgressView
 import com.oktay.namaz.ui.theme.AmberAccent
@@ -59,6 +62,7 @@ fun HomeScreen(
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val activeLocation by viewModel.activeLocation.collectAsState()
     val todayTimes by viewModel.todayTimes.collectAsState()
     val progressInfo by viewModel.progressInfo.collectAsState()
@@ -103,13 +107,13 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.LocationOn,
-                            contentDescription = "Konum",
+                            contentDescription = stringResource(R.string.select_location),
                             tint = Color.White,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = activeLocation?.name ?: "Konum Seçin",
+                            text = activeLocation?.name ?: stringResource(R.string.select_location),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White
@@ -128,7 +132,7 @@ fun HomeScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Ayarlar",
+                        contentDescription = stringResource(R.string.settings),
                         tint = Color.White
                     )
                 }
@@ -146,13 +150,13 @@ fun HomeScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOff,
-                        contentDescription = "Konum Yok",
+                        contentDescription = stringResource(R.string.no_location_title),
                         tint = Color.White.copy(alpha = 0.8f),
                         modifier = Modifier.size(80.dp)
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(
-                        text = "Namaz vakitlerini görüntülemek için lütfen bir konum ekleyin.",
+                        text = stringResource(R.string.no_location_desc),
                         fontSize = 15.sp,
                         color = Color.White.copy(alpha = 0.8f),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -176,12 +180,12 @@ fun HomeScreen(
                             } else {
                                 Icon(
                                     imageVector = Icons.Default.MyLocation,
-                                    contentDescription = "Bul",
+                                    contentDescription = stringResource(R.string.detect_location),
                                     tint = Color.Black
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Mevcut Konumu Kullan",
+                                    text = stringResource(R.string.use_current_location),
                                     color = Color.Black,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp
@@ -200,7 +204,7 @@ fun HomeScreen(
                             .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
                     ) {
                         Text(
-                            text = "Şehir Arama",
+                            text = stringResource(R.string.search_city),
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
@@ -214,10 +218,11 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        val localizedPrayerName = info.nextPrayer.getLocalizedName(context)
                         CircularProgressView(
                             progress = progress,
                             timeRemaining = timeRemaining,
-                            nextPrayerName = "${info.nextPrayer.turkishName} vaktine kalan"
+                            nextPrayerName = stringResource(R.string.time_remaining_label, localizedPrayerName)
                         )
                     }
                 }
@@ -240,7 +245,7 @@ fun HomeScreen(
                     ) {
                         Column {
                             Text(
-                                text = "Bugün Vakitler",
+                                text = stringResource(R.string.today_prayers),
                                 color = Color.White.copy(alpha = 0.95f),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -282,7 +287,7 @@ fun HomeScreen(
                                 .padding(horizontal = 16.dp, vertical = 16.dp)
                         ) {
                             Text(
-                                text = item.type.turkishName,
+                                text = item.type.getLocalizedName(context),
                                 color = if (isActive) Color.White else Color.White.copy(alpha = 0.85f),
                                 fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 15.sp
@@ -302,7 +307,7 @@ fun HomeScreen(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Icon(
                                     imageVector = Icons.Default.ArrowBackIosNew,
-                                    contentDescription = "Aktif",
+                                    contentDescription = stringResource(R.string.active),
                                     tint = AmberAccent,
                                     modifier = Modifier.size(10.dp)
                                 )

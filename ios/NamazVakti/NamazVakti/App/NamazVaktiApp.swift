@@ -6,6 +6,7 @@ import WidgetKit
 struct NamazVaktiApp: App {
     @Environment(\.scenePhase) var scenePhase
     @StateObject private var viewModel = AppViewModel.shared
+    @StateObject private var languageManager = LanguageManager.shared
 
     static let refreshTaskId = "com.oktay.NamazVakti.refresh"
 
@@ -44,7 +45,10 @@ struct NamazVaktiApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .environment(\.locale, languageManager.currentLocale)
+                .environment(\.layoutDirection, languageManager.layoutDirection)
                 .preferredColorScheme(.dark)
+                .id(languageManager.currentLanguage)
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                     // Refresh data when app returns to foreground
                     viewModel.updateTimes()

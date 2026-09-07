@@ -48,6 +48,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.oktay.namaz.R
+import androidx.compose.ui.res.stringResource
 import com.oktay.namaz.model.LocationData
 import com.oktay.namaz.service.LocationManager
 import com.oktay.namaz.ui.theme.AmberAccent
@@ -94,7 +96,7 @@ fun LocationScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "Konum Yönetimi",
+                    text = stringResource(R.string.location_management),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -104,7 +106,7 @@ fun LocationScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Geri",
+                        contentDescription = stringResource(R.string.back_btn),
                         tint = Color.White
                     )
                 }
@@ -116,11 +118,11 @@ fun LocationScreen(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Şehir Ara...", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.search_city_placeholder), color = Color.Gray) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Ara",
+                    contentDescription = stringResource(R.string.search_city),
                     tint = Color.Gray
                 )
             },
@@ -191,7 +193,7 @@ fun LocationScreen(
             // Saved Locations List
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Kaydedilen Konumlar",
+                    text = stringResource(R.string.saved_locations),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Gray,
@@ -213,12 +215,12 @@ fun LocationScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MyLocation,
-                                contentDescription = "Konum",
+                                contentDescription = stringResource(R.string.detect_location),
                                 tint = AmberAccent
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Mevcut Konumu Kullan",
+                                text = if (isDetectingLocation) stringResource(R.string.detecting_location) else stringResource(R.string.use_current_location),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
@@ -244,13 +246,13 @@ fun LocationScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Map,
-                                    contentDescription = "Boş",
+                                    contentDescription = stringResource(R.string.saved_locations),
                                     tint = Color.Gray,
                                     modifier = Modifier.size(40.dp)
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    text = "Henüz kaydedilmiş bir konum yok.",
+                                    text = stringResource(R.string.no_location_desc),
                                     color = Color.Gray,
                                     fontSize = 14.sp
                                 )
@@ -290,7 +292,7 @@ fun LocationScreen(
                                 if (isActive) {
                                     Icon(
                                         imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = "Seçili",
+                                        contentDescription = stringResource(R.string.active),
                                         tint = AmberAccent
                                     )
                                     Spacer(modifier = Modifier.width(16.dp))
@@ -299,7 +301,7 @@ fun LocationScreen(
                                 IconButton(onClick = { viewModel.removeLocation(location) }) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
-                                        contentDescription = "Sil",
+                                        contentDescription = stringResource(R.string.delete),
                                         tint = Color.Red.copy(alpha = 0.8f)
                                     )
                                 }

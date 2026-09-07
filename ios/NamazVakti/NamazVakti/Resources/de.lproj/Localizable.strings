@@ -1,0 +1,79 @@
+/* German Localizable.strings */
+
+/* Prayers */
+"prayer_fajr" = "Fadschr";
+"prayer_sunrise" = "Sonnenaufgang";
+"prayer_dhuhr" = "Zuhr";
+"prayer_asr" = "Asr";
+"prayer_maghrib" = "Maghrib";
+"prayer_isha" = "Ischa";
+
+/* Home Screen */
+"select_location" = "Ort wählen";
+"no_location_title" = "Kein Ort hinzugefügt";
+"no_location_desc" = "Bitte fügen Sie einen Ort hinzu, um genaue Gebetszeiten zu berechnen.";
+"use_current_location" = "Aktuellen Standort verwenden";
+"search_city" = "Stadt suchen";
+"today_prayers" = "Heutige Gebete";
+"time_until" = "%@ in %@";
+"time_remaining_label" = "Verbleibende Zeit bis %@";
+
+/* Location Screen */
+"location_management" = "Standortverwaltung";
+"search_city_placeholder" = "Stadt suchen...";
+"detect_location" = "Standort automatisch ermitteln";
+"detecting_location" = "Standort wird ermittelt...";
+"saved_locations" = "Gespeicherte Orte";
+"no_saved_locations" = "Noch keine Orte gespeichert.";
+"active" = "Aktiv";
+"delete" = "Löschen";
+
+/* Settings Screen */
+"settings" = "Einstellungen";
+"notifications" = "Benachrichtigungen";
+"prayer_notifications" = "Gebetserinnerungen";
+"notification_timing" = "Erinnerungszeitpunkt";
+"reminder_times" = "Erinnerungszeiten";
+"reminder_times_footer" = "Sie können bis zu 3 verschiedene Erinnerungen hinzufügen (z. B. 30 Min. vorher und zur Gebetszeit).";
+"add_reminder" = "Erinnerung hinzufügen";
+"new_reminder_duration" = "Neuer Erinnerungszeitpunkt";
+"add" = "Hinzufügen";
+"exact_time" = "Pünktlich (0 Min.)";
+"mins_before" = "%d Minuten vorher";
+"notification_permission_required" = "Benachrichtigungsberechtigung erforderlich";
+"notification_permission_desc" = "Bitte erteilen Sie in den Systemeinstellungen die Benachrichtigungsberechtigung, um Gebetszeiten rechtzeitig zu erhalten.";
+"open_settings" = "Einstellungen öffnen";
+
+/* Calculation Settings */
+"calculation_settings" = "Berechnungseinstellungen";
+"calculation_method" = "Berechnungsmethode";
+"calculation_method_desc" = "Ausgewählt basierend auf Ihrer geografischen Region";
+"asr_madhab" = "Asr-Methode (Madhab)";
+"madhab_standard" = "Standard (Schafi'i, Maliki, Hanbali)";
+"madhab_hanafi" = "Hanafi (Späteres Asr)";
+
+/* Language Settings */
+"app_language" = "App-Sprache";
+"language_system" = "Systemstandard";
+"language_tr" = "Türkçe";
+"language_en" = "English";
+"language_de" = "Deutsch";
+"language_ar" = "العربية";
+"language_fr" = "Français";
+
+/* Onboarding */
+"setup_wizard" = "Einrichtungsassistent";
+"onboarding_step1_desc" = "Wählen Sie einen Ort aus, um Gebetszeiten zu berechnen.";
+"or_search_city" = "oder nach einer Stadt suchen:";
+"onboarding_step2_desc" = "Standardeinstellungen basierend auf Ihrem Standort ausgewählt. Passen Sie diese bei Bedarf an:";
+"calculation_method_source" = "Berechnungsmethode (Behörde)";
+"continue_btn" = "Weiter";
+"back_btn" = "Zurück";
+"get_started" = "Loslegen";
+"change" = "Ändern";
+"cancel" = "Abbrechen";
+"close" = "Schließen";
+
+/* About & Privacy */
+"about" = "Über";
+"about_desc" = "Gebetszeiten ist eine 100% offlinefähige, datenschutzorientierte und werbefreie Gebetszeiten-App.";

@@ -76,7 +76,7 @@ class AppViewModel: ObservableObject {
                 
                 // Add next prayer details for widget
                 if let info = PrayerCalculator.shared.getProgressInfo(for: active) {
-                    widgetTimes["nextPrayerName"] = info.nextPrayer.turkishName
+                    widgetTimes["nextPrayerName"] = info.nextPrayer.localizedName(for: LanguageManager.shared.effectiveLanguageCode)
                     let hours = Int(info.timeRemaining) / 3600
                     let minutes = (Int(info.timeRemaining) % 3600) / 60
                     widgetTimes["nextPrayerTimeRemaining"] = String(format: "%02d:%02d", hours, minutes)
@@ -218,12 +218,20 @@ class AppViewModel: ObservableObject {
             defaultMethod = 4 // Umm Al-Qura
         } else if countryLower.contains("egypt") {
             defaultMethod = 5 // Egyptian
+        } else if countryLower.contains("emirates") || countryLower.contains("dubai") || countryLower.contains("uae") {
+            defaultMethod = 16 // Dubai
+        } else if countryLower.contains("singapore") || countryLower.contains("malaysia") {
+            defaultMethod = 11 // Singapore MUIS
+        } else if countryLower.contains("kuwait") {
+            defaultMethod = 9 // Kuwait
+        } else if countryLower.contains("qatar") {
+            defaultMethod = 10 // Qatar
         } else if countryLower.contains("pakistan") || countryLower.contains("india") || countryLower.contains("bangladesh") {
             defaultMethod = 1 // Karachi
         } else if countryLower.contains("united states") || countryLower.contains("canada") || countryLower.contains("america") {
             defaultMethod = 2 // ISNA
         } else {
-            defaultMethod = 3 // Muslim World League
+            defaultMethod = 3 // Muslim World League (Europe, UK, Global default)
         }
         
         let defaultSchool: Int
@@ -274,13 +282,20 @@ class AppViewModel: ObservableObject {
         }
     }
     
+    func setAppLanguage(_ code: String) {
+        LanguageManager.shared.currentLanguage = code
+        updateTimes()
+        saveLocations()
+    }
+    
     func updateTimes() {
         guard let active = activeLocation else { return }
+        let locale = LanguageManager.shared.currentLocale
         
         todayTimes = PrayerCalculator.shared.getPrayerTimesList(for: active, date: Date())
         progressInfo = PrayerCalculator.shared.getProgressInfo(for: active)
-        hijriDateString = PrayerCalculator.shared.getHijriDateString(for: active, date: Date())
-        gregorianDateString = PrayerCalculator.shared.getGregorianDateString(for: active, date: Date())
+        hijriDateString = PrayerCalculator.shared.getHijriDateString(for: active, date: Date(), locale: locale)
+        gregorianDateString = PrayerCalculator.shared.getGregorianDateString(for: active, date: Date(), locale: locale)
         
         updateTimerTick()
     }

@@ -3,9 +3,11 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var notificationManager = NotificationManager.shared
+    @StateObject private var languageManager = LanguageManager.shared
     private var appViewModel = AppViewModel.shared
     
     @State private var selectedMethod = 13
+    @State private var selectedMadhab = 0
     @State private var enabledPrayers: Set<PrayerType> = []
     @State private var reminderOffsets: [Int] = []
     @State private var showingAddReminderSheet = false
@@ -20,6 +22,25 @@ struct SettingsView: View {
                 Color.black.opacity(0.92).ignoresSafeArea()
                 
                 Form {
+                    // Language Settings Section
+                    Section(header: Text(tr("app_language")).foregroundColor(.gray)) {
+                        Picker(tr("app_language"), selection: Binding(
+                            get: { languageManager.currentLanguage },
+                            set: { newValue in
+                                appViewModel.setAppLanguage(newValue)
+                            }
+                        )) {
+                            Text(tr("language_system")).tag("system")
+                            Text("Türkçe").tag("tr")
+                            Text("English").tag("en")
+                            Text("Deutsch").tag("de")
+                            Text("العربية").tag("ar")
+                            Text("Français").tag("fr")
+                        }
+                        .foregroundColor(.white)
+                    }
+                    .listRowBackground(Color.white.opacity(0.05))
+                    
                     // Notification permission banner
                     if !notificationManager.isPermissionGranted {
                         Section {
@@ -27,11 +48,11 @@ struct SettingsView: View {
                                 HStack {
                                     Image(systemName: "bell.badge.fill")
                                         .foregroundColor(.red)
-                                    Text("Bildirim İzni Devre Dışı")
+                                    Text(tr("notification_permission_required"))
                                         .font(.system(.headline, design: .rounded))
                                         .foregroundColor(.white)
                                 }
-                                Text("Namaz vakitlerinde hatırlatıcı alabilmek için lütfen ayarlardan bildirim izni verin.")
+                                Text(tr("notification_permission_desc"))
                                     .font(.system(.subheadline, design: .rounded))
                                     .foregroundColor(.gray)
                                 
@@ -44,7 +65,7 @@ struct SettingsView: View {
                                         }
                                     }
                                 }) {
-                                    Text("Sistem Ayarlarını Aç")
+                                    Text(tr("open_settings"))
                                         .font(.system(.subheadline, design: .rounded))
                                         .fontWeight(.semibold)
                                         .foregroundColor(.amberColor)
@@ -57,7 +78,7 @@ struct SettingsView: View {
                     }
                     
                     // Toggle per prayer time
-                    Section(header: Text("Vakit Seçimi").foregroundColor(.gray)) {
+                    Section(header: Text(tr("prayer_notifications")).foregroundColor(.gray)) {
                         ForEach([PrayerType.fajr, .dhuhr, .asr, .maghrib, .isha], id: \.self) { prayer in
                             Toggle(isOn: Binding(
                                 get: { enabledPrayers.contains(prayer) },
@@ -74,7 +95,7 @@ struct SettingsView: View {
                                     Image(systemName: prayer.iconName)
                                         .foregroundColor(.amberColor)
                                         .frame(width: 24)
-                                    Text(prayer.turkishName)
+                                    Text(prayer.localizedName(for: languageManager.effectiveLanguageCode))
                                         .font(.system(.body, design: .rounded))
                                         .foregroundColor(.white)
                                 }
@@ -85,12 +106,12 @@ struct SettingsView: View {
                     
                     // Reminder offsets list (max 3)
                     Section(
-                        header: Text("Hatırlatıcı Zamanları").foregroundColor(.gray),
-                        footer: Text("En fazla 3 farklı hatırlatıcı ekleyebilirsiniz. (Örn: 30 dk önce ve Namaz vaktinde)").foregroundColor(.gray)
+                        header: Text(tr("reminder_times")).foregroundColor(.gray),
+                        footer: Text(tr("reminder_times_footer")).foregroundColor(.gray)
                     ) {
                         ForEach(reminderOffsets, id: \.self) { offset in
                             HStack {
-                                Text(offset == 0 ? "Namaz Vaktinde" : "\(offset) dakika önce")
+                                Text(offset == 0 ? tr("exact_time") : tr("mins_before", offset))
                                     .font(.system(.body, design: .rounded))
                                     .foregroundColor(.white)
                                 Spacer()
@@ -107,7 +128,7 @@ struct SettingsView: View {
                             Button(action: { showingAddReminderSheet = true }) {
                                 HStack {
                                     Image(systemName: "plus.circle.fill")
-                                    Text("Hatırlatıcı Ekle")
+                                    Text(tr("add_reminder"))
                                         .font(.system(.body, design: .rounded))
                                 }
                                 .foregroundColor(.amberColor)
@@ -117,50 +138,54 @@ struct SettingsView: View {
                     .listRowBackground(Color.white.opacity(0.05))
                     
                     // Calculation Parameters Section
-                    Section(header: Text("Hesaplama Ayarları").foregroundColor(.gray)) {
-                        Picker("Hesaplama Metodu", selection: Binding(
+                    Section(
+                        header: Text(tr("calculation_settings")).foregroundColor(.gray),
+                        footer: Text(tr("calculation_method_desc")).foregroundColor(.gray)
+                    ) {
+                        Picker(tr("calculation_method"), selection: Binding(
                             get: { selectedMethod },
                             set: { newValue in
                                 selectedMethod = newValue
                                 appViewModel.setCalculationMethod(newValue)
+                                selectedMadhab = appViewModel.getAsrMadhab()
                             }
                         )) {
-                            Text("Kum Leva Enstitüsü (Caferi)").tag(0)
-                            Text("Karaçi (İslami İlimler)").tag(1)
-                            Text("ISNA (Kuzey Amerika)").tag(2)
-                            Text("Muslim World League").tag(3)
-                            Text("Umm Al-Qura (Mekke)").tag(4)
-                            Text("Mısır Genel Araştırma").tag(5)
-                            Text("Tahran Üniversitesi (Şii)").tag(7)
-                            Text("Körfez Bölgesi").tag(8)
-                            Text("Kuveyt").tag(9)
-                            Text("Katar").tag(10)
-                            Text("Singapur (MUIS)").tag(11)
-                            Text("Fransa (UOIF)").tag(12)
-                            Text("Türkiye (Diyanet)").tag(13)
-                            Text("Rusya").tag(14)
-                            Text("Moonsighting Committee").tag(15)
-                            Text("Dubai").tag(16)
-                            Text("Malezya (JAKIM)").tag(17)
-                            Text("Tunus").tag(18)
-                            Text("Cezayir").tag(19)
-                            Text("Endonezya (KEMENAG)").tag(20)
-                            Text("Fas").tag(21)
-                            Text("Portekiz (Lizbon)").tag(22)
-                            Text("Ürdün").tag(23)
+                            ForEach(CalculationMethodRegistry.methods) { method in
+                                Text("\(method.name) (\(method.region))").tag(method.id)
+                            }
+                        }
+                        .foregroundColor(.white)
+                        
+                        Picker(tr("asr_madhab"), selection: Binding(
+                            get: { selectedMadhab },
+                            set: { newValue in
+                                selectedMadhab = newValue
+                                appViewModel.setAsrMadhab(newValue)
+                            }
+                        )) {
+                            Text(tr("madhab_standard")).tag(0)
+                            Text(tr("madhab_hanafi")).tag(1)
                         }
                         .foregroundColor(.white)
                     }
                     .listRowBackground(Color.white.opacity(0.05))
+                    
+                    // About Section
+                    Section(header: Text(tr("about")).foregroundColor(.gray)) {
+                        Text(tr("about_desc"))
+                            .font(.system(.footnote, design: .rounded))
+                            .foregroundColor(.gray)
+                    }
+                    .listRowBackground(Color.white.opacity(0.05))
                 }
-                .scrollContentBackground(.hidden) // Removes standard Form background on iOS 16+
+                .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Bildirim Ayarları")
+            .navigationTitle(tr("settings"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { dismiss() }) {
-                        Text("Kapat")
+                        Text(tr("close"))
                             .foregroundColor(.white)
                             .fontWeight(.semibold)
                     }
@@ -171,15 +196,15 @@ struct SettingsView: View {
                     ZStack {
                         Color.black.opacity(0.92).ignoresSafeArea()
                         VStack(spacing: 24) {
-                            Text("Yeni Hatırlatıcı Süresi")
+                            Text(tr("new_reminder_duration"))
                                 .font(.system(.headline, design: .rounded))
                                 .foregroundColor(.white)
                                 .padding(.top)
                             
-                            Picker("Süre", selection: $selectedOffsetToAdd) {
-                                Text("Namaz Vaktinde").tag(0)
+                            Picker(tr("notification_timing"), selection: $selectedOffsetToAdd) {
+                                Text(tr("exact_time")).tag(0)
                                 ForEach(offsetOptions, id: \.self) { min in
-                                    Text("\(min) dakika önce").tag(min)
+                                    Text(tr("mins_before", min)).tag(min)
                                 }
                             }
                             .pickerStyle(WheelPickerStyle())
@@ -189,7 +214,7 @@ struct SettingsView: View {
                                 addOffset(selectedOffsetToAdd)
                                 showingAddReminderSheet = false
                             }) {
-                                Text("Ekle")
+                                Text(tr("add"))
                                     .font(.system(.body, design: .rounded))
                                     .fontWeight(.bold)
                                     .foregroundColor(.black)
@@ -204,13 +229,13 @@ struct SettingsView: View {
                         }
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button("İptal") { showingAddReminderSheet = false }
+                                Button(tr("cancel")) { showingAddReminderSheet = false }
                                     .foregroundColor(.white)
                             }
                         }
                     }
                 }
-                .presentationDetents([.height(320)]) // Half-sheet in iOS 16
+                .presentationDetents([.height(320)])
                 .preferredColorScheme(.dark)
             }
         }
@@ -228,6 +253,7 @@ struct SettingsView: View {
         enabledPrayers = notificationManager.getEnabledPrayers()
         reminderOffsets = notificationManager.getReminderOffsets()
         selectedMethod = appViewModel.getCalculationMethod()
+        selectedMadhab = appViewModel.getAsrMadhab()
     }
     
     private func addOffset(_ offset: Int) {

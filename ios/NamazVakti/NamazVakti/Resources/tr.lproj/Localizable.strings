@@ -1,0 +1,79 @@
+/* Turkish Localizable.strings */
+
+/* Prayers */
+"prayer_fajr" = "İmsak";
+"prayer_sunrise" = "Güneş";
+"prayer_dhuhr" = "Öğle";
+"prayer_asr" = "İkindi";
+"prayer_maghrib" = "Akşam";
+"prayer_isha" = "Yatsı";
+
+/* Home Screen */
+"select_location" = "Konum Seçin";
+"no_location_title" = "Konum Yok";
+"no_location_desc" = "Namaz vakitlerini görüntülemek için lütfen bir konum ekleyin.";
+"use_current_location" = "Mevcut Konumu Kullan";
+"search_city" = "Şehir Arama";
+"today_prayers" = "Bugün Vakitler";
+"time_until" = "%@ vaktine %@ kaldı";
+"time_remaining_label" = "%@ vaktine kalan";
+
+/* Location Screen */
+"location_management" = "Konum Yönetimi";
+"search_city_placeholder" = "Şehir Ara...";
+"detect_location" = "Konumumu Otomatik Bul";
+"detecting_location" = "Konum belirleniyor...";
+"saved_locations" = "Kayıtlı Konumlar";
+"no_saved_locations" = "Henüz kaydedilmiş bir konum yok.";
+"active" = "Aktif";
+"delete" = "Sil";
+
+/* Settings Screen */
+"settings" = "Ayarlar";
+"notifications" = "Bildirimler";
+"prayer_notifications" = "Vakit Bildirimleri";
+"notification_timing" = "Bildirim Zamanı";
+"reminder_times" = "Hatırlatıcı Zamanları";
+"reminder_times_footer" = "En fazla 3 farklı hatırlatıcı ekleyebilirsiniz (Örn: 30 dk önce ve Namaz vaktinde).";
+"add_reminder" = "Hatırlatıcı Ekle";
+"new_reminder_duration" = "Yeni Hatırlatıcı Süresi";
+"add" = "Ekle";
+"exact_time" = "Vaktinde (0 dk)";
+"mins_before" = "%d dakika önce";
+"notification_permission_required" = "Bildirim İzni Gerekli";
+"notification_permission_desc" = "Ezan ve vakit bildirimlerini zamanında alabilmek için sistem ayarlarından bildirim izni vermeniz gerekmektedir.";
+"open_settings" = "Ayarları Aç";
+
+/* Calculation Settings */
+"calculation_settings" = "Hesaplama Ayarları";
+"calculation_method" = "Hesaplama Metodu";
+"calculation_method_desc" = "Coğrafi bölgenize göre seçilmiştir";
+"asr_madhab" = "İkindi Vakti Hesabı (Mezhep)";
+"madhab_standard" = "Standart (Şafii, Maliki, Hanbeli)";
+"madhab_hanafi" = "Hanefi (İkindi 2. gölge)";
+
+/* Language Settings */
+"app_language" = "Uygulama Dili";
+"language_system" = "Sistem Dili";
+"language_tr" = "Türkçe";
+"language_en" = "English";
+"language_de" = "Deutsch";
+"language_ar" = "العربية";
+"language_fr" = "Français";
+
+/* Onboarding */
+"setup_wizard" = "Kurulum Sihirbazı";
+"onboarding_step1_desc" = "Namaz vakitlerini hesaplamak için bir konum seçin.";
+"or_search_city" = "veya şehir arayın:";
+"onboarding_step2_desc" = "Konumunuza göre varsayılan hesaplama ayarları seçildi. Değiştirmek isterseniz düzenleyin:";
+"calculation_method_source" = "Hesaplama Metodu (Kaynak)";
+"continue_btn" = "Devam Et";
+"back_btn" = "Geri";
+"get_started" = "Başlayalım";
+"change" = "Değiştir";
+"cancel" = "İptal";
+"close" = "Kapat";
+
+/* About & Privacy */
+"about" = "Hakkında";
+"about_desc" = "Namaz Vakti, %100 çevrimdışı, gizlilik odaklı ve reklamsız bir namaz vakti uygulamasıdır.";

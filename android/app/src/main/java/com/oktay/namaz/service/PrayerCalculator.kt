@@ -24,7 +24,18 @@ enum class PrayerType(val rawValue: String, val turkishName: String) {
     DHUHR("dhuhr", "Öğle"),
     ASR("asr", "İkindi"),
     MAGHRIB("maghrib", "Akşam"),
-    ISHA("isha", "Yatsı")
+    ISHA("isha", "Yatsı");
+
+    fun getLocalizedName(context: Context): String {
+        return when (this) {
+            FAJR -> context.getString(com.oktay.namaz.R.string.prayer_fajr)
+            SUNRISE -> context.getString(com.oktay.namaz.R.string.prayer_sunrise)
+            DHUHR -> context.getString(com.oktay.namaz.R.string.prayer_dhuhr)
+            ASR -> context.getString(com.oktay.namaz.R.string.prayer_asr)
+            MAGHRIB -> context.getString(com.oktay.namaz.R.string.prayer_maghrib)
+            ISHA -> context.getString(com.oktay.namaz.R.string.prayer_isha)
+        }
+    }
 }
 
 data class PrayerTimeItem(
@@ -223,9 +234,9 @@ object PrayerCalculator {
     }
 
     /**
-     * Diyanet takvimiyle uyumlu Türkçe Hicri tarih üretimi (örn: "24 Rebiülevvel 1448").
+     * Yerel Hicri tarih üretimi (örn: "24 Rebiülevvel 1448" / "24 Rabi' al-Awwal 1448").
      */
-    fun getHijriDateString(context: Context, location: LocationData, date: Date = Date()): String {
+    fun getHijriDateString(context: Context, location: LocationData, date: Date = Date(), locale: Locale = Locale.getDefault()): String {
         return try {
             val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
             val localDate = date.toInstant().atZone(tz.toZoneId()).toLocalDate()
@@ -234,13 +245,40 @@ object PrayerCalculator {
             val month = hijrahDate.get(ChronoField.MONTH_OF_YEAR)
             val year = hijrahDate.get(ChronoField.YEAR)
 
-            val turkishHijriMonths = listOf(
-                "Muharrem", "Safer", "Rebiülevvel", "Rebiülahir",
-                "Cemaziyelevvel", "Cemaziyelahir", "Recep", "Şaban",
-                "Ramazan", "Şevval", "Zilkade", "Zilhicce"
-            )
-            val monthName = turkishHijriMonths.getOrElse(month - 1) { "" }
-            "$day $monthName $year"
+            val lang = locale.language.lowercase()
+            val monthName = when (lang) {
+                "tr" -> listOf(
+                    "Muharrem", "Safer", "Rebiülevvel", "Rebiülahir",
+                    "Cemaziyelevvel", "Cemaziyelahir", "Recep", "Şaban",
+                    "Ramazan", "Şevval", "Zilkade", "Zilhicce"
+                ).getOrElse(month - 1) { "" }
+                "ar" -> listOf(
+                    "محرم", "صفر", "ربيع الأول", "ربيع الآخر",
+                    "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان",
+                    "رمضان", "شوال", "ذو القعدة", "ذو الحجة"
+                ).getOrElse(month - 1) { "" }
+                "de" -> listOf(
+                    "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
+                    "Dschumada l-ula", "Dschumada th-thaniya", "Radschab", "Scha'ban",
+                    "Ramadan", "Schawwal", "Dhu l-qa'da", "Dhu l-Hiddscha"
+                ).getOrElse(month - 1) { "" }
+                "fr" -> listOf(
+                    "Mouharram", "Safar", "Rabi' al-Awwal", "Rabi' ath-Thani",
+                    "Joumada al-Oula", "Joumada ath-Thaniya", "Rajab", "Cha'bane",
+                    "Ramadan", "Chawwal", "Dhou al-Qi'da", "Dhou al-Hijja"
+                ).getOrElse(month - 1) { "" }
+                else -> listOf(
+                    "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
+                    "Jumada al-Awwal", "Jumada al-Thani", "Rajab", "Sha'ban",
+                    "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"
+                ).getOrElse(month - 1) { "" }
+            }
+
+            if (lang == "ar") {
+                "$day $monthName $year هـ"
+            } else {
+                "$day $monthName $year"
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             ""
@@ -248,12 +286,12 @@ object PrayerCalculator {
     }
 
     /**
-     * Türkçe Miladi tarih formatı (örn: "6 Eylül 2026, Pazar").
+     * Yerel Miladi tarih formatı (örn: "6 Eylül 2026, Pazar" / "September 6, 2026, Sunday").
      */
-    fun getGregorianDateString(context: Context, location: LocationData, date: Date = Date()): String {
+    fun getGregorianDateString(context: Context, location: LocationData, date: Date = Date(), locale: Locale = Locale.getDefault()): String {
         return try {
             val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
-            val formatter = SimpleDateFormat("d MMMM yyyy, EEEE", Locale("tr", "TR")).apply {
+            val formatter = SimpleDateFormat("d MMMM yyyy, EEEE", locale).apply {
                 timeZone = tz
             }
             formatter.format(date)

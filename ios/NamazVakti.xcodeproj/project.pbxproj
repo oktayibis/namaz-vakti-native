@@ -10,8 +10,10 @@
 		158771C3B2BFC0F6F276C574 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 543D4EE2273B167D58A5B32F /* NotificationManager.swift */; };
 		17E92DF4EE19FA9917A78AD6 /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F696707DAACB0582D17DF0 /* LocationData.swift */; };
 		1D00C0A32F786980E3A0594D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B822C367FBBB455B936AFCA /* Assets.xcassets */; };
+		1DE499D38DED0807803644C4 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AE7350DB02C44B751685117A /* Localizable.strings */; };
 		29728A080E2C5D516A045C03 /* NamazVaktiWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAEFBB30DAA7582817362C6E /* NamazVaktiWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3C3B661AB64A9F14DAF922FF /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC1B83252700DC5916F4DE0 /* LocationManager.swift */; };
+		4339B0740D02801588BCCB87 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBE0EBF1E3F5C1401E45CB2 /* LanguageManager.swift */; };
 		51D86F9F646200A829B5DA4C /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F80456A69A10778917A741 /* AppViewModel.swift */; };
 		77592738EF2CDCD457CF08CE /* Gradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D9A7FE9D22A14485EA1A0AD /* Gradients.swift */; };
 		87DB2567452D4EE4DBCDE727 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = B256C97EDF1CF24C10C7C344 /* Adhan */; };
@@ -22,6 +24,7 @@
 		A9E4C485B4EACDEFA8A2877E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0389C30CF6E6BA30CF2B69 /* SettingsView.swift */; };
 		B1C67CBAAE9CBF3B71FA2D3F /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD9B010CB0ADF68FB98E5CB /* CircularProgressView.swift */; };
 		B553967EA2B56D5397A25E9E /* PrayerCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFDF97A4D661BCDCBB7F9ED /* PrayerCalculator.swift */; };
+		B739F824106C5BA9EB6F4972 /* CalculationMethodRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99C6C15E7ABC48EBA0BC8B6F /* CalculationMethodRegistry.swift */; };
 		B74581A9B6E92D4B935645AE /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 8A0924ED36C8860079D2C7A7 /* Adhan */; };
 		C2D818AB7127970DB5749EF3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFD136E73B0D5708316CA0A /* HomeView.swift */; };
 		D62C0C7F5CC8CC6F7EE387AE /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B4B2A6490F2D05E3E82AD2 /* OnboardingView.swift */; };
@@ -55,6 +58,7 @@
 /* Begin PBXFileReference section */
 		0100669DA5F19177131DBE63 /* NamazVakti.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NamazVakti.entitlements; sourceTree = "<group>"; };
 		09F696707DAACB0582D17DF0 /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
+		0AF865227CA2DE5C7255942B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0B822C367FBBB455B936AFCA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		208032D5AE74C517A0A24C29 /* NamazVaktiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamazVaktiApp.swift; sourceTree = "<group>"; };
 		243BE1D87466D1B48C61FFC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -62,16 +66,22 @@
 		3BD9B010CB0ADF68FB98E5CB /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
 		543D4EE2273B167D58A5B32F /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		57B4B2A6490F2D05E3E82AD2 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		684009ED3E4E6A3950FC2926 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FFD136E73B0D5708316CA0A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		786A941015363EDBE0194F1C /* LocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationView.swift; sourceTree = "<group>"; };
 		977D8625CFE97B4F3B03ED88 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		AAEFBB30DAA7582817362C6E /* NamazVaktiWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NamazVaktiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		99C6C15E7ABC48EBA0BC8B6F /* CalculationMethodRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculationMethodRegistry.swift; sourceTree = "<group>"; };
+		9B9755106ACA647559D5A2CB /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		AAEFBB30DAA7582817362C6E /* NamazVaktiWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = NamazVaktiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC0389C30CF6E6BA30CF2B69 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C573247B3C5C9AE2228B59B2 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CDC1B83252700DC5916F4DE0 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
-		D5DB0CF0103F49F800A8B16C /* NamazVakti.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NamazVakti.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5DB0CF0103F49F800A8B16C /* NamazVakti.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NamazVakti.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0F80456A69A10778917A741 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		EBAD6B2F839A67966CC457CB /* NamazVaktiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NamazVaktiWidget.entitlements; sourceTree = "<group>"; };
+		F6B8CC3735B481413CA19123 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FD089C1958C789AD8D843505 /* NamazVaktiWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamazVaktiWidget.swift; sourceTree = "<group>"; };
+		FFBE0EBF1E3F5C1401E45CB2 /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
 		FFFDF97A4D661BCDCBB7F9ED /* PrayerCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerCalculator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -109,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				E0F80456A69A10778917A741 /* AppViewModel.swift */,
+				FFBE0EBF1E3F5C1401E45CB2 /* LanguageManager.swift */,
 				CDC1B83252700DC5916F4DE0 /* LocationManager.swift */,
 				543D4EE2273B167D58A5B32F /* NotificationManager.swift */,
 				FFFDF97A4D661BCDCBB7F9ED /* PrayerCalculator.swift */,
@@ -125,6 +136,14 @@
 			);
 			sourceTree = "<group>";
 		};
+		69033BBAA136F8D1F4286327 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AE7350DB02C44B751685117A /* Localizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		694879AE3B688F9A2B62B1DF /* NamazVakti */ = {
 			isa = PBXGroup;
 			children = (
@@ -133,6 +152,7 @@
 				0100669DA5F19177131DBE63 /* NamazVakti.entitlements */,
 				D8C8E4F2DEB280D08F60694A /* App */,
 				9964F1EAAD6540BBEA8BF34F /* Models */,
+				69033BBAA136F8D1F4286327 /* Resources */,
 				31775666E97EF765517BD6C0 /* Services */,
 				F201A1E09E129F4407C01734 /* UI */,
 			);
@@ -152,6 +172,7 @@
 		9964F1EAAD6540BBEA8BF34F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				99C6C15E7ABC48EBA0BC8B6F /* CalculationMethodRegistry.swift */,
 				09F696707DAACB0582D17DF0 /* LocationData.swift */,
 			);
 			path = Models;
@@ -238,13 +259,25 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					51EED641D30DA55751C4CF41 = {
+						DevelopmentTeam = 2ZG8A6RT9F;
+					};
+					E6A7199ADC080381D34FB6F5 = {
+						DevelopmentTeam = 2ZG8A6RT9F;
+					};
+				};
 			};
 			buildConfigurationList = A78099CB5B76DBAB9F9D9D1D /* Build configuration list for PBXProject "NamazVakti" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
+				ar,
+				de,
 				en,
+				fr,
+				tr,
 			);
 			mainGroup = 31884B7806F27718EFE3AA9F;
 			minimizedProjectReferenceProxies = 1;
@@ -268,6 +301,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D00C0A32F786980E3A0594D /* Assets.xcassets in Resources */,
+				1DE499D38DED0807803644C4 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,9 +323,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				51D86F9F646200A829B5DA4C /* AppViewModel.swift in Sources */,
+				B739F824106C5BA9EB6F4972 /* CalculationMethodRegistry.swift in Sources */,
 				B1C67CBAAE9CBF3B71FA2D3F /* CircularProgressView.swift in Sources */,
 				77592738EF2CDCD457CF08CE /* Gradients.swift in Sources */,
 				C2D818AB7127970DB5749EF3 /* HomeView.swift in Sources */,
+				4339B0740D02801588BCCB87 /* LanguageManager.swift in Sources */,
 				17E92DF4EE19FA9917A78AD6 /* LocationData.swift in Sources */,
 				3C3B661AB64A9F14DAF922FF /* LocationManager.swift in Sources */,
 				9FDA3087E34B62DA3453A903 /* LocationView.swift in Sources */,
@@ -312,6 +348,21 @@
 			targetProxy = C8A0686CCE70C2364AC49B9F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		AE7350DB02C44B751685117A /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0AF865227CA2DE5C7255942B /* ar */,
+				684009ED3E4E6A3950FC2926 /* de */,
+				F6B8CC3735B481413CA19123 /* en */,
+				9B9755106ACA647559D5A2CB /* fr */,
+				C573247B3C5C9AE2228B59B2 /* tr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		9C886B99B6B96E761C25E64D /* Release */ = {
@@ -376,7 +427,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = NamazVaktiWidget/NamazVaktiWidget.entitlements;
-				DEVELOPMENT_TEAM = 3SN795A9D6;
 				INFOPLIST_FILE = NamazVaktiWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -459,7 +509,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = NamazVaktiWidget/NamazVaktiWidget.entitlements;
-				DEVELOPMENT_TEAM = 3SN795A9D6;
 				INFOPLIST_FILE = NamazVaktiWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -479,7 +528,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = NamazVakti/NamazVakti/NamazVakti.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 3SN795A9D6;
 				INFOPLIST_FILE = NamazVakti/NamazVakti/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -498,7 +546,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = NamazVakti/NamazVakti/NamazVakti.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 3SN795A9D6;
 				INFOPLIST_FILE = NamazVakti/NamazVakti/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (

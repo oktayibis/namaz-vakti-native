@@ -1,0 +1,79 @@
+/* English Localizable.strings */
+
+/* Prayers */
+"prayer_fajr" = "Fajr";
+"prayer_sunrise" = "Sunrise";
+"prayer_dhuhr" = "Dhuhr";
+"prayer_asr" = "Asr";
+"prayer_maghrib" = "Maghrib";
+"prayer_isha" = "Isha";
+
+/* Home Screen */
+"select_location" = "Select Location";
+"no_location_title" = "No Location Added";
+"no_location_desc" = "Please add a location to calculate accurate prayer times.";
+"use_current_location" = "Use Current Location";
+"search_city" = "Search City";
+"today_prayers" = "Today's Prayers";
+"time_until" = "%@ in %@";
+"time_remaining_label" = "Time remaining until %@";
+
+/* Location Screen */
+"location_management" = "Location Management";
+"search_city_placeholder" = "Search city...";
+"detect_location" = "Auto-Detect Location";
+"detecting_location" = "Detecting location...";
+"saved_locations" = "Saved Locations";
+"no_saved_locations" = "No saved locations yet.";
+"active" = "Active";
+"delete" = "Delete";
+
+/* Settings Screen */
+"settings" = "Settings";
+"notifications" = "Notifications";
+"prayer_notifications" = "Prayer Reminders";
+"notification_timing" = "Reminder Timing";
+"reminder_times" = "Reminder Times";
+"reminder_times_footer" = "You can add up to 3 different reminders (e.g. 30 min before and at prayer time).";
+"add_reminder" = "Add Reminder";
+"new_reminder_duration" = "New Reminder Time";
+"add" = "Add";
+"exact_time" = "At prayer time (0 min)";
+"mins_before" = "%d minutes before";
+"notification_permission_required" = "Notification Permission Required";
+"notification_permission_desc" = "Please grant notification permissions in system settings to receive timely prayer alerts.";
+"open_settings" = "Open Settings";
+
+/* Calculation Settings */
+"calculation_settings" = "Calculation Settings";
+"calculation_method" = "Calculation Method";
+"calculation_method_desc" = "Selected based on your geographical region";
+"asr_madhab" = "Asr Juristic Method";
+"madhab_standard" = "Standard (Shafi, Maliki, Hanbali)";
+"madhab_hanafi" = "Hanafi (Later Asr)";
+
+/* Language Settings */
+"app_language" = "App Language";
+"language_system" = "System Default";
+"language_tr" = "Türkçe";
+"language_en" = "English";
+"language_de" = "Deutsch";
+"language_ar" = "العربية";
+"language_fr" = "Français";
+
+/* Onboarding */
+"setup_wizard" = "Setup Wizard";
+"onboarding_step1_desc" = "Choose a location to calculate prayer times.";
+"or_search_city" = "or search for a city:";
+"onboarding_step2_desc" = "Default calculation settings applied based on your location. Customize if needed:";
+"calculation_method_source" = "Calculation Method (Authority)";
+"continue_btn" = "Continue";
+"back_btn" = "Back";
+"get_started" = "Get Started";
+"change" = "Change";
+"cancel" = "Cancel";
+"close" = "Close";
+
+/* About & Privacy */
+"about" = "About";
+"about_desc" = "Prayer Times is a 100% offline, privacy-first, ad-free prayer times application.";
