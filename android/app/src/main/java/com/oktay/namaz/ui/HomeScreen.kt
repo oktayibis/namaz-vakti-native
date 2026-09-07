@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,13 +43,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.platform.LocalContext
 import com.oktay.namaz.R
+import com.oktay.namaz.service.PrayerProgressInfo
+import com.oktay.namaz.service.PrayerTimeItem
 import com.oktay.namaz.service.PrayerType
 import com.oktay.namaz.ui.components.CircularProgressView
 import com.oktay.namaz.ui.theme.AmberAccent
@@ -63,16 +68,21 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val isTabletOrLandscape = configuration.screenWidthDp >= 600
+
     val activeLocation by viewModel.activeLocation.collectAsState()
     val todayTimes by viewModel.todayTimes.collectAsState()
     val progressInfo by viewModel.progressInfo.collectAsState()
     val timeRemaining by viewModel.timeRemainingString.collectAsState()
     val progress by viewModel.progress.collectAsState()
     val isDetectingLocation by viewModel.isDetectingLocation.collectAsState()
-    
+    val gregorianDate by viewModel.gregorianDateString.collectAsState()
+    val hijriDate by viewModel.hijriDateString.collectAsState()
+
     val currentPrayerType = progressInfo?.currentPrayer ?: PrayerType.ISHA
     val bgBrush = getPrayerGradient(currentPrayerType)
-    
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -84,17 +94,19 @@ fun HomeScreen(
         }
 
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 30.dp)
         ) {
-            // Header
+            // Header (bounded to max-width on large screens)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
+                    .widthIn(max = 1040.dp)
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 40.dp)
+                    .padding(start = 20.dp, end = 20.dp, top = 40.dp)
             ) {
                 // Location Switcher Trigger
                 Box(
@@ -141,12 +153,13 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             if (activeLocation == null) {
-                // First Launch / No Location Selected
+                // First Launch / No Location Selected (centered and max-width clamped)
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
+                        .widthIn(max = 480.dp)
                         .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 80.dp)
+                        .padding(horizontal = 30.dp, vertical = 60.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOff,
@@ -211,8 +224,48 @@ fun HomeScreen(
                         )
                     }
                 }
+            } else if (isTabletOrLandscape) {
+                // Adaptive Two-Column Dashboard for Tablets / Foldables / Landscape
+                Row(
+                    modifier = Modifier
+                        .widthIn(max = 1040.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(32.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    // Left Column: Hero Countdown Ring
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(top = 16.dp)
+                    ) {
+                        progressInfo?.let { info ->
+                            val localizedPrayerName = info.nextPrayer.getLocalizedName(context)
+                            CircularProgressView(
+                                progress = progress,
+                                timeRemaining = timeRemaining,
+                                nextPrayerName = stringResource(R.string.time_remaining_label, localizedPrayerName)
+                            )
+                        }
+                    }
+
+                    // Right Column: Prayer Schedule Card
+                    Box(
+                        modifier = Modifier.weight(1.15f)
+                    ) {
+                        PrayerTimesCard(
+                            todayTimes = todayTimes,
+                            progressInfo = progressInfo,
+                            gregorianDate = gregorianDate,
+                            hijriDate = hijriDate,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
             } else {
-                // Countdown ring
+                // Standard Single-Column Flow for Phones
                 progressInfo?.let { info ->
                     Box(
                         contentAlignment = Alignment.Center,
@@ -229,91 +282,107 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Prayer List Card
-                Column(
+                PrayerTimesCard(
+                    todayTimes = todayTimes,
+                    progressInfo = progressInfo,
+                    gregorianDate = gregorianDate,
+                    hijriDate = hijriDate,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .background(SurfaceGlass, shape = RoundedCornerShape(20.dp))
-                        .border(1.5.dp, BorderGlass, shape = RoundedCornerShape(20.dp))
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 14.dp)
-                    ) {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.today_prayers),
-                                color = Color.White.copy(alpha = 0.95f),
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            val gregorianDate by viewModel.gregorianDateString.collectAsState()
-                            if (gregorianDate.isNotEmpty()) {
-                                Text(
-                                    text = gregorianDate,
-                                    color = Color.White.copy(alpha = 0.65f),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        val hijriDate by viewModel.hijriDateString.collectAsState()
-                        if (hijriDate.isNotEmpty()) {
-                            Text(
-                                text = hijriDate,
-                                color = AmberAccent.copy(alpha = 0.95f),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                    
-                    Divider(color = Color.White.copy(alpha = 0.15f))
-                    
-                    todayTimes.forEach { item ->
-                        val isActive = progressInfo?.currentPrayer == item.type
-                        
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    if (isActive) Color.White.copy(alpha = 0.14f) else Color.Transparent
-                                )
-                                .padding(horizontal = 16.dp, vertical = 16.dp)
-                        ) {
-                            Text(
-                                text = item.type.getLocalizedName(context),
-                                color = if (isActive) Color.White else Color.White.copy(alpha = 0.85f),
-                                fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                                fontSize = 15.sp
-                            )
-                            
-                            Spacer(modifier = Modifier.weight(1f))
-                            
-                            Text(
-                                text = item.formattedTime,
-                                color = if (isActive) Color.White else Color.White.copy(alpha = 0.85f),
-                                fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                                fontFamily = FontFamily.Monospace,
-                                fontSize = 15.sp
-                            )
-                            
-                            if (isActive) {
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Icon(
-                                    imageVector = Icons.Default.ArrowBackIosNew,
-                                    contentDescription = stringResource(R.string.active),
-                                    tint = AmberAccent,
-                                    modifier = Modifier.size(10.dp)
-                                )
-                            }
-                        }
-                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PrayerTimesCard(
+    todayTimes: List<PrayerTimeItem>,
+    progressInfo: PrayerProgressInfo?,
+    gregorianDate: String,
+    hijriDate: String,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    Column(
+        modifier = modifier
+            .background(SurfaceGlass, shape = RoundedCornerShape(20.dp))
+            .border(1.5.dp, BorderGlass, shape = RoundedCornerShape(20.dp))
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp, vertical = 14.dp)
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.today_prayers),
+                    color = Color.White.copy(alpha = 0.95f),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                if (gregorianDate.isNotEmpty()) {
+                    Text(
+                        text = gregorianDate,
+                        color = Color.White.copy(alpha = 0.65f),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (hijriDate.isNotEmpty()) {
+                Text(
+                    text = hijriDate,
+                    color = AmberAccent.copy(alpha = 0.95f),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+
+        Divider(color = Color.White.copy(alpha = 0.15f))
+
+        for (item in todayTimes) {
+            val isActive = progressInfo?.currentPrayer == item.type
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        if (isActive) Color.White.copy(alpha = 0.14f) else Color.Transparent
+                    )
+                    .padding(horizontal = 18.dp, vertical = 15.dp)
+            ) {
+                Text(
+                    text = item.type.getLocalizedName(context),
+                    color = if (isActive) Color.White else Color.White.copy(alpha = 0.85f),
+                    fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
+                    fontSize = 15.sp
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = item.formattedTime,
+                    color = if (isActive) Color.White else Color.White.copy(alpha = 0.85f),
+                    fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 15.sp
+                )
+
+                if (isActive) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = stringResource(R.string.active),
+                        tint = AmberAccent,
+                        modifier = Modifier.size(10.dp)
+                    )
                 }
             }
         }
@@ -329,21 +398,16 @@ fun StarsOverlay() {
             0.05f to 0.25f, 0.18f to 0.28f, 0.35f to 0.14f, 0.55f to 0.25f, 0.72f to 0.18f,
             0.92f to 0.22f, 0.12f to 0.04f, 0.5f to 0.03f, 0.8f to 0.27f, 0.3f to 0.26f
         )
-        
-        Canvas(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.35f)) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
             val width = size.width
             val height = size.height
-            
-            starPositions.forEach { (xPercent, yPercent) ->
+            starPositions.forEach { (relX, relY) ->
                 drawCircle(
-                    color = Color.White.copy(alpha = (0.3f..0.8f).random()),
-                    radius = (2f..5f).random(),
-                    center = androidx.compose.ui.geometry.Offset(width * xPercent, height * yPercent)
+                    color = Color.White.copy(alpha = 0.5f),
+                    radius = 2.dp.toPx(),
+                    center = androidx.compose.ui.geometry.Offset(relX * width, relY * height)
                 )
             }
         }
     }
 }
-
-// Helper utility for generating random numbers in ClosedRange
-private fun ClosedRange<Float>.random() = (Math.random() * (endInclusive - start) + start).toFloat()

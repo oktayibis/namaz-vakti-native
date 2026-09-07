@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -87,16 +88,22 @@ fun LocationScreen(
         }
     }
 
-    Column(
+    Box(
+        contentAlignment = Alignment.TopCenter,
         modifier = modifier
             .fillMaxSize()
             .background(MidnightBg)
     ) {
-        // App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.location_management),
+        Column(
+            modifier = Modifier
+                .widthIn(max = 680.dp)
+                .fillMaxSize()
+        ) {
+            // App Bar
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.location_management),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -313,4 +320,5 @@ fun LocationScreen(
             }
         }
     }
+}
 }

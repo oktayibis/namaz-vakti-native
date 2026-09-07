@@ -147,6 +147,8 @@ struct LocationView: View {
                         }
                     }
                 }
+                .frame(maxWidth: 680)
+                .frame(maxWidth: .infinity)
                 .navigationTitle(tr("location_management"))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {

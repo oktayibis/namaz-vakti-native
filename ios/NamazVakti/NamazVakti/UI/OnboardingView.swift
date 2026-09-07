@@ -266,6 +266,8 @@ struct OnboardingView: View {
                         }
                     }
                 }
+                .frame(maxWidth: 640)
+                .frame(maxWidth: .infinity)
             }
         }
         .preferredColorScheme(.dark)
