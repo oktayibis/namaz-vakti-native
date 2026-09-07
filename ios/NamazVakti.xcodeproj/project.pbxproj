@@ -28,7 +28,9 @@
 		B74581A9B6E92D4B935645AE /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 8A0924ED36C8860079D2C7A7 /* Adhan */; };
 		C2D818AB7127970DB5749EF3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FFD136E73B0D5708316CA0A /* HomeView.swift */; };
 		D62C0C7F5CC8CC6F7EE387AE /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B4B2A6490F2D05E3E82AD2 /* OnboardingView.swift */; };
+		E15FF3AC254FDB3171AFF858 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D73E07C1C6778E855907B308 /* PrivacyInfo.xcprivacy */; };
 		E35CB7C3B9DD3904F167052E /* PrayerCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFDF97A4D661BCDCBB7F9ED /* PrayerCalculator.swift */; };
+		FB00AACDE8F97ED049EF91B2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 18FFEE211A626A6E12B44A7D /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,17 +68,23 @@
 		3BD9B010CB0ADF68FB98E5CB /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
 		543D4EE2273B167D58A5B32F /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		57B4B2A6490F2D05E3E82AD2 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		5A8C956A44F4D3D6033469D2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		684009ED3E4E6A3950FC2926 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FFD136E73B0D5708316CA0A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		786A941015363EDBE0194F1C /* LocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationView.swift; sourceTree = "<group>"; };
+		86092AE5761047ADC98D1945 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9050E5EC777B3E00354752E1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		977D8625CFE97B4F3B03ED88 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		99C6C15E7ABC48EBA0BC8B6F /* CalculationMethodRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculationMethodRegistry.swift; sourceTree = "<group>"; };
+		9B3F1600D45E83FD07F5BD88 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9B9755106ACA647559D5A2CB /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AAEFBB30DAA7582817362C6E /* NamazVaktiWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = NamazVaktiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC0389C30CF6E6BA30CF2B69 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C573247B3C5C9AE2228B59B2 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C747216787F2BEB805308CA6 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		CDC1B83252700DC5916F4DE0 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		D5DB0CF0103F49F800A8B16C /* NamazVakti.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NamazVakti.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D73E07C1C6778E855907B308 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E0F80456A69A10778917A741 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		EBAD6B2F839A67966CC457CB /* NamazVaktiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NamazVaktiWidget.entitlements; sourceTree = "<group>"; };
 		F6B8CC3735B481413CA19123 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -139,6 +147,7 @@
 		69033BBAA136F8D1F4286327 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				18FFEE211A626A6E12B44A7D /* InfoPlist.strings */,
 				AE7350DB02C44B751685117A /* Localizable.strings */,
 			);
 			path = Resources;
@@ -150,6 +159,7 @@
 				0B822C367FBBB455B936AFCA /* Assets.xcassets */,
 				243BE1D87466D1B48C61FFC7 /* Info.plist */,
 				0100669DA5F19177131DBE63 /* NamazVakti.entitlements */,
+				D73E07C1C6778E855907B308 /* PrivacyInfo.xcprivacy */,
 				D8C8E4F2DEB280D08F60694A /* App */,
 				9964F1EAAD6540BBEA8BF34F /* Models */,
 				69033BBAA136F8D1F4286327 /* Resources */,
@@ -301,7 +311,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D00C0A32F786980E3A0594D /* Assets.xcassets in Resources */,
+				FB00AACDE8F97ED049EF91B2 /* InfoPlist.strings in Resources */,
 				1DE499D38DED0807803644C4 /* Localizable.strings in Resources */,
+				E15FF3AC254FDB3171AFF858 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,6 +362,18 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		18FFEE211A626A6E12B44A7D /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C747216787F2BEB805308CA6 /* ar */,
+				9B3F1600D45E83FD07F5BD88 /* de */,
+				9050E5EC777B3E00354752E1 /* en */,
+				5A8C956A44F4D3D6033469D2 /* fr */,
+				86092AE5761047ADC98D1945 /* tr */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		AE7350DB02C44B751685117A /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -434,7 +458,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.oktay.NamazVakti.NamazVaktiWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.okib.NamazVakti.NamazVaktiWidget;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -516,7 +540,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.oktay.NamazVakti.NamazVaktiWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.okib.NamazVakti.NamazVaktiWidget;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -534,7 +558,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.oktay.NamazVakti;
+				PRODUCT_BUNDLE_IDENTIFIER = com.okib.NamazVakti;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -552,7 +576,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.oktay.NamazVakti;
+				PRODUCT_BUNDLE_IDENTIFIER = com.okib.NamazVakti;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

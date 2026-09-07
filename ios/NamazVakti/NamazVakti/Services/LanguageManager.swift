@@ -12,7 +12,7 @@ struct SupportedLanguage: Identifiable, Hashable {
 final class LanguageManager: ObservableObject {
     static let shared = LanguageManager()
     
-    private let defaults = UserDefaults(suiteName: "group.com.oktay.namaz") ?? UserDefaults.standard
+    private let defaults = UserDefaults(suiteName: "group.com.okib.namaz") ?? UserDefaults.standard
     private let languageKey = "app_language"
     
     @Published var currentLanguage: String {

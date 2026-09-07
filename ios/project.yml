@@ -1,6 +1,6 @@
 name: NamazVakti
 options:
-  bundleIdPrefix: com.oktay
+  bundleIdPrefix: com.okib
   minimumXcodeGenVersion: 2.28.0
 
 packages:
@@ -43,6 +43,6 @@ targets:
         INFOPLIST_FILE: NamazVaktiWidget/Info.plist
         CODE_SIGN_ENTITLEMENTS: NamazVaktiWidget/NamazVaktiWidget.entitlements
         # Extension bundle ids must be prefixed by the host app's bundle id
-        PRODUCT_BUNDLE_IDENTIFIER: com.oktay.NamazVakti.NamazVaktiWidget
+        PRODUCT_BUNDLE_IDENTIFIER: com.okib.NamazVakti.NamazVaktiWidget
     dependencies:
       - package: Adhan

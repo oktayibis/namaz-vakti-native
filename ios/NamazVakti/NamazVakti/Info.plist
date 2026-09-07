@@ -15,17 +15,14 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Namaz vakitlerini hesaplamak için konumunuza ihtiyacımız var.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Widget ve bildirimleri güncellemek için arka planda konumunuza ihtiyacımız var.</string>
+	<string>Namaz vakitlerini ve kıble yönünü doğru hesaplayabilmek için konumunuza ihtiyaç duyuyoruz.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
-		<string>processing</string>
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.oktay.NamazVakti.refresh</string>
+		<string>com.okib.NamazVakti.refresh</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict/>

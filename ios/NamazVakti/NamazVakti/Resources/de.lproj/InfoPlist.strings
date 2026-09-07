@@ -1,0 +1,3 @@
+/* German */
+"CFBundleDisplayName" = "Gebetszeiten";
+"NSLocationWhenInUseUsageDescription" = "Wir benötigen Ihren Standort, um genaue Gebetszeiten für Ihre Stadt zu berechnen.";

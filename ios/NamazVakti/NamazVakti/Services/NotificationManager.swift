@@ -5,7 +5,7 @@ class NotificationManager: ObservableObject {
     static let shared = NotificationManager()
     
     // Shared App Group UserDefaults for sharing configuration with the Widget
-    let defaults = UserDefaults(suiteName: "group.com.oktay.namaz") ?? UserDefaults.standard
+    let defaults = UserDefaults(suiteName: "group.com.okib.namaz") ?? UserDefaults.standard
     
     @Published var isPermissionGranted = false
     

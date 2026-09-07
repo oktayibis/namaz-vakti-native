@@ -1,0 +1,3 @@
+/* Arabic */
+"CFBundleDisplayName" = "أوقات الصلاة";
+"NSLocationWhenInUseUsageDescription" = "نحتاج إلى موقعك لحساب أوقات الصلاة واتجاه القبلة بدقة لمدينتك.";

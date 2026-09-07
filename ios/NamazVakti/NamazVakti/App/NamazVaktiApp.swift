@@ -8,7 +8,7 @@ struct NamazVaktiApp: App {
     @StateObject private var viewModel = AppViewModel.shared
     @StateObject private var languageManager = LanguageManager.shared
 
-    static let refreshTaskId = "com.oktay.NamazVakti.refresh"
+    static let refreshTaskId = "com.okib.NamazVakti.refresh"
 
     init() {
         // Customize appearance for dark UI

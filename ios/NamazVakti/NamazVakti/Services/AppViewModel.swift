@@ -6,7 +6,7 @@ import CoreLocation
 class AppViewModel: ObservableObject {
     static let shared = AppViewModel()
     
-    let defaults = UserDefaults(suiteName: "group.com.oktay.namaz") ?? UserDefaults.standard
+    let defaults = UserDefaults(suiteName: "group.com.okib.namaz") ?? UserDefaults.standard
     
     @Published var savedLocations: [LocationData] = []
     @Published var activeLocation: LocationData? = nil

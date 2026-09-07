@@ -12,7 +12,7 @@ struct NamazVaktiWidgetBundle: WidgetBundle {
 
 struct Provider: TimelineProvider {
     // Shared defaults
-    let defaults = UserDefaults(suiteName: "group.com.oktay.namaz") ?? UserDefaults.standard
+    let defaults = UserDefaults(suiteName: "group.com.okib.namaz") ?? UserDefaults.standard
     private let locationsKey = "saved_locations"
     private let activeLocationIdKey = "active_location_id"
     

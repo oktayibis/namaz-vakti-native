@@ -1,0 +1,3 @@
+/* French */
+"CFBundleDisplayName" = "Heures de Prière";
+"NSLocationWhenInUseUsageDescription" = "Nous avons besoin de votre position pour calculer avec précision les heures de prière de votre ville.";
