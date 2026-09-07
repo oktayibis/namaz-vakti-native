@@ -13,7 +13,6 @@
 		186DB6D7E730458840A32AA3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 18FFEE211A626A6E12B44A7D /* InfoPlist.strings */; };
 		1D00C0A32F786980E3A0594D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B822C367FBBB455B936AFCA /* Assets.xcassets */; };
 		1DE499D38DED0807803644C4 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AE7350DB02C44B751685117A /* Localizable.strings */; };
-		234CB37DF01C054A606D0EF6 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBE0EBF1E3F5C1401E45CB2 /* LanguageManager.swift */; };
 		29728A080E2C5D516A045C03 /* NamazVaktiWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAEFBB30DAA7582817362C6E /* NamazVaktiWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3C3B661AB64A9F14DAF922FF /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC1B83252700DC5916F4DE0 /* LocationManager.swift */; };
 		4339B0740D02801588BCCB87 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFBE0EBF1E3F5C1401E45CB2 /* LanguageManager.swift */; };
@@ -385,7 +384,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				234CB37DF01C054A606D0EF6 /* LanguageManager.swift in Sources */,
 				A2B144156C73A91CAE8C4D33 /* LocationData.swift in Sources */,
 				A2AE68FA89CD108445E1A60D /* NamazVaktiWidget.swift in Sources */,
 				B553967EA2B56D5397A25E9E /* PrayerCalculator.swift in Sources */,
