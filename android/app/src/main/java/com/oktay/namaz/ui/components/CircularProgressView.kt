@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.oktay.namaz.ui.theme.BorderGlass
@@ -34,7 +35,8 @@ fun CircularProgressView(
     progress: Double,
     timeRemaining: String,
     nextPrayerName: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    size: Dp = 250.dp
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress.toFloat(),
@@ -42,19 +44,23 @@ fun CircularProgressView(
         label = "ProgressAnimation"
     )
 
+    val strokeWidth = size.value * 0.096f
+    val canvasSize = size * 0.84f
+    val isCompact = size < 200.dp
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .size(250.dp)
+            .size(size)
             .background(SurfaceGlass, shape = CircleShape)
             .border(1.5.dp, BorderGlass, shape = CircleShape)
     ) {
         // Draw track and progress ring
-        Canvas(modifier = Modifier.size(210.dp)) {
+        Canvas(modifier = Modifier.size(canvasSize)) {
             // Track
             drawCircle(
                 color = Color.White.copy(alpha = 0.15f),
-                style = Stroke(width = 24f)
+                style = Stroke(width = strokeWidth)
             )
 
             // Progress Arc
@@ -63,33 +69,43 @@ fun CircularProgressView(
                 startAngle = -90f,
                 sweepAngle = 360f * animatedProgress,
                 useCenter = false,
-                style = Stroke(width = 24f, cap = StrokeCap.Round),
-                size = Size(size.width, size.height)
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                size = Size(this.size.width, this.size.height)
             )
         }
 
         // Info Column
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(if (isCompact) 10.dp else 24.dp)
         ) {
             Text(
                 text = nextPrayerName,
-                fontSize = 13.sp,
+                fontSize = if (isCompact) 11.sp else 13.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.White.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
-            
-            Spacer(modifier = Modifier.height(6.dp))
-            
+
+            Spacer(modifier = Modifier.height(if (isCompact) 2.dp else 4.dp))
+
             Text(
                 text = timeRemaining,
-                fontSize = 34.sp,
+                fontSize = if (isCompact) 22.sp else 34.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Monospace,
                 color = Color.White,
                 textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(if (isCompact) 2.dp else 4.dp))
+
+            val percent = (animatedProgress * 100).toInt()
+            Text(
+                text = "%$percent",
+                fontSize = if (isCompact) 11.sp else 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.White.copy(alpha = 0.7f)
             )
         }
     }

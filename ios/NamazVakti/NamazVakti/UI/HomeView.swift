@@ -2,10 +2,17 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @StateObject private var viewModel = AppViewModel.shared
     @StateObject private var languageManager = LanguageManager.shared
     @State private var showSettings = false
     @State private var showLocations = false
+    
+    private static let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        return formatter
+    }()
     
     var body: some View {
         NavigationView {
@@ -27,49 +34,89 @@ struct HomeView: View {
                         viewModel.updateTimes()
                     })
                 } else {
-                    GeometryReader { geometry in
-                        let isTablet = geometry.size.width >= 600 || horizontalSizeClass == .regular
+                    TimelineView(.periodic(from: .now, by: 1.0)) { timeline in
+                        let currentTime = Self.timeFormatter.string(from: timeline.date)
                         
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: 24) {
-                                // Header Section
-                                HStack {
-                                    Button(action: { showLocations = true }) {
-                                        HStack(spacing: 6) {
-                                            Image(systemName: "mappin.and.ellipse")
-                                            Text(viewModel.activeLocation?.name ?? tr("select_location"))
-                                                .font(.system(.headline, design: .rounded))
-                                                .fontWeight(.semibold)
-                                            Image(systemName: "chevron.down")
-                                                .font(.caption2)
+                        GeometryReader { geometry in
+                            let isPhoneLandscape = verticalSizeClass == .compact
+                            let isTablet = geometry.size.width >= 600 || horizontalSizeClass == .regular
+                            
+                            if isPhoneLandscape {
+                                // Dedicated Landscape / Desk Clock (StandBy) Mode
+                                landscapeDeskClockView(currentTime: currentTime)
+                            } else {
+                                // Portrait / Tablet Layout
+                                ScrollView(showsIndicators: false) {
+                                    VStack(spacing: 20) {
+                                        // Header Section
+                                        HStack {
+                                            Button(action: { showLocations = true }) {
+                                                HStack(spacing: 6) {
+                                                    Image(systemName: "mappin.and.ellipse")
+                                                    Text(viewModel.activeLocation?.name ?? tr("select_location"))
+                                                        .font(.system(.headline, design: .rounded))
+                                                        .fontWeight(.semibold)
+                                                    Image(systemName: "chevron.down")
+                                                        .font(.caption2)
+                                                }
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 8)
+                                                .background(Color.white.opacity(0.12))
+                                                .cornerRadius(20)
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            Button(action: { showSettings = true }) {
+                                                Image(systemName: "slider.horizontal.3")
+                                                    .font(.system(.title3, design: .rounded))
+                                                    .foregroundColor(.white)
+                                                    .padding(10)
+                                                    .background(Color.white.opacity(0.12))
+                                                    .clipShape(Circle())
+                                            }
                                         }
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 8)
-                                        .background(Color.white.opacity(0.12))
-                                        .cornerRadius(20)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: { showSettings = true }) {
-                                        Image(systemName: "slider.horizontal.3")
-                                            .font(.system(.title3, design: .rounded))
-                                            .foregroundColor(.white)
-                                            .padding(10)
-                                            .background(Color.white.opacity(0.12))
-                                            .clipShape(Circle())
-                                    }
-                                }
-                                .padding(.horizontal)
-                                .padding(.top, 10)
-                                .frame(maxWidth: 1040)
-                                
-                                if isTablet {
-                                    // Dual-Column Dashboard for iPad / Large Screens
-                                    HStack(alignment: .top, spacing: 32) {
-                                        // Left Column: Hero Countdown Ring
-                                        VStack {
+                                        .padding(.horizontal)
+                                        .padding(.top, 10)
+                                        .frame(maxWidth: 1040)
+                                        
+                                        if isTablet {
+                                            // Dual-Column Dashboard for iPad / Large Screens
+                                            HStack(alignment: .top, spacing: 32) {
+                                                // Left Column: Digital Clock + Hero Countdown Ring
+                                                VStack(spacing: 16) {
+                                                    Text(currentTime)
+                                                        .font(.system(size: 42, weight: .bold, design: .monospaced))
+                                                        .foregroundColor(.white)
+                                                        .padding(.top, 8)
+                                                    
+                                                    if let progressInfo = viewModel.progressInfo {
+                                                        let prayerName = progressInfo.nextPrayer.localizedName(for: languageManager.effectiveLanguageCode)
+                                                        CircularProgressView(
+                                                            progress: viewModel.progress,
+                                                            timeRemaining: viewModel.timeRemainingString,
+                                                            nextPrayerName: tr("time_remaining_label", prayerName)
+                                                        )
+                                                        .padding(.vertical, 12)
+                                                    }
+                                                }
+                                                .frame(maxWidth: .infinity)
+                                                
+                                                // Right Column: Prayer Times Card
+                                                prayerTimesCard
+                                                    .frame(maxWidth: .infinity)
+                                            }
+                                            .padding(.horizontal, 24)
+                                            .frame(maxWidth: 1040)
+                                        } else {
+                                            // Single-Column Layout for iPhones in Portrait
+                                            // Subtle digital clock
+                                            Text(currentTime)
+                                                .font(.system(size: 28, weight: .semibold, design: .monospaced))
+                                                .foregroundColor(.white.opacity(0.9))
+                                                .padding(.top, 2)
+                                            
                                             if let progressInfo = viewModel.progressInfo {
                                                 let prayerName = progressInfo.nextPrayer.localizedName(for: languageManager.effectiveLanguageCode)
                                                 CircularProgressView(
@@ -77,35 +124,17 @@ struct HomeView: View {
                                                     timeRemaining: viewModel.timeRemainingString,
                                                     nextPrayerName: tr("time_remaining_label", prayerName)
                                                 )
-                                                .padding(.vertical, 24)
+                                                .padding(.vertical, 6)
                                             }
+                                            
+                                            prayerTimesCard
+                                                .padding(.horizontal)
                                         }
-                                        .frame(maxWidth: .infinity)
-                                        
-                                        // Right Column: Prayer Times Card
-                                        prayerTimesCard
-                                            .frame(maxWidth: .infinity)
                                     }
-                                    .padding(.horizontal, 24)
-                                    .frame(maxWidth: 1040)
-                                } else {
-                                    // Single-Column Layout for iPhones
-                                    if let progressInfo = viewModel.progressInfo {
-                                        let prayerName = progressInfo.nextPrayer.localizedName(for: languageManager.effectiveLanguageCode)
-                                        CircularProgressView(
-                                            progress: viewModel.progress,
-                                            timeRemaining: viewModel.timeRemainingString,
-                                            nextPrayerName: tr("time_remaining_label", prayerName)
-                                        )
-                                        .padding(.vertical, 10)
-                                    }
-                                    
-                                    prayerTimesCard
-                                        .padding(.horizontal)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.bottom, 30)
                                 }
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding(.bottom, 30)
                         }
                     }
                 }
@@ -118,9 +147,169 @@ struct HomeView: View {
                 LocationView()
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
             viewModel.updateTimes()
         }
+    }
+    
+    // Dedicated Landscape / Desk Clock (StandBy) Mode
+    @ViewBuilder
+    private func landscapeDeskClockView(currentTime: String) -> some View {
+        VStack(spacing: 10) {
+            // Minimalist Top Bar
+            HStack {
+                Button(action: { showLocations = true }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "mappin.and.ellipse")
+                            .foregroundColor(.amberColor)
+                        Text(viewModel.activeLocation?.name ?? tr("select_location"))
+                            .font(.system(.subheadline, design: .rounded))
+                            .fontWeight(.semibold)
+                        Image(systemName: "chevron.down")
+                            .font(.caption2)
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.12))
+                    .cornerRadius(16)
+                }
+                
+                Spacer()
+                
+                if let hijriDate = viewModel.hijriDateString {
+                    Text(hijriDate)
+                        .font(.system(.subheadline, design: .rounded))
+                        .fontWeight(.medium)
+                        .foregroundColor(.amberColor)
+                }
+                
+                Spacer()
+                
+                Button(action: { showSettings = true }) {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(.subheadline, design: .rounded))
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(Color.white.opacity(0.12))
+                        .clipShape(Circle())
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 8)
+            
+            // 3-Column Desk Dashboard
+            HStack(alignment: .center, spacing: 12) {
+                // Column 1: Big Digital Clock & Dates
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(currentTime)
+                        .font(.system(size: 46, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                        .minimumScaleFactor(0.8)
+                        .lineLimit(1)
+                    
+                    if let gregorianDate = viewModel.gregorianDateString {
+                        Text(gregorianDate)
+                            .font(.system(.subheadline, design: .rounded))
+                            .fontWeight(.medium)
+                            .foregroundColor(.white.opacity(0.8))
+                            .lineLimit(1)
+                    }
+                    
+                    if let progressInfo = viewModel.progressInfo {
+                        let currentName = progressInfo.currentPrayer.localizedName(for: languageManager.effectiveLanguageCode)
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(Color.amberColor)
+                                .frame(width: 8, height: 8)
+                            Text(currentName)
+                                .font(.system(.caption, design: .rounded))
+                                .fontWeight(.bold)
+                                .foregroundColor(.amberColor)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.amberColor.opacity(0.15))
+                        .cornerRadius(12)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 12)
+                
+                // Column 2: Compact Circular Progress Countdown
+                if let progressInfo = viewModel.progressInfo {
+                    let nextName = progressInfo.nextPrayer.localizedName(for: languageManager.effectiveLanguageCode)
+                    VStack {
+                        CircularProgressView(
+                            progress: viewModel.progress,
+                            timeRemaining: viewModel.timeRemainingString,
+                            nextPrayerName: tr("time_remaining_label", nextName)
+                        )
+                        .scaleEffect(0.76)
+                        .frame(width: 155, height: 155)
+                    }
+                }
+                
+                // Column 3: 2x3 Grid of Prayer Times
+                HStack(spacing: 6) {
+                    let prayers = viewModel.todayTimes
+                    let leftCol = prayers.prefix(3)
+                    let rightCol = prayers.dropFirst(3).prefix(3)
+                    
+                    VStack(spacing: 6) {
+                        ForEach(Array(leftCol)) { item in
+                            miniPrayerPill(item: item)
+                        }
+                    }
+                    VStack(spacing: 6) {
+                        ForEach(Array(rightCol)) { item in
+                            miniPrayerPill(item: item)
+                        }
+                    }
+                }
+                .padding(.trailing, 12)
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 4)
+            
+            Spacer(minLength: 0)
+        }
+    }
+    
+    @ViewBuilder
+    private func miniPrayerPill(item: PrayerTimeItem) -> some View {
+        let isActive = viewModel.progressInfo?.currentPrayer == item.type
+        let prayerName = item.type.localizedName(for: languageManager.effectiveLanguageCode)
+        
+        HStack(spacing: 6) {
+            Image(systemName: item.type.iconName)
+                .font(.system(size: 11))
+                .foregroundColor(isActive ? .amberColor : .white.opacity(0.7))
+                .frame(width: 14)
+            
+            Text(prayerName)
+                .font(.system(size: 12, weight: isActive ? .bold : .regular, design: .rounded))
+                .foregroundColor(isActive ? .white : .white.opacity(0.85))
+                .lineLimit(1)
+            
+            Spacer(minLength: 4)
+            
+            Text(item.formattedTime)
+                .font(.system(size: 12, weight: isActive ? .bold : .regular, design: .monospaced))
+                .foregroundColor(isActive ? .amberColor : .white.opacity(0.85))
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+        }
+        .frame(minWidth: 115)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(isActive ? Color.white.opacity(0.18) : Color.white.opacity(0.07))
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(isActive ? Color.amberColor.opacity(0.6) : Color.white.opacity(0.08), lineWidth: 1)
+        )
     }
     
     // Extracted Prayer Times Card
