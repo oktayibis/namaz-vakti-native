@@ -71,6 +71,16 @@
     <string name="cancel">Annuler</string>
     <string name="close">Fermer</string>
 
+    <!-- États d\'erreur de localisation et de recherche -->
+    <string name="current_location">Position actuelle</string>
+    <string name="location_permission_denied_title">Accès à la position refusé</string>
+    <string name="location_permission_denied_desc">Heures de Prière ne peut pas accéder à votre position. Activez-la dans les Paramètres ou recherchez plutôt votre ville.</string>
+    <string name="location_unavailable_title">Position indisponible</string>
+    <string name="location_unavailable_desc">Votre position n\'a pas pu être déterminée. Veuillez réessayer ou rechercher votre ville.</string>
+    <string name="search_error_offline">Aucune connexion Internet. Vérifiez votre connexion et réessayez.</string>
+    <string name="search_error_failed">La recherche a échoué. Veuillez réessayer.</string>
+    <string name="search_no_results">Aucune ville trouvée.</string>
+    <string name="ok">OK</string>
     <!-- À propos et confidentialité -->
     <string name="about">À propos</string>
     <string name="about_desc">Heures de Prière est une application 100% hors ligne, sans publicité et respectueuse de votre vie privée.</string>

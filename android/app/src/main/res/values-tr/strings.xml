@@ -71,6 +71,16 @@
     <string name="cancel">İptal</string>
     <string name="close">Kapat</string>
 
+    <!-- Konum ve Arama Hata Durumları -->
+    <string name="current_location">Mevcut Konum</string>
+    <string name="location_permission_denied_title">Konum Erişimi Reddedildi</string>
+    <string name="location_permission_denied_desc">Namaz Vakti konumunuza erişemiyor. Ayarlar\'dan izin verebilir veya şehrinizi arayabilirsiniz.</string>
+    <string name="location_unavailable_title">Konum Alınamadı</string>
+    <string name="location_unavailable_desc">Konumunuz belirlenemedi. Lütfen tekrar deneyin veya şehrinizi arayın.</string>
+    <string name="search_error_offline">İnternet bağlantısı yok. Bağlantınızı kontrol edip tekrar deneyin.</string>
+    <string name="search_error_failed">Arama başarısız oldu. Lütfen tekrar deneyin.</string>
+    <string name="search_no_results">Şehir bulunamadı.</string>
+    <string name="ok">Tamam</string>
     <!-- Hakkında & Gizlilik -->
     <string name="about">Hakkında</string>
     <string name="about_desc">Namaz Vakti, %100 çevrimdışı, gizlilik odaklı ve reklamsız bir namaz vakti uygulamasıdır.</string>

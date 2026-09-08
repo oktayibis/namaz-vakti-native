@@ -46,9 +46,10 @@ class LocationManager(private val context: Context) {
             if (location != null) {
                 // Reverse geocode
                 val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                val defaultLocationName = context.getString(com.oktay.namaz.R.string.current_location)
                 if (!addresses.isNullOrEmpty()) {
                     val address = addresses[0]
-                    val city = address.locality ?: address.subAdminArea ?: address.adminArea ?: "Mevcut Konum"
+                    val city = address.locality ?: address.subAdminArea ?: address.adminArea ?: defaultLocationName
                     val country = address.countryName ?: ""
                     val timezone = TimeZone.getDefault().id // default to device timezone for current location
                     
@@ -61,7 +62,7 @@ class LocationManager(private val context: Context) {
                     )
                 } else {
                     LocationData(
-                        name = "Mevcut Konum",
+                        name = defaultLocationName,
                         country = "",
                         latitude = location.latitude,
                         longitude = location.longitude,
@@ -77,12 +78,19 @@ class LocationManager(private val context: Context) {
         }
     }
 
+    private fun getGeocodingLanguage(): String {
+        val supported = setOf("en", "de", "fr", "es", "it", "pt", "ru", "tr")
+        val currentLang = Locale.getDefault().language.lowercase()
+        return if (supported.contains(currentLang)) currentLang else "en"
+    }
+
     suspend fun searchCity(query: String): List<LocationData> = withContext(Dispatchers.IO) {
         if (query.isEmpty()) return@withContext emptyList()
 
         try {
             val encodedQuery = URLEncoder.encode(query, "UTF-8")
-            val urlString = "https://geocoding-api.open-meteo.com/v1/search?name=$encodedQuery&count=10&language=tr&format=json"
+            val lang = getGeocodingLanguage()
+            val urlString = "https://geocoding-api.open-meteo.com/v1/search?name=$encodedQuery&count=10&language=$lang&format=json"
             val url = URL(urlString)
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"

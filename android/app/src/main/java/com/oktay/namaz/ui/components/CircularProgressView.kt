@@ -24,6 +24,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +49,8 @@ fun CircularProgressView(
     val strokeWidth = size.value * 0.096f
     val canvasSize = size * 0.84f
     val isCompact = size < 200.dp
+    val percentValue = (minOf(maxOf(progress, 0.0), 1.0) * 100).toInt()
+    val accessibleDescription = "$nextPrayerName, $timeRemaining, %$percentValue"
 
     Box(
         contentAlignment = Alignment.Center,
@@ -54,6 +58,9 @@ fun CircularProgressView(
             .size(size)
             .background(SurfaceGlass, shape = CircleShape)
             .border(1.5.dp, BorderGlass, shape = CircleShape)
+            .semantics(mergeDescendants = true) {
+                contentDescription = accessibleDescription
+            }
     ) {
         // Draw track and progress ring
         Canvas(modifier = Modifier.size(canvasSize)) {

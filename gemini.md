@@ -25,66 +25,53 @@ A parallel `claude.md` exists for another assistant; keep architectural facts co
 
 #### iOS Platform (Swift / SwiftUI)
 * **`/ios/NamazVakti/NamazVakti/`**
-  * `UI/HomeView.swift`: Displays progress countdown and today's prayer times. Displays `OnboardingView` if no active location exists.
+  * `UI/HomeView.swift`: Displays progress countdown and today's prayer times. Displays `OnboardingView` if no active location exists. Includes 3-column Executive Desk Clock / StandBy mode in phone landscape.
   * `UI/OnboardingView.swift`: Premium 2-step Setup Wizard with location geocoding and pickers.
   * `Services/AppViewModel.swift`: Observes active location, calculates time remaining, completes onboarding, and updates timelines.
-  * `Services/PrayerCalculator.swift`: Yearly API calendar caching and offline fallback mathematics using `Adhan-Swift`.
+  * `Services/PrayerCalculator.swift`: In-memory memoized astronomical calculations using `Adhan-Swift`.
   * `Services/LocationManager.swift` & `Services/NotificationManager.swift`: Native wrappers for GPS coordinates, reverse-geocoding, and UNUserNotificationCenter scheduling.
+  * `Services/AnalyticsService.swift`: Centralized Firebase Analytics and Crashlytics logging service.
 * **`/ios/NamazVaktiWidget/`**
-  * `NamazVaktiWidget.swift`: WidgetKit timeline extension. Reads the yearly calendar cache from App Group defaults (`group.com.oktay.namaz`).
-  * The widget target compiles `LocationData.swift` and `PrayerCalculator.swift` directly from the app target (listed in its `sources` in `project.yml`) — no shared framework, so keep those files free of app-only dependencies.
+  * `NamazVaktiWidget.swift`: WidgetKit timeline extension. Reads shared settings and times from App Group suite (`group.com.okib.namaz`).
+  * The widget target compiles `LocationData.swift` and `PrayerCalculator.swift` directly from the app target (listed in its `sources` in `project.yml`) — keep those files strictly free of app-only dependencies (Firebase, AnalyticsService, UI packages).
 
 ---
 
-## 2. Core Coding Rules & API Specifications
+## 2. Core Architecture & Engineering Standards
 
-### Aladhan API & Cache Mapping
-* **Endpoint**: `https://api.aladhan.com/v1/calendar/{year}?latitude={lat}&longitude={lng}&method={methodId}&school={schoolId}`
-* **Response structure**: Maps month strings `"1"` to `"12"` to daily lists of timings; day rows are matched by `dd-MM-yyyy` Gregorian date, and times are parsed in the location's own timezone.
-* **Format**:
-  * Android: Saved as a JSON file `namaz_cache_[locationId]_[year].json` in the app's `cacheDir`. Settings live in SharedPreferences `namaz_prefs` (keys include `calculation_method`, `asr_madhab`).
-  * iOS: Saved as a JSON string in the shared `group.com.oktay.namaz` suite under the key `namaz_cache_[locationId]_[year]`.
-* **Lookup order** in `PrayerCalculator.calculatePrayerTimes`: annual JSON cache → on miss, kick off a background re-fetch **and** fall back to on-device astronomical calculation via the Batoulapps Adhan library (`com.batoulapps.adhan:adhan` on Android, `Adhan-Swift` SPM package on iOS). Always prefer cached annual calendar values for display and notification scheduling.
-* **Cache refresh signal**: when a background fetch lands, both platforms emit `com.oktay.namaz.ACTION_CACHE_UPDATED` (Android: broadcast received by `AppViewModel`; iOS: `NotificationCenter` post). Android's `PrayerCalculator` also keeps a synchronized in-memory copy of the parsed annual JSON (the file is 1–2 MB and the widget/countdown would otherwise re-parse it every second) — invalidate it whenever the cache file is rewritten.
-* **City text search**: Open-Meteo Geocoding API (`geocoding-api.open-meteo.com/v1/search`); GPS reverse-geocoding is native (`CLGeocoder` on iOS).
+### Memoization & Battery Optimization
+* **Astronomical Calculations Cache**: `PrayerCalculator.calculatePrayerTimes` MUST memoize calculated day tables in a thread-safe in-memory cache (limit ~12 entries, keyed by location ID, date components, method, and madhab). `getProgressInfo` runs every 1 second for countdown ticks and requires yesterday/today/tomorrow; without memoization, this performs 3 full solar calculations per second on the main thread.
+* **Notification Scheduling Off Main Thread**: Calculating days of prayer times and issuing notification requests must ALWAYS run in background dispatch queues / coroutines (`DispatchQueue.global(qos: .utility)` on iOS, `Dispatchers.IO` / WorkManager on Android).
 
-### Calculation Methods (Aladhan API IDs)
-* `13` → Türkiye (Diyanet) — no Adhan-library equivalent; local fallback approximates it with Muslim World League
-* `3` → Muslim World League (default fallback)
-* `2` → ISNA (North America)
-* `4` → Umm Al-Qura (Makkah)
-* `5` → Egyptian General Authority of Survey
-* `1` → University of Islamic Sciences, Karachi
+### Location & City Search
+* **City text search**: Open-Meteo Geocoding API (`geocoding-api.open-meteo.com/v1/search`); GPS reverse-geocoding is native (`CLGeocoder` on iOS, `Geocoder` on Android).
+* **Search Debouncing & Task Cancellation**: Always debounce search input by 300ms. On each new keystroke, cancel the pending debounce AND any active in-flight network task (`URLSessionTask.cancel()` on iOS, job cancellation on Android).
+* **Language Fallback**: Open-Meteo localizes results for a fixed set of languages (`tr`, `en`, `de`, `fr`, etc.), but does NOT support Arabic. Fall back to `en` if Arabic is active to prevent API errors.
+* **Error Disambiguation**: Differentiate clearly between:
+  1. *Permission Denied* → Present alert / dialog prompting user to open system Settings.
+  2. *Location Unavailable / Geocode Failure* → Prompt user to retry or search city manually.
+  3. *Offline (No Internet)* → Explain network is unavailable.
+  4. *Zero Results* → Explain no cities match the search query.
 
-### Madhab (Asr School IDs)
-* `1` → Hanafi (double-shadow Asr)
-* `0` → Shafi / Maliki / Hanbali (standard)
+### Notifications & Alarms
+* **Timezone Anchoring**: Notification/alarm triggers must be matched in the tracked city's timezone (`LocationData.timezoneIdentifier`), NOT the device's local timezone.
+* **Time Sensitivity**: On iOS, notification content must set `interruptionLevel = .timeSensitive` (iOS 15+) so prayer alerts break through Focus / Do Not Disturb modes.
+* **Foreground Alerting**: Implement `UNUserNotificationCenterDelegate` with `willPresent` to show alerts and play sound even when app is active in foreground.
 
-### Parameter Auto-Detection by Country
-* **Turkey**: Method = 13 (Diyanet), Madhab = 1 (Hanafi)
-* **Saudi Arabia / Gulf**: Method = 4 (Umm Al-Qura), Madhab = 0 (Standard/Shafi)
-* **Pakistan / India**: Method = 1 (Karachi), Madhab = 1 (Hanafi)
-* **North America**: Method = 2 (ISNA), Madhab = 0 (Standard)
-* **Default / Other**: Method = 3 (Muslim World League), Madhab = 0 (Standard)
+### Accessibility (A11y) & Dynamic Type
+* **Countdown Timer TalkBack / VoiceOver**: The countdown circle must be treated as a SINGLE accessibility element (`accessibilityElement(children: .ignore)`). NEVER feed 1-second ticking raw digits to accessibility readers. Provide a coarse, spoken summary updated periodically (e.g., *"1 saat 23 dakika kaldı, yüzde 45 tamamlandı"*).
+* **Reduce Motion**: Animations on progress rings must be disabled when `reduceMotion` (iOS) or transition animation scale (Android) is set to reduce motion.
+* **Dynamic Type**: Text sizes within fixed circular containers must use dynamic metrics (`@ScaledMetric`) with multi-line wrap and minimum scale factor rather than overflowing. Maintain WCAG >= 4.5:1 contrast against sky gradient backgrounds.
 
-### Android Specific Rules
-* **Dynamic Broadcast Receivers**: Specify `Context.RECEIVER_NOT_EXPORTED` on API 33+ (Tiramisu) when registering custom broadcast receivers dynamically:
-  ```kotlin
-  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
-  } else {
-      context.registerReceiver(receiver, filter)
-  }
-  ```
-* **Search Debouncing**: Always add a `delay(300)` debounce when reacting to query text changes inside Compose `LaunchedEffect` to avoid freezing focus or triggering excessive network requests.
-* **Loading Spinner Heights**: When swapping a list for a loading spinner (`CircularProgressIndicator`), keep the container size stable (`.weight(1f)` or equivalent) so the text field doesn't lose focus and dismiss the keyboard.
-* **State**: Collect flows in composables with `.collectAsState()`; initialize flow values in `AppViewModel`.
-* **Dependency pins**: `app/build.gradle.kts` pins the Compose BOM and `fragment-ktx` versions for crash reasons documented in comments there — don't downgrade them.
-
-### iOS Specific Rules
-* **Project Generation (`xcodegen`)**: Never edit `.xcodeproj` files manually. All file additions and project setting changes must be done in `project.yml`, followed by running `xcodegen` in `/ios`.
-* **Thread Safety**: Ensure all changes modifying `@Published` properties in `AppViewModel.swift` are dispatched on `DispatchQueue.main.async`.
-* **Widget Sharing**: All shared settings, active locations list, and JSON calendar caches must be written to `UserDefaults(suiteName: "group.com.oktay.namaz")`.
+### App Store & Firebase Compliance
+* **Bundle Identifiers & App Group (iOS)**:
+  * Prefix: `com.okib`
+  * Main App: `com.okib.NamazVakti`
+  * Widget: `com.okib.NamazVakti.NamazVaktiWidget`
+  * App Group: `group.com.okib.namaz`
+* **Zero Tracking & No IDFA**: Do NOT link `AdSupport` or `AppTrackingTransparency`. In App Store Connect Privacy questions: Zero user tracking, zero data linked to identity.
+* **Privacy Manifest**: Maintain `PrivacyInfo.xcprivacy` declaring `NSPrivacyAccessedAPICategoryUserDefaults` with reason `CA92.1`.
+* **API Key Restrictions**: `GoogleService-Info.plist` is a client identifier; restrict its API key in Google Cloud Console to `com.okib.NamazVakti` under iOS Application Restrictions.
 
 ---
 
@@ -92,13 +79,14 @@ A parallel `claude.md` exists for another assistant; keep architectural facts co
 
 ### Android (run inside `/android`)
 * Build debug APK: `./gradlew assembleDebug`
+* Run unit tests: `./gradlew testDebugUnitTest`
 * Install on device/emulator: `./gradlew installDebug`
 * Launch: `adb shell am start -n com.oktay.namaz/com.oktay.namaz.MainActivity`
 * Check crashes: `adb logcat -b crash -d`
-* Screenshot for layout inspection: `adb shell screencap -p /sdcard/screencap.png && adb pull /sdcard/screencap.png`
+* Screenshot: `adb shell screencap -p /sdcard/screencap.png && adb pull /sdcard/screencap.png`
 
 ### iOS (run inside `/ios`)
-* Regenerate Xcode project (required after adding/removing files or changing settings): `xcodegen`
-* Build for simulator: `xcodebuild -project NamazVakti.xcodeproj -scheme NamazVakti -sdk iphonesimulator clean build`
+* Regenerate Xcode project: `xcodegen`
+* Build for simulator: `xcodebuild -project NamazVakti.xcodeproj -scheme NamazVakti -sdk iphonesimulator build`
 * Install on booted simulator: `xcrun simctl install booted [path_to_app]`
-* Launch: `xcrun simctl launch booted com.oktay.NamazVakti`
+* Launch: `xcrun simctl launch booted com.okib.NamazVakti`

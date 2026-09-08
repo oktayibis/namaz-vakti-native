@@ -106,15 +106,41 @@ object PrayerCalculator {
         return params
     }
 
+    private val timesCache = mutableMapOf<String, Map<PrayerType, Date>>()
+    private val cacheLock = Any()
+    private const val CACHE_LIMIT = 12
+
+    private fun cacheKey(location: LocationData, calendar: Calendar, methodId: Int, schoolId: Int): String {
+        val y = calendar.get(Calendar.YEAR)
+        val m = calendar.get(Calendar.MONTH) + 1
+        val d = calendar.get(Calendar.DAY_OF_MONTH)
+        return "${location.id}_${y}-${m}-${d}_${methodId}_${schoolId}"
+    }
+
+    fun invalidateTimesCache() {
+        synchronized(cacheLock) {
+            timesCache.clear()
+        }
+    }
+
     /**
      * Tamamen çevrimdışı, anlık (0 ms) ve yüksek hassasiyetli namaz vakti hesaplama motoru.
      * Ağ bağımlılığı olmadan verilen koordinat, saat dilimi ve tarihe göre vakitleri üretir.
      */
     fun calculatePrayerTimes(context: Context, location: LocationData, date: Date): Map<PrayerType, Date>? {
-        val coordinates = Coordinates(location.latitude, location.longitude)
         val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
         val calendar = Calendar.getInstance(tz).apply { time = date }
 
+        val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
+        val methodId = prefs.getInt("calculation_method", 13)
+        val schoolId = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (methodId == 1) 1 else 0)
+
+        val key = cacheKey(location, calendar, methodId, schoolId)
+        synchronized(cacheLock) {
+            timesCache[key]?.let { return it }
+        }
+
+        val coordinates = Coordinates(location.latitude, location.longitude)
         val components = DateComponents(
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH) + 1,
@@ -125,7 +151,7 @@ object PrayerCalculator {
 
         return try {
             val prayerTimes = PrayerTimes(coordinates, components, params)
-            mapOf(
+            val result = mapOf(
                 PrayerType.FAJR to prayerTimes.fajr,
                 PrayerType.SUNRISE to prayerTimes.sunrise,
                 PrayerType.DHUHR to prayerTimes.dhuhr,
@@ -133,6 +159,13 @@ object PrayerCalculator {
                 PrayerType.MAGHRIB to prayerTimes.maghrib,
                 PrayerType.ISHA to prayerTimes.isha
             )
+            synchronized(cacheLock) {
+                if (timesCache.size >= CACHE_LIMIT) {
+                    timesCache.clear()
+                }
+                timesCache[key] = result
+            }
+            result
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -192,6 +225,7 @@ object PrayerCalculator {
         }
 
         milestones.sortBy { it.date.time }
+        if (milestones.size < 2) return null
 
         val refTime = referenceDate.time
 

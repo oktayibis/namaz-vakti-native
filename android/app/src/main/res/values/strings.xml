@@ -71,6 +71,16 @@
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
 
+    <!-- Location & Search Error States -->
+    <string name="current_location">Current Location</string>
+    <string name="location_permission_denied_title">Location Access Denied</string>
+    <string name="location_permission_denied_desc">Prayer Times cannot access your location. Enable it in Settings, or search for your city instead.</string>
+    <string name="location_unavailable_title">Location Unavailable</string>
+    <string name="location_unavailable_desc">Your location could not be determined. Please try again, or search for your city instead.</string>
+    <string name="search_error_offline">No internet connection. Check your connection and try again.</string>
+    <string name="search_error_failed">Search failed. Please try again.</string>
+    <string name="search_no_results">No cities found.</string>
+    <string name="ok">OK</string>
     <!-- About & Privacy -->
     <string name="about">About</string>
     <string name="about_desc">Prayer Times is a 100% offline, privacy-first, ad-free prayer times application.</string>
