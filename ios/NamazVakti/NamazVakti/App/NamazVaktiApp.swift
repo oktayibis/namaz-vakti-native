@@ -18,6 +18,10 @@ struct NamazVaktiApp: App {
         // Customize appearance for dark UI
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).overrideUserInterfaceStyle = .dark
 
+        // Instantiates the singleton, which registers the UNUserNotificationCenter
+        // delegate so alerts are not suppressed while the app is foregrounded.
+        NotificationManager.shared.activate()
+
         // Notifications are only scheduled a few days ahead (64-request limit), so a
         // periodic background refresh keeps the window rolling even if the user
         // doesn't open the app for a while.
@@ -42,7 +46,9 @@ struct NamazVaktiApp: App {
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
+            #if DEBUG
             print("Failed to submit background refresh: \(error)")
+            #endif
         }
     }
 
@@ -53,23 +59,27 @@ struct NamazVaktiApp: App {
                 .environment(\.layoutDirection, languageManager.layoutDirection)
                 .preferredColorScheme(.dark)
                 .id(languageManager.currentLanguage)
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                    // Refresh data when app returns to foreground
-                    viewModel.updateTimes()
-                    if let active = viewModel.activeLocation {
-                        NotificationManager.shared.scheduleAllNotifications(for: active)
-                    }
-                }
+                // scenePhase is the single activation trigger. This previously also
+                // listened for willEnterForegroundNotification, so every activation ran
+                // the whole teardown-and-rebuild twice, and the second removeAll could
+                // wipe requests the first pass had not finished adding.
                 .onChange(of: scenePhase) { newPhase in
                     if newPhase == .active {
                         viewModel.updateTimes()
-                        if let active = viewModel.activeLocation {
-                            NotificationManager.shared.scheduleAllNotifications(for: active)
-                        }
+                        rescheduleNotifications()
                     } else if newPhase == .background {
                         Self.scheduleAppRefresh()
                     }
                 }
+        }
+    }
+
+    /// Scheduling walks several days of solar math and issues up to 60 requests, so keep
+    /// it off the main thread — it used to run synchronously on every activation.
+    private func rescheduleNotifications() {
+        guard let active = viewModel.activeLocation else { return }
+        DispatchQueue.global(qos: .utility).async {
+            NotificationManager.shared.scheduleAllNotifications(for: active)
         }
     }
 }

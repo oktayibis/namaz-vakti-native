@@ -77,3 +77,45 @@
 /* About & Privacy */
 "about" = "حول التطبيق";
 "about_desc" = "تطبيق أوقات الصلاة يعمل بنسبة 100% دون اتصال بالإنترنت، بخصوصية تامة وخالٍ تماماً من الإعلانات.";
+
+/* Home-screen widget gallery entry (follows the system language) */
+"widget_display_name" = "أوقات الصلاة";
+"widget_description" = "يعرض أوقات الصلاة اليومية والصلاة التالية.";
+
+/* Location & search error states */
+"current_location" = "الموقع الحالي";
+"location_permission_denied_title" = "تم رفض الوصول إلى الموقع";
+"location_permission_denied_desc" = "لا يمكن لتطبيق أوقات الصلاة الوصول إلى موقعك. يمكنك تفعيله من الإعدادات أو البحث عن مدينتك بدلاً من ذلك.";
+"location_unavailable_title" = "الموقع غير متاح";
+"location_unavailable_desc" = "تعذّر تحديد موقعك. يرجى المحاولة مرة أخرى أو البحث عن مدينتك.";
+"search_error_offline" = "لا يوجد اتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.";
+"search_error_failed" = "فشل البحث. يرجى المحاولة مرة أخرى.";
+"search_no_results" = "لم يتم العثور على مدن.";
+"ok" = "حسناً";
+
+/* VoiceOver labels */
+"clear_search" = "مسح البحث";
+"clear_location" = "مسح الموقع المكتشف";
+"a11y_current_prayer" = "الصلاة الحالية";
+"a11y_delete_reminder" = "حذف التذكير";
+"a11y_current_time" = "الوقت الحالي";
+"a11y_prayer_progress" = "انقضى %d بالمئة";
+
+/* Local notification content */
+"notif_title_now" = "وقت %@";
+"notif_body_now" = "حان وقت %@.";
+"notif_title_soon" = "اقترب وقت %@";
+"notif_body_soon" = "يبدأ %@ خلال %d دقيقة.";
+
+/* Calculation method regions */
+"region_tr_eu" = "تركيا وأوروبا";
+"region_global" = "أوروبا والإعداد العالمي الافتراضي";
+"region_gulf" = "السعودية والخليج";
+"region_north_america" = "أمريكا الشمالية (الولايات المتحدة وكندا)";
+"region_na_uk" = "أمريكا الشمالية والمملكة المتحدة";
+"region_south_asia" = "باكستان والهند وبنغلاديش";
+"region_egypt" = "مصر وشمال أفريقيا";
+"region_uae" = "الإمارات العربية المتحدة";
+"region_sea" = "سنغافورة وجنوب شرق آسيا";
+"region_kuwait" = "الكويت";
+"region_qatar" = "قطر";

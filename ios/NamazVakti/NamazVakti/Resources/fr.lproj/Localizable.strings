@@ -77,3 +77,45 @@
 /* About & Privacy */
 "about" = "À propos";
 "about_desc" = "Heures de Prière est une application 100% hors ligne, sans publicité et respectueuse de votre vie privée.";
+
+/* Home-screen widget gallery entry (follows the system language) */
+"widget_display_name" = "Heures de Prière";
+"widget_description" = "Affiche les heures de prière du jour et la prochaine prière.";
+
+/* Location & search error states */
+"current_location" = "Position actuelle";
+"location_permission_denied_title" = "Accès à la position refusé";
+"location_permission_denied_desc" = "Heures de Prière ne peut pas accéder à votre position. Activez-la dans les Réglages ou recherchez plutôt votre ville.";
+"location_unavailable_title" = "Position indisponible";
+"location_unavailable_desc" = "Votre position n'a pas pu être déterminée. Veuillez réessayer ou rechercher votre ville.";
+"search_error_offline" = "Aucune connexion Internet. Vérifiez votre connexion et réessayez.";
+"search_error_failed" = "La recherche a échoué. Veuillez réessayer.";
+"search_no_results" = "Aucune ville trouvée.";
+"ok" = "OK";
+
+/* VoiceOver labels */
+"clear_search" = "Effacer la recherche";
+"clear_location" = "Effacer la position détectée";
+"a11y_current_prayer" = "Prière actuelle";
+"a11y_delete_reminder" = "Supprimer le rappel";
+"a11y_current_time" = "Heure actuelle";
+"a11y_prayer_progress" = "%d pour cent écoulé";
+
+/* Local notification content */
+"notif_title_now" = "Heure de %@";
+"notif_body_now" = "L'heure de %@ est arrivée.";
+"notif_title_soon" = "%@ approche";
+"notif_body_soon" = "%@ commence dans %d minutes.";
+
+/* Calculation method regions */
+"region_tr_eu" = "Turquie et Europe";
+"region_global" = "Europe et valeur par défaut mondiale";
+"region_gulf" = "Arabie saoudite et Golfe";
+"region_north_america" = "Amérique du Nord (États-Unis et Canada)";
+"region_na_uk" = "Amérique du Nord et Royaume-Uni";
+"region_south_asia" = "Pakistan, Inde, Bangladesh";
+"region_egypt" = "Égypte et Afrique du Nord";
+"region_uae" = "Émirats arabes unis";
+"region_sea" = "Singapour et Asie du Sud-Est";
+"region_kuwait" = "Koweït";
+"region_qatar" = "Qatar";

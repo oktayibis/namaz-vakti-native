@@ -77,3 +77,45 @@
 /* About & Privacy */
 "about" = "Über";
 "about_desc" = "Gebetszeiten ist eine 100% offlinefähige, datenschutzorientierte und werbefreie Gebetszeiten-App.";
+
+/* Home-screen widget gallery entry (follows the system language) */
+"widget_display_name" = "Gebetszeiten";
+"widget_description" = "Zeigt die heutigen Gebetszeiten und das nächste Gebet.";
+
+/* Location & search error states */
+"current_location" = "Aktueller Standort";
+"location_permission_denied_title" = "Standortzugriff verweigert";
+"location_permission_denied_desc" = "Gebetszeiten kann nicht auf Ihren Standort zugreifen. Aktivieren Sie ihn in den Einstellungen oder suchen Sie stattdessen nach Ihrer Stadt.";
+"location_unavailable_title" = "Standort nicht verfügbar";
+"location_unavailable_desc" = "Ihr Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut oder suchen Sie nach Ihrer Stadt.";
+"search_error_offline" = "Keine Internetverbindung. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.";
+"search_error_failed" = "Suche fehlgeschlagen. Bitte versuchen Sie es erneut.";
+"search_no_results" = "Keine Städte gefunden.";
+"ok" = "OK";
+
+/* VoiceOver labels */
+"clear_search" = "Suche löschen";
+"clear_location" = "Erkannten Standort löschen";
+"a11y_current_prayer" = "Aktuelles Gebet";
+"a11y_delete_reminder" = "Erinnerung löschen";
+"a11y_current_time" = "Aktuelle Uhrzeit";
+"a11y_prayer_progress" = "%d Prozent vergangen";
+
+/* Local notification content */
+"notif_title_now" = "%@-Zeit";
+"notif_body_now" = "Die Zeit für %@ hat begonnen.";
+"notif_title_soon" = "%@ steht bevor";
+"notif_body_soon" = "%@ beginnt in %d Minuten.";
+
+/* Calculation method regions */
+"region_tr_eu" = "Türkei & Europa";
+"region_global" = "Europa & globaler Standard";
+"region_gulf" = "Saudi-Arabien & Golfstaaten";
+"region_north_america" = "Nordamerika (USA & Kanada)";
+"region_na_uk" = "Nordamerika & Großbritannien";
+"region_south_asia" = "Pakistan, Indien, Bangladesch";
+"region_egypt" = "Ägypten & Nordafrika";
+"region_uae" = "Vereinigte Arabische Emirate";
+"region_sea" = "Singapur & Südostasien";
+"region_kuwait" = "Kuwait";
+"region_qatar" = "Katar";

@@ -1,7 +1,7 @@
 import Foundation
 import UserNotifications
 
-class NotificationManager: ObservableObject {
+class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationManager()
     
     // Shared App Group UserDefaults for sharing configuration with the Widget
@@ -13,8 +13,26 @@ class NotificationManager: ObservableObject {
     private let enabledPrayersKey = "enabledPrayers"
     private let reminderOffsetsKey = "reminderOffsets"
     
-    private init() {
+    private override init() {
+        super.init()
+        // Without a delegate iOS suppresses alerts while the app is foregrounded —
+        // for a prayer-time app that silently drops the alert the user is waiting for.
+        UNUserNotificationCenter.current().delegate = self
         checkPermission()
+    }
+
+    /// No-op touch point so the app can force `shared` to instantiate (and register the
+    /// delegate above) during launch, before any notification can arrive.
+    func activate() {}
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        if #available(iOS 14.0, *) {
+            completionHandler([.banner, .list, .sound])
+        } else {
+            completionHandler([.alert, .sound])
+        }
     }
     
     func requestPermission(completion: @escaping (Bool) -> Void) {
@@ -76,6 +94,12 @@ class NotificationManager: ObservableObject {
         let center = UNUserNotificationCenter.current()
         let calendar = Calendar.current
         let now = Date()
+        let languageCode = LanguageManager.resolvedLanguageCode()
+
+        // Fire at the tracked city's wall-clock time. Without an explicit timezone the
+        // trigger is matched in whatever zone the device is in when it fires, so a
+        // traveling user would get alerts at the wrong moment.
+        let triggerTimeZone = TimeZone(identifier: location.timezoneIdentifier)
 
         // iOS silently drops pending requests beyond 64 per app, so derive the window
         // from the actual configuration (e.g. 6 prayers x 3 alerts would overflow a
@@ -101,38 +125,41 @@ class NotificationManager: ObservableObject {
                         
                         let content = UNMutableNotificationContent()
                         content.sound = .default
-                        
-                        let prayerName = prayerType.turkishName
+                        // A prayer alert is the definition of time sensitive: without
+                        // this, Focus and Do Not Disturb silence it.
+                        if #available(iOS 15.0, *) {
+                            content.interruptionLevel = .timeSensitive
+                        }
+
+                        let prayerName = prayerType.localizedName(for: languageCode)
                         if minutesBefore == 0 {
-                            content.title = "\(prayerName) Vakti"
-                            content.body = "\(prayerName) vakti girdi. Namazınızı kılabilirsiniz."
-                        } else if minutesBefore == 30 {
-                            content.title = "\(prayerName) Vaktine Az Kaldı"
-                            content.body = "\(prayerName) vaktinin girmesine 30 dakika kaldı."
+                            content.title = tr("notif_title_now", prayerName)
+                            content.body = tr("notif_body_now", prayerName)
                         } else {
-                            content.title = "\(prayerName) Hatırlatıcısı"
-                            content.body = "\(prayerName) vaktine \(minutesBefore) dakika kaldı."
+                            content.title = tr("notif_title_soon", prayerName)
+                            content.body = tr("notif_body_soon", prayerName, minutesBefore)
                         }
                         
-                        // Create trigger date components relative to the target location timezone
-                        // Wait, UNCalendarNotificationTrigger matches components in the device local timezone.
-                        // Since triggerDate is a Swift Date (UTC), converting it to components in Calendar.current
-                        // gives the correct local time of the user's device.
-                        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: triggerDate)
+                        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: triggerDate)
+                        components.timeZone = triggerTimeZone
                         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
                         
                         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
                         
                         center.add(request) { error in
+                            #if DEBUG
                             if let error = error {
                                 print("Error scheduling notification: \(error.localizedDescription)")
                             }
+                            #endif
                         }
                     }
                 }
             }
         }
         
-        print("Notifications scheduled for \(location.name) for the next \(daysToSchedule) days.")
+        #if DEBUG
+        print("Notifications scheduled for the next \(daysToSchedule) days.")
+        #endif
     }
 }

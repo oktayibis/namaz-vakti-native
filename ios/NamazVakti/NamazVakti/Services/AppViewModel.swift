@@ -14,11 +14,21 @@ class AppViewModel: ObservableObject {
     @Published var todayTimes: [PrayerTimeItem] = []
     @Published var progressInfo: PrayerProgressInfo? = nil
     @Published var timeRemainingString: String = "00:00:00"
+    /// Coarse, spoken form of the countdown ("1 hour 23 minutes"). Updated only when the
+    /// minute changes: the digit string below ticks every second, and re-publishing that
+    /// to VoiceOver yanks focus and re-announces continuously, which makes the home
+    /// screen unusable with the screen reader.
+    @Published var accessibleTimeRemaining: String = ""
+    private var lastAnnouncedMinute: Int = -1
     @Published var progress: Double = 0.0
     @Published var hijriDateString: String? = nil
     @Published var gregorianDateString: String? = nil
     
     @Published var isDetectingLocation = false
+    /// Set when a location lookup fails, so the UI can explain why instead of just
+    /// stopping the spinner. iOS never re-prompts after a denial, so silently doing
+    /// nothing leaves the button looking permanently broken.
+    @Published var locationAlert: LocationAlert? = nil
     @Published var showFirstLaunchLocationRequest = false
     @Published var onboardingLoading = false
     @Published var detectedLocation: LocationData? = nil
@@ -38,7 +48,9 @@ class AppViewModel: ObservableObject {
             do {
                 savedLocations = try JSONDecoder().decode([LocationData].self, from: data)
             } catch {
+                #if DEBUG
                 print("Failed to decode locations: \(error)")
+                #endif
             }
         }
         
@@ -67,34 +79,13 @@ class AppViewModel: ObservableObject {
             let data = try JSONEncoder().encode(savedLocations)
             defaults.set(data, forKey: locationsKey)
             
-            // Also save individual times for widget to read easily without calculating
-            if let active = activeLocation {
-                let timesList = PrayerCalculator.shared.getPrayerTimesList(for: active, date: Date())
-                var widgetTimes: [String: String] = [:]
-                widgetTimes["cityName"] = active.name
-                widgetTimes["countryName"] = active.country
-                
-                // Add next prayer details for widget
-                if let info = PrayerCalculator.shared.getProgressInfo(for: active) {
-                    widgetTimes["nextPrayerName"] = info.nextPrayer.localizedName(for: LanguageManager.shared.effectiveLanguageCode)
-                    let hours = Int(info.timeRemaining) / 3600
-                    let minutes = (Int(info.timeRemaining) % 3600) / 60
-                    widgetTimes["nextPrayerTimeRemaining"] = String(format: "%02d:%02d", hours, minutes)
-                    widgetTimes["currentPrayer"] = info.currentPrayer.rawValue.lowercased()
-                }
-                
-                for item in timesList {
-                    widgetTimes[item.type.rawValue] = item.formattedTime
-                }
-                
-                defaults.set(widgetTimes, forKey: "widget_prayer_times")
-            } else {
-                defaults.removeObject(forKey: "widget_prayer_times")
-            }
-            
+            // The widget recomputes from `saved_locations` via PrayerCalculator, so the
+            // old "widget_prayer_times" mirror was written on every save and never read.
             WidgetCenter.shared.reloadAllTimelines()
         } catch {
+            #if DEBUG
             print("Failed to save locations: \(error)")
+            #endif
         }
     }
     
@@ -133,7 +124,6 @@ class AppViewModel: ObservableObject {
         if savedLocations.isEmpty {
             activeLocation = nil
             defaults.removeObject(forKey: activeLocationIdKey)
-            defaults.removeObject(forKey: "widget_prayer_times")
             WidgetCenter.shared.reloadAllTimelines()
         } else if activeIdBefore != nil, !savedLocations.contains(where: { $0.id == activeIdBefore }) {
             selectLocation(savedLocations.first!)
@@ -144,12 +134,15 @@ class AppViewModel: ObservableObject {
     
     func detectLocationForOnboarding() {
         isDetectingLocation = true
-        LocationManager.shared.getCurrentLocation { [weak self] locationData in
+        LocationManager.shared.getCurrentLocation { [weak self] result in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 self.isDetectingLocation = false
-                if let location = locationData {
+                switch result {
+                case .success(let location):
                     self.detectedLocation = location
+                case .failure(let failure):
+                    self.locationAlert = LocationAlert(failure)
                 }
             }
         }
@@ -157,43 +150,42 @@ class AppViewModel: ObservableObject {
     
     func completeOnboarding(location: LocationData, methodId: Int, completion: @escaping () -> Void) {
         onboardingLoading = true
-        
+
         defaults.set(methodId, forKey: "calculation_method")
         let schoolId = (methodId == 1) ? 1 : 0
         defaults.set(schoolId, forKey: "asr_madhab")
-        
-        PrayerCalculator.shared.clearCache()
-        
-        let currentYear = Calendar.current.component(.year, from: Date())
-        
-        PrayerCalculator.shared.fetchYearCalendar(for: location, year: currentYear) { [weak self] _ in
+
+        PrayerCalculator.shared.invalidateTimesCache()
+
+        // Times are computed on device, so there is nothing to fetch — this used to await
+        // a no-op that only existed to show a spinner.
+        DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            DispatchQueue.main.async {
-                self.onboardingLoading = false
-                self.addLocation(location)
-                
-                // Request notification permission on iOS. addLocation above already
-                // scheduled notifications, but that ran before authorization existed;
-                // re-schedule once the user grants so delivery is guaranteed.
-                NotificationManager.shared.requestPermission { granted in
-                    if granted, let active = self.activeLocation {
-                        NotificationManager.shared.scheduleAllNotifications(for: active)
-                    }
-                    self.showFirstLaunchLocationRequest = false
-                    completion()
+            self.onboardingLoading = false
+            self.addLocation(location)
+
+            // addLocation already scheduled notifications, but that ran before
+            // authorization existed; re-schedule once the user grants so delivery
+            // is guaranteed.
+            NotificationManager.shared.requestPermission { granted in
+                if granted, let active = self.activeLocation {
+                    NotificationManager.shared.scheduleAllNotifications(for: active)
                 }
+                self.showFirstLaunchLocationRequest = false
+                completion()
             }
         }
     }
     
     func detectCurrentLocation() {
         isDetectingLocation = true
-        LocationManager.shared.getCurrentLocation { [weak self] locationData in
+        LocationManager.shared.getCurrentLocation { [weak self] result in
             guard let self = self else { return }
-            self.isDetectingLocation = false
-            
-            if let location = locationData {
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                self.isDetectingLocation = false
+
+                switch result {
+                case .success(let location):
                     let defaultsVal = self.determineDefaultParameters(for: location)
                     if self.defaults.object(forKey: "calculation_method") == nil {
                         self.defaults.set(defaultsVal.0, forKey: "calculation_method")
@@ -203,9 +195,9 @@ class AppViewModel: ObservableObject {
                     }
                     self.addLocation(location)
                     self.showFirstLaunchLocationRequest = false
+                case .failure(let failure):
+                    self.locationAlert = LocationAlert(failure)
                 }
-            } else {
-                print("Failed to detect location or permission denied.")
             }
         }
     }
@@ -257,7 +249,7 @@ class AppViewModel: ObservableObject {
         let schoolId = (methodId == 1) ? 1 : 0
         defaults.set(schoolId, forKey: "asr_madhab")
         
-        PrayerCalculator.shared.clearCache()
+        PrayerCalculator.shared.invalidateTimesCache()
         updateTimes()
         saveLocations()
         if let active = activeLocation {
@@ -275,7 +267,7 @@ class AppViewModel: ObservableObject {
     
     func setAsrMadhab(_ schoolId: Int) {
         defaults.set(schoolId, forKey: "asr_madhab")
-        PrayerCalculator.shared.clearCache()
+        PrayerCalculator.shared.invalidateTimesCache()
         updateTimes()
         saveLocations()
         if let active = activeLocation {
@@ -321,6 +313,23 @@ class AppViewModel: ObservableObject {
             let minutes = (Int(info.timeRemaining) % 3600) / 60
             let seconds = Int(info.timeRemaining) % 60
             self.timeRemainingString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+
+            let totalMinutes = Int(info.timeRemaining) / 60
+            if totalMinutes != self.lastAnnouncedMinute {
+                self.lastAnnouncedMinute = totalMinutes
+                self.accessibleTimeRemaining = Self.spokenDuration(for: info.timeRemaining)
+            }
         }
+    }
+
+    /// Localized "1 hour 23 minutes" for VoiceOver. Rebuilt per call because the app's
+    /// language can change at runtime; it only runs once a minute.
+    private static func spokenDuration(for interval: TimeInterval) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = interval >= 3600 ? [.hour, .minute] : [.minute]
+        formatter.calendar?.locale = LanguageManager.shared.currentLocale
+        // Round up so a countdown never announces "0 minutes" in its final seconds.
+        return formatter.string(from: max(interval, 60)) ?? ""
     }
 }

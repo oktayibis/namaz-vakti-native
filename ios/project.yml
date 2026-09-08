@@ -18,15 +18,14 @@ settings:
     SWIFT_VERSION: 5.9
     DEVELOPMENT_TEAM: "2ZG8A6RT9F"
     DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
-    # Automatic signing resolves Development vs. Distribution at build/export time.
-    # Without these, XcodeGen injects the legacy "iPhone Developer" identity into
-    # Release as well, which blocks a distribution archive.
+    # Automatic signing picks the actual certificate at build/export time: Development
+    # for local builds, Distribution when exporting the archive for the App Store.
+    # "Apple Development" is what Xcode itself writes for both configs under automatic
+    # signing — pinning "Apple Distribution" here instead makes the archive fail with
+    # "conflicting provisioning settings". The point of setting it at all is to displace
+    # the legacy "iPhone Developer" value XcodeGen injects by default.
     CODE_SIGN_STYLE: Automatic
-  configs:
-    debug:
-      CODE_SIGN_IDENTITY: "Apple Development"
-    release:
-      CODE_SIGN_IDENTITY: "Apple Distribution"
+    CODE_SIGN_IDENTITY: "Apple Development"
 
 schemes:
   NamazVakti:
@@ -55,13 +54,13 @@ targets:
       base:
         INFOPLIST_FILE: NamazVakti/NamazVakti/Info.plist
         CODE_SIGN_ENTITLEMENTS: NamazVakti/NamazVakti/NamazVakti.entitlements
-      # XcodeGen's application preset injects the legacy "iPhone Developer"
-      # identity at target level, which outranks the project-level setting above.
+      # XcodeGen's application preset injects the legacy "iPhone Developer" identity at
+      # target level, which outranks the project-level setting above.
       configs:
         debug:
           CODE_SIGN_IDENTITY: "Apple Development"
         release:
-          CODE_SIGN_IDENTITY: "Apple Distribution"
+          CODE_SIGN_IDENTITY: "Apple Development"
     dependencies:
       - package: Adhan
       - package: Firebase

@@ -9,6 +9,8 @@ struct OnboardingView: View {
     @State private var searchQuery = ""
     @State private var searchResults: [LocationData] = []
     @State private var isSearching = false
+    @State private var searchError: String? = nil
+    @State private var searchWorkItem: DispatchWorkItem? = nil
     @State private var selectedMethod = 13
     
     var body: some View {
@@ -57,6 +59,7 @@ struct OnboardingView: View {
                                 HStack {
                                     Image(systemName: "location.circle.fill")
                                         .font(.system(size: 32))
+                                        .accessibilityHidden(true)
                                         .foregroundColor(.amberColor)
                                     
                                     VStack(alignment: .leading, spacing: 4) {
@@ -72,7 +75,10 @@ struct OnboardingView: View {
                                         Image(systemName: "xmark.circle.fill")
                                             .foregroundColor(.gray)
                                             .font(.title2)
+                                            .frame(width: 44, height: 44)
+                                            .contentShape(Rectangle())
                                     }
+                                    .accessibilityLabel(tr("clear_location"))
                                 }
                                 .padding()
                                 .background(Color.white.opacity(0.06))
@@ -132,14 +138,22 @@ struct OnboardingView: View {
                                 HStack {
                                     Image(systemName: "magnifyingglass")
                                         .foregroundColor(.gray)
+                                        .accessibilityHidden(true)
                                     TextField(tr("search_city_placeholder"), text: $searchQuery)
                                         .foregroundColor(.white)
                                         .autocorrectionDisabled()
                                     if !searchQuery.isEmpty {
-                                        Button(action: { searchQuery = "" }) {
+                                        Button(action: {
+                                            searchQuery = ""
+                                            searchResults = []
+                                            searchError = nil
+                                        }) {
                                             Image(systemName: "xmark.circle.fill")
                                                 .foregroundColor(.gray)
+                                                .frame(width: 44, height: 44)
+                                                .contentShape(Rectangle())
                                         }
+                                        .accessibilityLabel(tr("clear_search"))
                                     }
                                 }
                                 .padding()
@@ -147,17 +161,7 @@ struct OnboardingView: View {
                                 .cornerRadius(12)
                                 .padding(.horizontal)
                                 .onChange(of: searchQuery) { query in
-                                    if query.count >= 2 {
-                                        isSearching = true
-                                        LocationManager.shared.searchCity(query: query) { results in
-                                            DispatchQueue.main.async {
-                                                self.searchResults = results
-                                                self.isSearching = false
-                                            }
-                                        }
-                                    } else {
-                                        self.searchResults = []
-                                    }
+                                    scheduleSearch(for: query)
                                 }
                                 
                                 // Search results list
@@ -167,22 +171,34 @@ struct OnboardingView: View {
                                         .progressViewStyle(CircularProgressViewStyle(tint: .amberColor))
                                         .frame(maxWidth: .infinity)
                                     Spacer()
+                                } else if let searchError = searchError {
+                                    Spacer()
+                                    Text(searchError)
+                                        .font(.system(.subheadline, design: .rounded))
+                                        .foregroundColor(.gray)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 32)
+                                        .frame(maxWidth: .infinity)
+                                    Spacer()
                                 } else {
                                     List(searchResults) { location in
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(location.name)
-                                                .font(.system(.body, design: .rounded))
-                                                .fontWeight(.semibold)
-                                                .foregroundColor(.white)
-                                            Text(location.country)
-                                                .font(.system(.footnote, design: .rounded))
-                                                .foregroundColor(.gray)
+                                        Button(action: {
+                                            viewModel.detectedLocation = location
+                                        }) {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                Text(location.name)
+                                                    .font(.system(.body, design: .rounded))
+                                                    .fontWeight(.semibold)
+                                                    .foregroundColor(.white)
+                                                Text(location.country)
+                                                    .font(.system(.footnote, design: .rounded))
+                                                    .foregroundColor(.gray)
+                                            }
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .contentShape(Rectangle())
+                                            .accessibilityElement(children: .combine)
                                         }
                                         .listRowBackground(Color.white.opacity(0.02))
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            viewModel.detectedLocation = location
-                                        }
                                     }
                                     .listStyle(PlainListStyle())
                                 }
@@ -205,27 +221,33 @@ struct OnboardingView: View {
                                     
                                     VStack(spacing: 0) {
                                         ForEach(CalculationMethodRegistry.methods) { item in
-                                            HStack {
-                                                VStack(alignment: .leading, spacing: 2) {
-                                                    Text(item.name)
-                                                        .font(.system(.body, design: .rounded))
-                                                        .foregroundColor(.white)
-                                                    Text(item.region)
-                                                        .font(.system(.caption, design: .rounded))
-                                                        .foregroundColor(.gray)
-                                                }
-                                                Spacer()
-                                                if selectedMethod == item.id {
-                                                    Image(systemName: "checkmark")
-                                                        .foregroundColor(.amberColor)
-                                                }
-                                            }
-                                            .padding()
-                                            .background(Color.white.opacity(selectedMethod == item.id ? 0.08 : 0.02))
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
+                                            Button(action: {
                                                 selectedMethod = item.id
+                                            }) {
+                                                HStack {
+                                                    VStack(alignment: .leading, spacing: 2) {
+                                                        Text(item.name)
+                                                            .font(.system(.body, design: .rounded))
+                                                            .foregroundColor(.white)
+                                                        Text(item.region)
+                                                            .font(.system(.caption, design: .rounded))
+                                                            .foregroundColor(.gray)
+                                                    }
+                                                    Spacer()
+                                                    if selectedMethod == item.id {
+                                                        Image(systemName: "checkmark")
+                                                            .foregroundColor(.amberColor)
+                                                            .accessibilityHidden(true)
+                                                    }
+                                                }
+                                                .padding()
+                                                .frame(minHeight: 44)
+                                                .background(Color.white.opacity(selectedMethod == item.id ? 0.08 : 0.02))
+                                                .contentShape(Rectangle())
                                             }
+                                            .buttonStyle(.plain)
+                                            .accessibilityElement(children: .combine)
+                                            .accessibilityAddTraits(selectedMethod == item.id ? [.isButton, .isSelected] : .isButton)
                                             
                                             Divider().background(Color.white.opacity(0.05))
                                         }
@@ -271,5 +293,44 @@ struct OnboardingView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .locationFailureAlert(viewModel: viewModel)
+    }
+
+    // MARK: - Debounced search
+
+    /// Mirrors LocationView: 300ms debounce, cancels the in-flight request, and keeps
+    /// "no matches" distinct from "the request never succeeded".
+    private func scheduleSearch(for query: String) {
+        searchWorkItem?.cancel()
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard trimmed.count >= 2 else {
+            LocationManager.shared.cancelSearch()
+            searchResults = []
+            searchError = nil
+            isSearching = false
+            return
+        }
+
+        let work = DispatchWorkItem { runSearch(trimmed) }
+        searchWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: work)
+    }
+
+    private func runSearch(_ query: String) {
+        isSearching = true
+        searchError = nil
+        LocationManager.shared.searchCity(query: query) { result in
+            guard query == searchQuery.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+            isSearching = false
+            switch result {
+            case .success(let results):
+                searchResults = results
+                searchError = results.isEmpty ? tr("search_no_results") : nil
+            case .failure(let failure):
+                searchResults = []
+                searchError = failure.localizedMessage
+            }
+        }
     }
 }

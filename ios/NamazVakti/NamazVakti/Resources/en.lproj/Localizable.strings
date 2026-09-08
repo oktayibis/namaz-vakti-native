@@ -77,3 +77,45 @@
 /* About & Privacy */
 "about" = "About";
 "about_desc" = "Prayer Times is a 100% offline, privacy-first, ad-free prayer times application.";
+
+/* Home-screen widget gallery entry (follows the system language) */
+"widget_display_name" = "Prayer Times";
+"widget_description" = "Shows today's prayer times and the next prayer.";
+
+/* Location & search error states */
+"current_location" = "Current Location";
+"location_permission_denied_title" = "Location Access Denied";
+"location_permission_denied_desc" = "Prayer Times can't access your location. Enable it in Settings, or search for your city instead.";
+"location_unavailable_title" = "Location Unavailable";
+"location_unavailable_desc" = "Your location couldn't be determined. Please try again, or search for your city instead.";
+"search_error_offline" = "No internet connection. Check your connection and try again.";
+"search_error_failed" = "Search failed. Please try again.";
+"search_no_results" = "No cities found.";
+"ok" = "OK";
+
+/* VoiceOver labels */
+"clear_search" = "Clear search";
+"clear_location" = "Clear detected location";
+"a11y_current_prayer" = "Current prayer";
+"a11y_delete_reminder" = "Delete reminder";
+"a11y_current_time" = "Current time";
+"a11y_prayer_progress" = "%d percent elapsed";
+
+/* Local notification content */
+"notif_title_now" = "%@ Time";
+"notif_body_now" = "It is time for %@.";
+"notif_title_soon" = "%@ Approaching";
+"notif_body_soon" = "%@ begins in %d minutes.";
+
+/* Calculation method regions */
+"region_tr_eu" = "Türkiye & Europe";
+"region_global" = "Europe & global default";
+"region_gulf" = "Saudi Arabia & the Gulf";
+"region_north_america" = "North America (USA & Canada)";
+"region_na_uk" = "North America & UK";
+"region_south_asia" = "Pakistan, India, Bangladesh";
+"region_egypt" = "Egypt & North Africa";
+"region_uae" = "United Arab Emirates";
+"region_sea" = "Singapore & Southeast Asia";
+"region_kuwait" = "Kuwait";
+"region_qatar" = "Qatar";

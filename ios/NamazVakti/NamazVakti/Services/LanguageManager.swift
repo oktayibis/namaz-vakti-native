@@ -39,6 +39,20 @@ final class LanguageManager: ObservableObject {
         self.updateBundle()
     }
     
+    /// Resolves the active language straight from the shared defaults, without touching
+    /// the @Published property. Safe to call from any thread — notification scheduling
+    /// runs on a background queue.
+    static func resolvedLanguageCode() -> String {
+        let defaults = UserDefaults(suiteName: "group.com.okib.namaz") ?? UserDefaults.standard
+        let raw = defaults.string(forKey: "app_language") ?? "system"
+        guard raw == "system" else { return raw }
+        let preferred = Locale.preferredLanguages.first?.lowercased() ?? "tr"
+        for code in ["tr", "de", "ar", "fr", "en"] where preferred.hasPrefix(code) {
+            return code
+        }
+        return "tr" // Default for diaspora app
+    }
+
     var effectiveLanguageCode: String {
         if currentLanguage == "system" {
             let preferred = Locale.preferredLanguages.first?.lowercased() ?? "tr"

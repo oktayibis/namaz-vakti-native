@@ -96,7 +96,40 @@ class PrayerCalculator {
     
     private let defaults = UserDefaults(suiteName: "group.com.okib.namaz") ?? UserDefaults.standard
 
+    /// Memoized day tables. getProgressInfo() needs yesterday/today/tomorrow, and the
+    /// countdown asks for it once a second — without this that is three full solar
+    /// computations per second on the main thread, forever, while the app is open.
+    /// The key carries the method and madhab, so changing either invalidates naturally.
+    private var timesCache: [String: [PrayerType: Date]] = [:]
+    private let cacheLock = NSLock()
+    private static let cacheLimit = 12
+
     private init() {}
+
+    private func cacheKey(for location: LocationData, components: DateComponents, methodId: Int, schoolId: Int) -> String {
+        let y = components.year ?? 0, m = components.month ?? 0, d = components.day ?? 0
+        return "\(location.id.uuidString)_\(y)-\(m)-\(d)_\(methodId)_\(schoolId)"
+    }
+
+    /// Drops every memoized table. Call when the inputs change in a way the key does not
+    /// capture (e.g. a location's coordinates are replaced under the same id).
+    func invalidateTimesCache() {
+        cacheLock.lock()
+        timesCache.removeAll()
+        cacheLock.unlock()
+    }
+
+    private func resolvedMethodAndSchool() -> (Int, Int) {
+        var methodId = defaults.integer(forKey: "calculation_method")
+        if defaults.object(forKey: "calculation_method") == nil {
+            methodId = 13
+        }
+        var schoolId = defaults.integer(forKey: "asr_madhab")
+        if defaults.object(forKey: "asr_madhab") == nil {
+            schoolId = (methodId == 1) ? 1 : 0
+        }
+        return (methodId, schoolId)
+    }
 
     private func getCalculationParameters(latitude: Double = 39.0) -> CalculationParameters {
         var methodId = defaults.integer(forKey: "calculation_method")
@@ -156,20 +189,29 @@ class PrayerCalculator {
      Ağ bağımlılığı olmadan verilen koordinat, saat dilimi ve tarihe göre vakitleri üretir.
      */
     func calculatePrayerTimes(for location: LocationData, date: Date) -> [PrayerType: Date]? {
-        let coordinates = Coordinates(latitude: location.latitude, longitude: location.longitude)
-        
         guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
         var targetCal = Calendar(identifier: .gregorian)
         targetCal.timeZone = tz
         let components = targetCal.dateComponents([.year, .month, .day], from: date)
-        
+
+        let (methodId, schoolId) = resolvedMethodAndSchool()
+        let key = cacheKey(for: location, components: components, methodId: methodId, schoolId: schoolId)
+
+        cacheLock.lock()
+        if let cached = timesCache[key] {
+            cacheLock.unlock()
+            return cached
+        }
+        cacheLock.unlock()
+
+        let coordinates = Coordinates(latitude: location.latitude, longitude: location.longitude)
         let params = getCalculationParameters(latitude: location.latitude)
-        
+
         guard let prayerTimes = PrayerTimes(coordinates: coordinates, date: components, calculationParameters: params) else {
             return nil
         }
-        
-        return [
+
+        let result: [PrayerType: Date] = [
             .fajr: prayerTimes.fajr,
             .sunrise: prayerTimes.sunrise,
             .dhuhr: prayerTimes.dhuhr,
@@ -177,6 +219,15 @@ class PrayerCalculator {
             .maghrib: prayerTimes.maghrib,
             .isha: prayerTimes.isha
         ]
+
+        cacheLock.lock()
+        // A handful of days is all that is ever live (yesterday/today/tomorrow, plus the
+        // notification scheduling window); clear rather than grow without bound.
+        if timesCache.count >= Self.cacheLimit { timesCache.removeAll() }
+        timesCache[key] = result
+        cacheLock.unlock()
+
+        return result
     }
 
     func calculateLocalPrayerTimes(for location: LocationData, date: Date) -> [PrayerType: Date]? {
@@ -234,6 +285,7 @@ class PrayerCalculator {
         
         milestones.sort { $0.date < $1.date }
         
+        guard milestones.count >= 2 else { return nil }
         for i in 0..<(milestones.count - 1) {
             let start = milestones[i]
             let end = milestones[i+1]
@@ -328,18 +380,4 @@ class PrayerCalculator {
         return formatter.string(from: date)
     }
     
-    func clearCache() {
-        let allKeys = defaults.dictionaryRepresentation().keys
-        for key in allKeys {
-            if key.hasPrefix("namaz_cache_") {
-                defaults.removeObject(forKey: key)
-            }
-        }
-    }
-
-    func fetchYearCalendar(for location: LocationData, year: Int, completion: @escaping (Bool) -> Void) {
-        DispatchQueue.main.async {
-            completion(true)
-        }
-    }
 }

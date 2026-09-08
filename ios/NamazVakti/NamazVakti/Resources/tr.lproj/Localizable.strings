@@ -77,3 +77,45 @@
 /* About & Privacy */
 "about" = "Hakkında";
 "about_desc" = "Namaz Vakti, %100 çevrimdışı, gizlilik odaklı ve reklamsız bir namaz vakti uygulamasıdır.";
+
+/* Home-screen widget gallery entry (follows the system language) */
+"widget_display_name" = "Namaz Vakitleri";
+"widget_description" = "Günlük namaz vakitlerini ve sıradaki vakti gösterir.";
+
+/* Location & search error states */
+"current_location" = "Mevcut Konum";
+"location_permission_denied_title" = "Konum Erişimi Reddedildi";
+"location_permission_denied_desc" = "Namaz Vakti konumunuza erişemiyor. Ayarlar'dan izin verebilir veya şehrinizi arayabilirsiniz.";
+"location_unavailable_title" = "Konum Alınamadı";
+"location_unavailable_desc" = "Konumunuz belirlenemedi. Lütfen tekrar deneyin veya şehrinizi arayın.";
+"search_error_offline" = "İnternet bağlantısı yok. Bağlantınızı kontrol edip tekrar deneyin.";
+"search_error_failed" = "Arama başarısız oldu. Lütfen tekrar deneyin.";
+"search_no_results" = "Şehir bulunamadı.";
+"ok" = "Tamam";
+
+/* VoiceOver labels */
+"clear_search" = "Aramayı temizle";
+"clear_location" = "Algılanan konumu temizle";
+"a11y_current_prayer" = "Şu anki vakit";
+"a11y_delete_reminder" = "Hatırlatıcıyı sil";
+"a11y_current_time" = "Şu anki saat";
+"a11y_prayer_progress" = "yüzde %d tamamlandı";
+
+/* Local notification content */
+"notif_title_now" = "%@ Vakti";
+"notif_body_now" = "%@ vakti girdi. Namazınızı kılabilirsiniz.";
+"notif_title_soon" = "%@ Vaktine Az Kaldı";
+"notif_body_soon" = "%@ vaktinin girmesine %d dakika kaldı.";
+
+/* Calculation method regions */
+"region_tr_eu" = "Türkiye ve Avrupa";
+"region_global" = "Avrupa ve genel varsayılan";
+"region_gulf" = "Suudi Arabistan ve Körfez";
+"region_north_america" = "Kuzey Amerika (ABD ve Kanada)";
+"region_na_uk" = "Kuzey Amerika ve Birleşik Krallık";
+"region_south_asia" = "Pakistan, Hindistan, Bangladeş";
+"region_egypt" = "Mısır ve Kuzey Afrika";
+"region_uae" = "Birleşik Arap Emirlikleri";
+"region_sea" = "Singapur ve Güneydoğu Asya";
+"region_kuwait" = "Kuveyt";
+"region_qatar" = "Katar";

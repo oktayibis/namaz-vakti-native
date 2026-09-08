@@ -4,7 +4,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var notificationManager = NotificationManager.shared
     @StateObject private var languageManager = LanguageManager.shared
-    private var appViewModel = AppViewModel.shared
+    @ObservedObject private var appViewModel = AppViewModel.shared
     
     @State private var selectedMethod = 13
     @State private var selectedMadhab = 0
@@ -48,6 +48,7 @@ struct SettingsView: View {
                                 HStack {
                                     Image(systemName: "bell.badge.fill")
                                         .foregroundColor(.red)
+                                        .accessibilityHidden(true)
                                     Text(tr("notification_permission_required"))
                                         .font(.system(.headline, design: .rounded))
                                         .foregroundColor(.white)
@@ -95,6 +96,7 @@ struct SettingsView: View {
                                     Image(systemName: prayer.iconName)
                                         .foregroundColor(.amberColor)
                                         .frame(width: 24)
+                                        .accessibilityHidden(true)
                                     Text(prayer.localizedName(for: languageManager.effectiveLanguageCode))
                                         .font(.system(.body, design: .rounded))
                                         .foregroundColor(.white)
@@ -120,7 +122,11 @@ struct SettingsView: View {
                                 }) {
                                     Image(systemName: "trash")
                                         .foregroundColor(.red.opacity(0.8))
+                                        .frame(width: 44, height: 44)
+                                        .contentShape(Rectangle())
                                 }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel(tr("a11y_delete_reminder"))
                             }
                         }
                         
@@ -128,6 +134,7 @@ struct SettingsView: View {
                             Button(action: { showingAddReminderSheet = true }) {
                                 HStack {
                                     Image(systemName: "plus.circle.fill")
+                                        .accessibilityHidden(true)
                                     Text(tr("add_reminder"))
                                         .font(.system(.body, design: .rounded))
                                 }

@@ -26,7 +26,9 @@ struct Provider: TimelineProvider {
                 }
                 return locations.first
             } catch {
+                #if DEBUG
                 print("Widget failed to decode locations: \(error)")
+                #endif
             }
         }
         return nil
@@ -86,10 +88,15 @@ struct Provider: TimelineProvider {
         // Add immediate entry
         entries.append(SimpleEntry(date: currentDate, location: location, todayTimes: todayTimes, progressInfo: progressInfo, languageCode: lang))
         
-        // Schedule reloads at each upcoming prayer time of today
-        let calendar = Calendar.current
+        // Schedule reloads at each upcoming prayer time of today.
+        // Use the tracked location's timezone: a city in another zone rolls over to the
+        // next day at a different instant than the device does.
+        var calendar = Calendar.current
+        if let tz = TimeZone(identifier: location.timezoneIdentifier) {
+            calendar.timeZone = tz
+        }
         guard let todayTimesDict = PrayerCalculator.shared.calculatePrayerTimes(for: location, date: currentDate) else {
-            let timeline = Timeline(entries: entries, policy: .atEnd)
+            let timeline = Timeline(entries: entries.sorted { $0.date < $1.date }, policy: .atEnd)
             completion(timeline)
             return
         }
@@ -122,8 +129,10 @@ struct Provider: TimelineProvider {
             ))
         }
         
-        // Create timeline
-        let timeline = Timeline(entries: entries, policy: .atEnd)
+        // Create timeline. Entries are built from an unordered Dictionary above, so they
+        // must be sorted ascending before handing them to WidgetKit — .atEnd takes its
+        // expiry from the last entry, which would otherwise not be the latest one.
+        let timeline = Timeline(entries: entries.sorted { $0.date < $1.date }, policy: .atEnd)
         completion(timeline)
     }
     
@@ -433,8 +442,11 @@ struct NamazVaktiWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             NamazVaktiWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Namaz Vakitleri")
-        .description("Günlük namaz vakitlerini ve sıradaki vakti gösterir.")
+        // The widget gallery is rendered by the system, so these follow the device
+        // language rather than the in-app picker. LocalizedStringKey resolves them
+        // against the extension's own bundle (the app's .lproj files are compiled in).
+        .configurationDisplayName(LocalizedStringKey("widget_display_name"))
+        .description(LocalizedStringKey("widget_description"))
         .supportedFamilies([.systemSmall, .systemMedium])
         .contentMarginsDisabled() // views manage their own padding on every OS version
     }
