@@ -115,9 +115,13 @@ struct Provider: TimelineProvider {
             }
         }
         
-        // Reload also at midnight
+        // Reload at midnight and also pre-populate tomorrow's prayer milestones so that
+        // if iOS defers the background reload overnight (e.g. Low Power Mode), the widget
+        // still transitions accurately at tomorrow's Fajr and subsequent prayers.
+        var reloadDate: Date? = nil
         if let tomorrow = calendar.date(byAdding: .day, value: 1, to: currentDate),
            let midnight = calendar.date(bySettingHour: 0, minute: 0, second: 1, of: tomorrow) {
+            reloadDate = midnight
             let midnightTimes = PrayerCalculator.shared.getPrayerTimesList(for: location, date: midnight)
             let midnightProgress = PrayerCalculator.shared.getProgressInfo(for: location, at: midnight)
             entries.append(SimpleEntry(
@@ -127,12 +131,25 @@ struct Provider: TimelineProvider {
                 progressInfo: midnightProgress,
                 languageCode: lang
             ))
+
+            if let tomorrowTimesDict = PrayerCalculator.shared.calculatePrayerTimes(for: location, date: midnight) {
+                for (_, prayerDate) in tomorrowTimesDict where prayerDate > midnight {
+                    let upcomingProgress = PrayerCalculator.shared.getProgressInfo(for: location, at: prayerDate.addingTimeInterval(1))
+                    entries.append(SimpleEntry(
+                        date: prayerDate,
+                        location: location,
+                        todayTimes: midnightTimes,
+                        progressInfo: upcomingProgress,
+                        languageCode: lang
+                    ))
+                }
+            }
         }
         
-        // Create timeline. Entries are built from an unordered Dictionary above, so they
-        // must be sorted ascending before handing them to WidgetKit — .atEnd takes its
-        // expiry from the last entry, which would otherwise not be the latest one.
-        let timeline = Timeline(entries: entries.sorted { $0.date < $1.date }, policy: .atEnd)
+        // Sort entries chronologically and request a fresh timeline after midnight.
+        let sortedEntries = entries.sorted { $0.date < $1.date }
+        let policy: TimelineReloadPolicy = reloadDate.map { .after($0) } ?? .atEnd
+        let timeline = Timeline(entries: sortedEntries, policy: policy)
         completion(timeline)
     }
     

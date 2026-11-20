@@ -76,16 +76,16 @@
 
 /* About & Privacy */
 "about" = "حول التطبيق";
-"about_desc" = "تطبيق أوقات الصلاة يعمل بنسبة 100% دون اتصال بالإنترنت، بخصوصية تامة وخالٍ تماماً من الإعلانات.";
+"about_desc" = "ميقات هو تطبيق أوقات صلاة يعمل بنسبة 100% دون اتصال بالإنترنت، بخصوصية تامة وخالٍ تماماً من الإعلانات.";
 
 /* Home-screen widget gallery entry (follows the system language) */
-"widget_display_name" = "أوقات الصلاة";
+"widget_display_name" = "ميقات";
 "widget_description" = "يعرض أوقات الصلاة اليومية والصلاة التالية.";
 
 /* Location & search error states */
 "current_location" = "الموقع الحالي";
 "location_permission_denied_title" = "تم رفض الوصول إلى الموقع";
-"location_permission_denied_desc" = "لا يمكن لتطبيق أوقات الصلاة الوصول إلى موقعك. يمكنك تفعيله من الإعدادات أو البحث عن مدينتك بدلاً من ذلك.";
+"location_permission_denied_desc" = "لا يمكن لتطبيق ميقات الوصول إلى موقعك. يمكنك تفعيله من الإعدادات أو البحث عن مدينتك بدلاً من ذلك.";
 "location_unavailable_title" = "الموقع غير متاح";
 "location_unavailable_desc" = "تعذّر تحديد موقعك. يرجى المحاولة مرة أخرى أو البحث عن مدينتك.";
 "search_error_offline" = "لا يوجد اتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.";

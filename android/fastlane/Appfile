@@ -1,0 +1,2 @@
+json_key_file(ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH"] || ENV["SUPPLY_JSON_KEY"] || "fastlane/play-service-account.json")
+package_name("com.oktay.namaz")

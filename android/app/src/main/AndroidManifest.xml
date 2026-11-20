@@ -2,20 +2,34 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- SCHEDULE_EXACT_ALARM is used with canScheduleExactAlarms() fallback for Play Store policy compliance -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Optional hardware features so Google Play allows installation on tablets & devices without GPS -->
+    <uses-feature
+        android:name="android.hardware.location"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.location.network"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NamazVakti">
+        android:theme="@style/Theme.NamazVakti"
+        android:usesCleartextTraffic="false">
         
         <activity
             android:name=".MainActivity"
@@ -48,10 +62,10 @@
             </intent-filter>
         </receiver>
 
-        <!-- AppWidget Provider -->
+        <!-- AppWidget Provider (must be exported so system/third-party launchers can deliver APPWIDGET_UPDATE) -->
         <receiver
             android:name=".widget.PrayerAppWidget"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/widget_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

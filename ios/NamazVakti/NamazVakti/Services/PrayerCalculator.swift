@@ -131,17 +131,7 @@ class PrayerCalculator {
         return (methodId, schoolId)
     }
 
-    private func getCalculationParameters(latitude: Double = 39.0) -> CalculationParameters {
-        var methodId = defaults.integer(forKey: "calculation_method")
-        if defaults.object(forKey: "calculation_method") == nil {
-            methodId = 13 // Default to Diyanet
-        }
-        
-        var schoolId = defaults.integer(forKey: "asr_madhab")
-        if defaults.object(forKey: "asr_madhab") == nil {
-            schoolId = (methodId == 1) ? 1 : 0
-        }
-        
+    private func getCalculationParameters(latitude: Double = 39.0, methodId: Int, schoolId: Int) -> CalculationParameters {
         var params: CalculationParameters
         switch methodId {
         case 13:
@@ -205,7 +195,7 @@ class PrayerCalculator {
         cacheLock.unlock()
 
         let coordinates = Coordinates(latitude: location.latitude, longitude: location.longitude)
-        let params = getCalculationParameters(latitude: location.latitude)
+        let params = getCalculationParameters(latitude: location.latitude, methodId: methodId, schoolId: schoolId)
 
         guard let prayerTimes = PrayerTimes(coordinates: coordinates, date: components, calculationParameters: params) else {
             return nil
@@ -251,7 +241,9 @@ class PrayerCalculator {
     }
     
     func getProgressInfo(for location: LocationData, at referenceDate: Date = Date()) -> PrayerProgressInfo? {
-        let calendar = Calendar.current
+        guard let tz = TimeZone(identifier: location.timezoneIdentifier) else { return nil }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = tz
         
         let yesterday = calendar.date(byAdding: .day, value: -1, to: referenceDate) ?? referenceDate
         let tomorrow = calendar.date(byAdding: .day, value: 1, to: referenceDate) ?? referenceDate

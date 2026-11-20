@@ -20,6 +20,7 @@ class AppViewModel: ObservableObject {
     /// screen unusable with the screen reader.
     @Published var accessibleTimeRemaining: String = ""
     private var lastAnnouncedMinute: Int = -1
+    private var lastRenderedDayKey: String = ""
     @Published var progress: Double = 0.0
     @Published var hijriDateString: String? = nil
     @Published var gregorianDateString: String? = nil
@@ -255,6 +256,10 @@ class AppViewModel: ObservableObject {
         if let active = activeLocation {
             NotificationManager.shared.scheduleAllNotifications(for: active)
         }
+        AnalyticsService.shared.logCalculationMethodChanged(
+            methodId: methodId,
+            methodName: CalculationMethodRegistry.getMethodName(for: methodId)
+        )
     }
     
     func getAsrMadhab() -> Int {
@@ -273,6 +278,7 @@ class AppViewModel: ObservableObject {
         if let active = activeLocation {
             NotificationManager.shared.scheduleAllNotifications(for: active)
         }
+        AnalyticsService.shared.logMadhabChanged(madhab: schoolId)
     }
     
     func setAppLanguage(_ code: String) {
@@ -284,12 +290,14 @@ class AppViewModel: ObservableObject {
     
     func updateTimes() {
         guard let active = activeLocation else { return }
+        let now = Date()
         let locale = LanguageManager.shared.currentLocale
         
-        todayTimes = PrayerCalculator.shared.getPrayerTimesList(for: active, date: Date())
-        progressInfo = PrayerCalculator.shared.getProgressInfo(for: active)
-        hijriDateString = PrayerCalculator.shared.getHijriDateString(for: active, date: Date(), locale: locale)
-        gregorianDateString = PrayerCalculator.shared.getGregorianDateString(for: active, date: Date(), locale: locale)
+        todayTimes = PrayerCalculator.shared.getPrayerTimesList(for: active, date: now)
+        progressInfo = PrayerCalculator.shared.getProgressInfo(for: active, at: now)
+        hijriDateString = PrayerCalculator.shared.getHijriDateString(for: active, date: now, locale: locale)
+        gregorianDateString = PrayerCalculator.shared.getGregorianDateString(for: active, date: now, locale: locale)
+        lastRenderedDayKey = Self.dayKey(for: active, at: now)
         
         updateTimerTick()
     }
@@ -304,8 +312,9 @@ class AppViewModel: ObservableObject {
     
     private func updateTimerTick() {
         guard let active = activeLocation else { return }
+        let now = Date()
         
-        if let info = PrayerCalculator.shared.getProgressInfo(for: active) {
+        if let info = PrayerCalculator.shared.getProgressInfo(for: active, at: now) {
             self.progressInfo = info
             self.progress = info.progress
             
@@ -318,8 +327,29 @@ class AppViewModel: ObservableObject {
             if totalMinutes != self.lastAnnouncedMinute {
                 self.lastAnnouncedMinute = totalMinutes
                 self.accessibleTimeRemaining = Self.spokenDuration(for: info.timeRemaining)
+
+                // Check once per minute if the day rolled over in the tracked city's
+                // timezone (e.g. overnight StandBy / Desk Clock mode) so todayTimes,
+                // Gregorian date, and Hijri date refresh automatically at midnight.
+                let currentDayKey = Self.dayKey(for: active, at: now)
+                if currentDayKey != self.lastRenderedDayKey {
+                    let locale = LanguageManager.shared.currentLocale
+                    self.todayTimes = PrayerCalculator.shared.getPrayerTimesList(for: active, date: now)
+                    self.hijriDateString = PrayerCalculator.shared.getHijriDateString(for: active, date: now, locale: locale)
+                    self.gregorianDateString = PrayerCalculator.shared.getGregorianDateString(for: active, date: now, locale: locale)
+                    self.lastRenderedDayKey = currentDayKey
+                }
             }
         }
+    }
+
+    private static func dayKey(for location: LocationData, at date: Date) -> String {
+        var cal = Calendar(identifier: .gregorian)
+        if let tz = TimeZone(identifier: location.timezoneIdentifier) {
+            cal.timeZone = tz
+        }
+        let comps = cal.dateComponents([.year, .month, .day], from: date)
+        return "\(location.id.uuidString)_\(comps.year ?? 0)-\(comps.month ?? 0)-\(comps.day ?? 0)"
     }
 
     /// Localized "1 hour 23 minutes" for VoiceOver. Rebuilt per call because the app's

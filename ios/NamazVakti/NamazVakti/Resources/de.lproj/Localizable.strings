@@ -76,16 +76,16 @@
 
 /* About & Privacy */
 "about" = "Über";
-"about_desc" = "Gebetszeiten ist eine 100% offlinefähige, datenschutzorientierte und werbefreie Gebetszeiten-App.";
+"about_desc" = "Miqat ist eine 100% offlinefähige, datenschutzorientierte und werbefreie Gebetszeiten-App.";
 
 /* Home-screen widget gallery entry (follows the system language) */
-"widget_display_name" = "Gebetszeiten";
+"widget_display_name" = "Miqat";
 "widget_description" = "Zeigt die heutigen Gebetszeiten und das nächste Gebet.";
 
 /* Location & search error states */
 "current_location" = "Aktueller Standort";
 "location_permission_denied_title" = "Standortzugriff verweigert";
-"location_permission_denied_desc" = "Gebetszeiten kann nicht auf Ihren Standort zugreifen. Aktivieren Sie ihn in den Einstellungen oder suchen Sie stattdessen nach Ihrer Stadt.";
+"location_permission_denied_desc" = "Miqat kann nicht auf Ihren Standort zugreifen. Aktivieren Sie ihn in den Einstellungen oder suchen Sie stattdessen nach Ihrer Stadt.";
 "location_unavailable_title" = "Standort nicht verfügbar";
 "location_unavailable_desc" = "Ihr Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut oder suchen Sie nach Ihrer Stadt.";
 "search_error_offline" = "Keine Internetverbindung. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.";

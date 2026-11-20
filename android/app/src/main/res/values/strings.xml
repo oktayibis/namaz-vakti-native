@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Prayer Times</string>
-    <string name="widget_name">Prayer Times Widget</string>
+    <string name="app_name">Miqat</string>
+    <string name="widget_name">Miqat Widget</string>
 
     <!-- Prayers -->
     <string name="prayer_fajr">Fajr</string>
@@ -74,7 +74,7 @@
     <!-- Location & Search Error States -->
     <string name="current_location">Current Location</string>
     <string name="location_permission_denied_title">Location Access Denied</string>
-    <string name="location_permission_denied_desc">Prayer Times cannot access your location. Enable it in Settings, or search for your city instead.</string>
+    <string name="location_permission_denied_desc">Miqat cannot access your location. Enable it in Settings, or search for your city instead.</string>
     <string name="location_unavailable_title">Location Unavailable</string>
     <string name="location_unavailable_desc">Your location could not be determined. Please try again, or search for your city instead.</string>
     <string name="search_error_offline">No internet connection. Check your connection and try again.</string>
@@ -83,5 +83,5 @@
     <string name="ok">OK</string>
     <!-- About & Privacy -->
     <string name="about">About</string>
-    <string name="about_desc">Prayer Times is a 100% offline, privacy-first, ad-free prayer times application.</string>
+    <string name="about_desc" formatted="false">Miqat is a 100% offline, privacy-first, ad-free prayer times application.</string>
 </resources>

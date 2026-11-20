@@ -33,11 +33,18 @@ struct NamazVaktiApp: App {
     static func handleAppRefresh(task: BGAppRefreshTask) {
         scheduleAppRefresh()
 
-        if let active = AppViewModel.shared.activeLocation {
-            NotificationManager.shared.scheduleAllNotifications(for: active)
-            WidgetCenter.shared.reloadAllTimelines()
+        task.expirationHandler = {
+            task.setTaskCompleted(success: false)
         }
-        task.setTaskCompleted(success: true)
+
+        if let active = AppViewModel.shared.activeLocation {
+            WidgetCenter.shared.reloadAllTimelines()
+            NotificationManager.shared.scheduleAllNotifications(for: active) {
+                task.setTaskCompleted(success: true)
+            }
+        } else {
+            task.setTaskCompleted(success: true)
+        }
     }
 
     static func scheduleAppRefresh() {
@@ -74,12 +81,9 @@ struct NamazVaktiApp: App {
         }
     }
 
-    /// Scheduling walks several days of solar math and issues up to 60 requests, so keep
-    /// it off the main thread — it used to run synchronously on every activation.
+    /// NotificationManager dispatches onto its dedicated `.utility` background queue.
     private func rescheduleNotifications() {
         guard let active = viewModel.activeLocation else { return }
-        DispatchQueue.global(qos: .utility).async {
-            NotificationManager.shared.scheduleAllNotifications(for: active)
-        }
+        NotificationManager.shared.scheduleAllNotifications(for: active)
     }
 }

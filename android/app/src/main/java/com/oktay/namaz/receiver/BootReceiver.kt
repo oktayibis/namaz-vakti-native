@@ -9,6 +9,9 @@ import com.google.gson.Gson
 import com.oktay.namaz.model.LocationData
 import com.oktay.namaz.service.AlarmScheduler
 import com.oktay.namaz.widget.PrayerAppWidget
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Reschedules prayer alarms whenever previously set alarms may have been lost or
@@ -27,34 +30,41 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action !in handledActions) return
 
-        val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
-        val activeLocationId = prefs.getString("active_location_id", null)
-        val locationsJson = prefs.getString("saved_locations", null)
+        val appContext = context.applicationContext
+        val pendingResult = goAsync()
 
-        if (activeLocationId != null && locationsJson != null) {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
-                val gson = Gson()
-                val type = object : com.google.gson.reflect.TypeToken<List<LocationData>>() {}.type
-                val locations = gson.fromJson<List<LocationData>>(locationsJson, type) ?: emptyList()
-                val activeLocation = locations.firstOrNull { it.id == activeLocationId }
+                val prefs = appContext.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
+                val activeLocationId = prefs.getString("active_location_id", null)
+                val locationsJson = prefs.getString("saved_locations", null)
 
-                if (activeLocation != null) {
-                    val scheduler = AlarmScheduler(context)
-                    scheduler.scheduleAlarms(activeLocation)
+                if (activeLocationId != null && locationsJson != null) {
+                    val gson = Gson()
+                    val type = object : com.google.gson.reflect.TypeToken<List<LocationData>>() {}.type
+                    val locations = gson.fromJson<List<LocationData>>(locationsJson, type) ?: emptyList()
+                    val activeLocation = locations.firstOrNull { it.id == activeLocationId }
+
+                    if (activeLocation != null) {
+                        val scheduler = AlarmScheduler(appContext)
+                        scheduler.scheduleAlarms(activeLocation)
+                    }
                 }
+
+                // Times shown on widgets shift too (especially on timezone change)
+                val widgetIntent = Intent(appContext, PrayerAppWidget::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    val ids = AppWidgetManager.getInstance(appContext).getAppWidgetIds(
+                        ComponentName(appContext, PrayerAppWidget::class.java)
+                    )
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+                }
+                appContext.sendBroadcast(widgetIntent)
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                pendingResult.finish()
             }
         }
-
-        // Times shown on widgets shift too (especially on timezone change)
-        val widgetIntent = Intent(context, PrayerAppWidget::class.java).apply {
-            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(
-                ComponentName(context, PrayerAppWidget::class.java)
-            )
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-        }
-        context.sendBroadcast(widgetIntent)
     }
 }

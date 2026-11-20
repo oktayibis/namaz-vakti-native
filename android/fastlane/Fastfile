@@ -1,0 +1,61 @@
+default_platform(:android)
+
+platform :android do
+  desc "Run unit tests"
+  lane :test do
+    gradle(task: "testDebugUnitTest")
+  end
+
+  desc "Build signed release Android App Bundle (.aab) and APK"
+  lane :build_release do
+    gradle(task: "testDebugUnitTest")
+    gradle(task: "bundle", build_type: "Release")
+  end
+
+  desc "Deploy a new version to the Google Play Internal Testing track"
+  lane :internal do
+    deploy(track: "internal")
+  end
+
+  desc "Deploy a new version to the Google Play Closed Testing (Beta) track"
+  lane :beta do
+    deploy(track: "beta")
+  end
+
+  desc "Deploy a new version to the Google Play Production track"
+  lane :production do
+    deploy(track: "production")
+  end
+
+  desc "Build and upload signed release AAB to a specified Google Play track (internal, alpha, beta, production)"
+  lane :deploy do |options|
+    track = options[:track] || ENV["PLAY_STORE_TRACK"] || "internal"
+    release_status = options[:release_status] || ENV["PLAY_RELEASE_STATUS"] || "completed"
+
+    aab_path = ENV["AAB_PATH"] || lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    unless aab_path && File.exist?(aab_path)
+      gradle(task: "bundle", build_type: "Release")
+      aab_path = lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH] || "app/build/outputs/bundle/release/app-release.aab"
+    end
+
+    upload_params = {
+      package_name: "com.oktay.namaz",
+      track: track,
+      aab: aab_path,
+      release_status: release_status,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    }
+
+    if ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH"] && !ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH"].empty?
+      upload_params[:json_key] = ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_PATH"]
+    elsif ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"] && !ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"].empty?
+      upload_params[:json_key_data] = ENV["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"]
+    end
+
+    upload_to_play_store(upload_params)
+  end
+end
