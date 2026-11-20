@@ -99,9 +99,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private var timerJob: Job? = null
+    private var lastRenderedDayKey: String? = null
 
     // Serial dispatcher for prayer-time calculations and alarm scheduling
     private val workDispatcher = Dispatchers.Default.limitedParallelism(1)
+
+    private fun computeDayKey(location: LocationData, date: Date): String {
+        val cal = Calendar.getInstance(java.util.TimeZone.getTimeZone(location.timezoneIdentifier)).apply {
+            time = date
+        }
+        return "${location.id}_${cal.get(Calendar.YEAR)}-${cal.get(Calendar.DAY_OF_YEAR)}"
+    }
 
     init {
         loadData()
@@ -320,11 +328,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val active = _activeLocation.value ?: return
 
         viewModelScope.launch(workDispatcher) {
+            val now = Date()
             val locale = getCurrentLocale()
-            _todayTimes.value = PrayerCalculator.getPrayerTimesList(context, active, Date())
-            _progressInfo.value = PrayerCalculator.getProgressInfo(context, active)
-            _hijriDateString.value = PrayerCalculator.getHijriDateString(context, active, Date(), locale)
-            _gregorianDateString.value = PrayerCalculator.getGregorianDateString(context, active, Date(), locale)
+            lastRenderedDayKey = computeDayKey(active, now)
+            _todayTimes.value = PrayerCalculator.getPrayerTimesList(context, active, now)
+            _progressInfo.value = PrayerCalculator.getProgressInfo(context, active, now)
+            _hijriDateString.value = PrayerCalculator.getHijriDateString(context, active, now, locale)
+            _gregorianDateString.value = PrayerCalculator.getGregorianDateString(context, active, now, locale)
 
             updateTimerTick()
         }
@@ -342,7 +352,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun updateTimerTick() {
         val active = _activeLocation.value ?: return
-        val info = PrayerCalculator.getProgressInfo(context, active) ?: return
+        val now = Date()
+        val currentDayKey = computeDayKey(active, now)
+        if (lastRenderedDayKey != null && lastRenderedDayKey != currentDayKey) {
+            val locale = getCurrentLocale()
+            lastRenderedDayKey = currentDayKey
+            _todayTimes.value = PrayerCalculator.getPrayerTimesList(context, active, now)
+            _hijriDateString.value = PrayerCalculator.getHijriDateString(context, active, now, locale)
+            _gregorianDateString.value = PrayerCalculator.getGregorianDateString(context, active, now, locale)
+        }
+        val info = PrayerCalculator.getProgressInfo(context, active, now) ?: return
         
         _progressInfo.value = info
         _progress.value = info.progress

@@ -1,0 +1,10 @@
+app_identifier("com.okib.NamazVakti")
+team_id(ENV["APPLE_TEAM_ID"] || "3SN795A9D6")
+
+if ENV["APPLE_ID"] && !ENV["APPLE_ID"].empty?
+  apple_id(ENV["APPLE_ID"])
+end
+
+if ENV["ITC_TEAM_ID"] && !ENV["ITC_TEAM_ID"].empty?
+  itc_team_id(ENV["ITC_TEAM_ID"])
+end

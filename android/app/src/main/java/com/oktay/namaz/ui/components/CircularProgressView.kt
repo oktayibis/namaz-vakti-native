@@ -1,6 +1,8 @@
 package com.oktay.namaz.ui.components
 
+import android.provider.Settings
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -15,17 +17,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,17 +45,43 @@ fun CircularProgressView(
     modifier: Modifier = Modifier,
     size: Dp = 250.dp
 ) {
+    val context = LocalContext.current
+    val reduceMotion = remember(context) {
+        try {
+            val animatorScale = Settings.Global.getFloat(
+                context.contentResolver,
+                Settings.Global.ANIMATOR_DURATION_SCALE,
+                1f
+            )
+            val transitionScale = Settings.Global.getFloat(
+                context.contentResolver,
+                Settings.Global.TRANSITION_ANIMATION_SCALE,
+                1f
+            )
+            animatorScale == 0f || transitionScale == 0f
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    val clampedProgress = minOf(maxOf(progress, 0.0), 1.0).toFloat()
     val animatedProgress by animateFloatAsState(
-        targetValue = progress.toFloat(),
-        animationSpec = tween(durationMillis = 800),
+        targetValue = clampedProgress,
+        animationSpec = if (reduceMotion) snap() else tween(durationMillis = 800),
         label = "ProgressAnimation"
     )
 
     val strokeWidth = size.value * 0.096f
     val canvasSize = size * 0.84f
     val isCompact = size < 200.dp
-    val percentValue = (minOf(maxOf(progress, 0.0), 1.0) * 100).toInt()
-    val accessibleDescription = "$nextPrayerName, $timeRemaining, %$percentValue"
+    val percentValue = (clampedProgress * 100).toInt()
+
+    // Coarse summary (hours & minutes only, ignoring 1-second raw ticking digits) for TalkBack
+    val coarseTimeSummary = remember(timeRemaining) {
+        val parts = timeRemaining.split(":")
+        if (parts.size >= 2) "${parts[0]}:${parts[1]}" else timeRemaining
+    }
+    val accessibleDescription = "$nextPrayerName, $coarseTimeSummary, %$percentValue"
 
     Box(
         contentAlignment = Alignment.Center,
@@ -58,7 +89,7 @@ fun CircularProgressView(
             .size(size)
             .background(SurfaceGlass, shape = CircleShape)
             .border(1.5.dp, BorderGlass, shape = CircleShape)
-            .semantics(mergeDescendants = true) {
+            .clearAndSetSemantics {
                 contentDescription = accessibleDescription
             }
     ) {
@@ -90,8 +121,10 @@ fun CircularProgressView(
                 text = nextPrayerName,
                 fontSize = if (isCompact) 11.sp else 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.White.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center
+                color = Color.White.copy(alpha = 0.85f),
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(if (isCompact) 2.dp else 4.dp))
@@ -102,7 +135,9 @@ fun CircularProgressView(
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Monospace,
                 color = Color.White,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Clip
             )
 
             Spacer(modifier = Modifier.height(if (isCompact) 2.dp else 4.dp))
@@ -112,7 +147,8 @@ fun CircularProgressView(
                 text = "%$percent",
                 fontSize = if (isCompact) 11.sp else 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.White.copy(alpha = 0.7f)
+                color = Color.White.copy(alpha = 0.85f),
+                maxLines = 1
             )
         }
     }

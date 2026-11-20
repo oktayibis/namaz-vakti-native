@@ -32,8 +32,24 @@ xcuserdata/
 *.xcuserstate
 *.xccheckout
 *.xcscmblueprint
-*.xcuserstate
 *.opensettings
 
 # Release / Build distribution
 dist/
+*.ipa
+*.xcarchive
+
+# Secrets, Signing Keys & Certificates (NEVER commit)
+.env
+/ios/.env
+ios/.env
+*.p8
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.jks
+*.keystore
+keystore.properties
+android/keystore.properties
+service-account*.json

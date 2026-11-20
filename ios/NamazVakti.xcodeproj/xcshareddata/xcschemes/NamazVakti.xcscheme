@@ -21,6 +21,20 @@
                ReferencedContainer = "container:NamazVakti.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "936E00806EB3E12B282797C8"
+               BuildableName = "NamazVaktiTests.xctest"
+               BlueprintName = "NamazVaktiTests"
+               ReferencedContainer = "container:NamazVakti.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -39,6 +53,17 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "936E00806EB3E12B282797C8"
+               BuildableName = "NamazVaktiTests.xctest"
+               BlueprintName = "NamazVaktiTests"
+               ReferencedContainer = "container:NamazVakti.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

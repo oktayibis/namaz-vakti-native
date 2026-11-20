@@ -1,5 +1,6 @@
 package com.oktay.namaz.receiver
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,10 +9,11 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.oktay.namaz.MainActivity
-import com.oktay.namaz.R
 import com.oktay.namaz.widget.PrayerAppWidget
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -80,8 +82,16 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
-        // Show notification (use requestCode as unique ID so multiple notifications can coexist)
-        notificationManager.notify(requestCode, builder.build())
+        val canNotify = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+        if (canNotify) {
+            // Show notification (use requestCode as unique ID so multiple notifications can coexist)
+            notificationManager.notify(requestCode, builder.build())
+        }
 
         // A prayer boundary just passed; refresh widgets so current/next flip on time
         val widgetIntent = Intent(context, PrayerAppWidget::class.java).apply {

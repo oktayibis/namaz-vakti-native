@@ -89,6 +89,7 @@ struct SettingsView: View {
                                     } else {
                                         enabledPrayers.remove(prayer)
                                     }
+                                    AnalyticsService.shared.logNotificationToggle(prayerName: prayer.rawValue, isEnabled: isEnabled)
                                     saveChanges()
                                 }
                             )) {

@@ -4,25 +4,46 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
 import android.location.Location
+import androidx.annotation.Keep
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import com.oktay.namaz.model.LocationData
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import java.net.UnknownHostException
 import java.util.Locale
 import java.util.TimeZone
+
+@Keep
+sealed class CitySearchResult {
+    data class Success(val locations: List<LocationData>) : CitySearchResult()
+    object Offline : CitySearchResult()
+    object Error : CitySearchResult()
+}
 
 class LocationManager(private val context: Context) {
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     private val geocoder = Geocoder(context, Locale.getDefault())
     private val gson = Gson()
+
+    companion object {
+        private val SUPPORTED_GEOCODING_LANGUAGES = setOf("en", "de", "fr", "es", "it", "pt", "ru", "tr")
+
+        fun resolveGeocodingLanguage(languageCode: String = Locale.getDefault().language): String {
+            val normalized = languageCode.lowercase(Locale.ROOT)
+            return if (SUPPORTED_GEOCODING_LANGUAGES.contains(normalized)) normalized else "en"
+        }
+    }
 
     @SuppressLint("MissingPermission")
     suspend fun getCurrentLocation(): LocationData? = withContext(Dispatchers.IO) {
@@ -45,6 +66,7 @@ class LocationManager(private val context: Context) {
 
             if (location != null) {
                 // Reverse geocode
+                @Suppress("DEPRECATION")
                 val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
                 val defaultLocationName = context.getString(com.oktay.namaz.R.string.current_location)
                 if (!addresses.isNullOrEmpty()) {
@@ -72,43 +94,42 @@ class LocationManager(private val context: Context) {
             } else {
                 null
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
 
-    private fun getGeocodingLanguage(): String {
-        val supported = setOf("en", "de", "fr", "es", "it", "pt", "ru", "tr")
-        val currentLang = Locale.getDefault().language.lowercase()
-        return if (supported.contains(currentLang)) currentLang else "en"
-    }
+    private fun getGeocodingLanguage(): String = resolveGeocodingLanguage(Locale.getDefault().language)
 
-    suspend fun searchCity(query: String): List<LocationData> = withContext(Dispatchers.IO) {
-        if (query.isEmpty()) return@withContext emptyList()
+    suspend fun searchCityWithStatus(query: String): CitySearchResult = withContext(Dispatchers.IO) {
+        val trimmed = query.trim()
+        if (trimmed.isEmpty()) return@withContext CitySearchResult.Success(emptyList())
 
+        var connection: HttpURLConnection? = null
         try {
-            val encodedQuery = URLEncoder.encode(query, "UTF-8")
+            coroutineContext.ensureActive()
+            val encodedQuery = URLEncoder.encode(trimmed, "UTF-8")
             val lang = getGeocodingLanguage()
             val urlString = "https://geocoding-api.open-meteo.com/v1/search?name=$encodedQuery&count=10&language=$lang&format=json"
             val url = URL(urlString)
-            val connection = url.openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-            connection.connectTimeout = 5000
-            connection.readTimeout = 5000
+            connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 5000
+                readTimeout = 5000
+            }
 
             val responseCode = connection.responseCode
+            coroutineContext.ensureActive()
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                val reader = BufferedReader(InputStreamReader(connection.inputStream))
-                val response = StringBuilder()
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    response.append(line)
+                val response = BufferedReader(InputStreamReader(connection.inputStream)).use { reader ->
+                    reader.readText()
                 }
-                reader.close()
-
-                val searchResponse = gson.fromJson(response.toString(), OpenMeteoResponse::class.java)
-                searchResponse.results?.map { result ->
+                coroutineContext.ensureActive()
+                val searchResponse = gson.fromJson(response, OpenMeteoResponse::class.java)
+                val list = searchResponse?.results?.map { result ->
                     LocationData(
                         name = result.name,
                         country = result.country ?: "",
@@ -117,26 +138,42 @@ class LocationManager(private val context: Context) {
                         timezoneIdentifier = result.timezone ?: TimeZone.getDefault().id
                     )
                 } ?: emptyList()
+                CitySearchResult.Success(list)
             } else {
-                emptyList()
+                CitySearchResult.Error
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: UnknownHostException) {
+            CitySearchResult.Offline
         } catch (e: Exception) {
             e.printStackTrace()
-            emptyList()
+            CitySearchResult.Error
+        } finally {
+            connection?.disconnect()
+        }
+    }
+
+    suspend fun searchCity(query: String): List<LocationData> {
+        return when (val result = searchCityWithStatus(query)) {
+            is CitySearchResult.Success -> result.locations
+            else -> emptyList()
         }
     }
 }
 
 // Data structures for JSON decoding
+@Keep
 data class OpenMeteoResponse(
-    val results: List<OpenMeteoCity>?
+    @SerializedName("results") val results: List<OpenMeteoCity>?
 )
 
+@Keep
 data class OpenMeteoCity(
-    val id: Long,
-    val name: String,
-    val latitude: Double,
-    val longitude: Double,
-    val country: String?,
-    val timezone: String?
+    @SerializedName("id") val id: Long,
+    @SerializedName("name") val name: String,
+    @SerializedName("latitude") val latitude: Double,
+    @SerializedName("longitude") val longitude: Double,
+    @SerializedName("country") val country: String?,
+    @SerializedName("timezone") val timezone: String?
 )

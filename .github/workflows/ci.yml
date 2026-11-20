@@ -1,0 +1,165 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android-ci:
+    name: Android CI (Test, Lint & Debug APK)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ./android
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Gradle with cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run Unit Tests, Lint, and Assemble Debug APK
+        run: ./gradlew testDebugUnitTest lintDebug assembleDebug --stacktrace
+
+      - name: Upload Unit Test & Lint Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-reports
+          path: |
+            android/app/build/reports/tests/testDebugUnitTest/
+            android/app/build/reports/lint-results-debug.*
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: namaz-vakti-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  ios-ci:
+    name: iOS CI (XcodeGen, Build & Simulator Tests)
+    runs-on: macos-14
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: ./ios
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Cache Swift Package Manager dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ios/DerivedData/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('ios/project.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Install XcodeGen
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+          xcodegen --version
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Detect available iPhone Simulator
+        id: simulator
+        run: |
+          SIM_UDID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin).get("devices", {})
+          candidates = []
+          for runtime, devices in data.items():
+              if "iOS" not in runtime:
+                  continue
+              for d in devices:
+                  if d.get("isAvailable") and "iPhone" in d.get("name", ""):
+                      candidates.append((runtime, d["name"], d["udid"]))
+          candidates.sort(key=lambda x: (x[0], "Pro" in x[1], "16" in x[1] or "15" in x[1]), reverse=True)
+          print(candidates[0][2] if candidates else "")
+          ')
+          if [ -z "$SIM_UDID" ]; then
+            echo "::error::No available iPhone simulator found on runner"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Selected simulator UDID: $SIM_UDID"
+          echo "udid=$SIM_UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve Swift Package Dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project NamazVakti.xcodeproj \
+            -scheme NamazVakti \
+            -clonedSourcePackagesDirPath DerivedData/SourcePackages
+
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild build \
+            -project NamazVakti.xcodeproj \
+            -scheme NamazVakti \
+            -sdk iphonesimulator \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -clonedSourcePackagesDirPath DerivedData/SourcePackages \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO
+
+      - name: Run iOS Unit Tests on Simulator
+        run: |
+          if grep -q "type: bundle.unit-test" project.yml; then
+            xcodebuild test \
+              -project NamazVakti.xcodeproj \
+              -scheme NamazVakti \
+              -sdk iphonesimulator \
+              -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+              -clonedSourcePackagesDirPath DerivedData/SourcePackages \
+              -resultBundlePath build/TestResults.xcresult \
+              CODE_SIGNING_ALLOWED=NO \
+              COMPILER_INDEX_STORE_ENABLE=NO
+          else
+            echo "::notice::No unit-test target defined in project.yml yet; skipping test action."
+          fi
+
+      - name: Upload iOS Test Result Bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: ios/build/TestResults.xcresult
+          if-no-files-found: ignore
+          retention-days: 14

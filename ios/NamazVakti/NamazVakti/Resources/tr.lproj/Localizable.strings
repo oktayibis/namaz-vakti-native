@@ -76,16 +76,16 @@
 
 /* About & Privacy */
 "about" = "Hakkında";
-"about_desc" = "Namaz Vakti, %100 çevrimdışı, gizlilik odaklı ve reklamsız bir namaz vakti uygulamasıdır.";
+"about_desc" = "Mîkât, %100 çevrimdışı, gizlilik odaklı ve reklamsız bir namaz vakti uygulamasıdır.";
 
 /* Home-screen widget gallery entry (follows the system language) */
-"widget_display_name" = "Namaz Vakitleri";
+"widget_display_name" = "Mîkât";
 "widget_description" = "Günlük namaz vakitlerini ve sıradaki vakti gösterir.";
 
 /* Location & search error states */
 "current_location" = "Mevcut Konum";
 "location_permission_denied_title" = "Konum Erişimi Reddedildi";
-"location_permission_denied_desc" = "Namaz Vakti konumunuza erişemiyor. Ayarlar'dan izin verebilir veya şehrinizi arayabilirsiniz.";
+"location_permission_denied_desc" = "Mîkât konumunuza erişemiyor. Ayarlar'dan izin verebilir veya şehrinizi arayabilirsiniz.";
 "location_unavailable_title" = "Konum Alınamadı";
 "location_unavailable_desc" = "Konumunuz belirlenemedi. Lütfen tekrar deneyin veya şehrinizi arayın.";
 "search_error_offline" = "İnternet bağlantısı yok. Bağlantınızı kontrol edip tekrar deneyin.";

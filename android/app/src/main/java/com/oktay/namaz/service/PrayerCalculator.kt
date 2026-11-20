@@ -1,6 +1,7 @@
 package com.oktay.namaz.service
 
 import android.content.Context
+import androidx.annotation.Keep
 import com.batoulapps.adhan.CalculationMethod
 import com.batoulapps.adhan.CalculationParameters
 import com.batoulapps.adhan.Coordinates
@@ -9,7 +10,6 @@ import com.batoulapps.adhan.Madhab
 import com.batoulapps.adhan.PrayerTimes
 import com.batoulapps.adhan.data.DateComponents
 import com.oktay.namaz.model.LocationData
-import java.io.File
 import java.text.SimpleDateFormat
 import java.time.chrono.HijrahDate
 import java.time.temporal.ChronoField
@@ -18,6 +18,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+@Keep
 enum class PrayerType(val rawValue: String, val turkishName: String) {
     FAJR("fajr", "İmsak"),
     SUNRISE("sunrise", "Güneş"),
@@ -38,12 +39,14 @@ enum class PrayerType(val rawValue: String, val turkishName: String) {
     }
 }
 
+@Keep
 data class PrayerTimeItem(
     val type: PrayerType,
     val date: Date,
     val formattedTime: String
 )
 
+@Keep
 data class PrayerProgressInfo(
     val currentPrayer: PrayerType,
     val nextPrayer: PrayerType,
@@ -55,11 +58,7 @@ data class PrayerProgressInfo(
 
 object PrayerCalculator {
 
-    private fun getCalculationParameters(context: Context, latitude: Double = 39.0): CalculationParameters {
-        val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
-        val methodId = prefs.getInt("calculation_method", 13) // Default to Diyanet
-        val schoolId = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (methodId == 1) 1 else 0)
-
+    internal fun getCalculationParameters(methodId: Int, schoolId: Int, latitude: Double = 39.0): CalculationParameters {
         val params = when (methodId) {
             13 -> {
                 if (latitude > 48.0) {
@@ -106,6 +105,13 @@ object PrayerCalculator {
         return params
     }
 
+    private fun getCalculationParameters(context: Context, latitude: Double = 39.0): CalculationParameters {
+        val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
+        val methodId = prefs.getInt("calculation_method", 13) // Default to Diyanet
+        val schoolId = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (methodId == 1) 1 else 0)
+        return getCalculationParameters(methodId, schoolId, latitude)
+    }
+
     private val timesCache = mutableMapOf<String, Map<PrayerType, Date>>()
     private val cacheLock = Any()
     private const val CACHE_LIMIT = 12
@@ -123,17 +129,23 @@ object PrayerCalculator {
         }
     }
 
+    internal fun getCacheSizeForTesting(): Int {
+        synchronized(cacheLock) {
+            return timesCache.size
+        }
+    }
+
     /**
-     * Tamamen çevrimdışı, anlık (0 ms) ve yüksek hassasiyetli namaz vakti hesaplama motoru.
-     * Ağ bağımlılığı olmadan verilen koordinat, saat dilimi ve tarihe göre vakitleri üretir.
+     * Context-free overload for unit testing and direct parameter calculation with thread-safe memoization.
      */
-    fun calculatePrayerTimes(context: Context, location: LocationData, date: Date): Map<PrayerType, Date>? {
+    fun calculatePrayerTimes(
+        location: LocationData,
+        date: Date,
+        methodId: Int = 13,
+        schoolId: Int = if (methodId == 1) 1 else 0
+    ): Map<PrayerType, Date>? {
         val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
         val calendar = Calendar.getInstance(tz).apply { time = date }
-
-        val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
-        val methodId = prefs.getInt("calculation_method", 13)
-        val schoolId = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (methodId == 1) 1 else 0)
 
         val key = cacheKey(location, calendar, methodId, schoolId)
         synchronized(cacheLock) {
@@ -147,7 +159,7 @@ object PrayerCalculator {
             calendar.get(Calendar.DAY_OF_MONTH)
         )
 
-        val params = getCalculationParameters(context, location.latitude)
+        val params = getCalculationParameters(methodId, schoolId, location.latitude)
 
         return try {
             val prayerTimes = PrayerTimes(coordinates, components, params)
@@ -172,12 +184,28 @@ object PrayerCalculator {
         }
     }
 
+    /**
+     * Tamamen çevrimdışı, anlık (0 ms) ve yüksek hassasiyetli namaz vakti hesaplama motoru.
+     * Ağ bağımlılığı olmadan verilen koordinat, saat dilimi ve tarihe göre vakitleri üretir.
+     */
+    fun calculatePrayerTimes(context: Context, location: LocationData, date: Date): Map<PrayerType, Date>? {
+        val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
+        val methodId = prefs.getInt("calculation_method", 13)
+        val schoolId = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (methodId == 1) 1 else 0)
+        return calculatePrayerTimes(location, date, methodId, schoolId)
+    }
+
     fun calculateLocalPrayerTimes(context: Context, location: LocationData, date: Date): Map<PrayerType, Date>? {
         return calculatePrayerTimes(context, location, date)
     }
 
-    fun getPrayerTimesList(context: Context, location: LocationData, date: Date): List<PrayerTimeItem> {
-        val times = calculatePrayerTimes(context, location, date) ?: return emptyList()
+    fun getPrayerTimesList(
+        location: LocationData,
+        date: Date,
+        methodId: Int = 13,
+        schoolId: Int = if (methodId == 1) 1 else 0
+    ): List<PrayerTimeItem> {
+        val times = calculatePrayerTimes(location, date, methodId, schoolId) ?: return emptyList()
         val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
 
         val formatter = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
@@ -190,20 +218,32 @@ object PrayerCalculator {
         }
     }
 
-    fun getProgressInfo(context: Context, location: LocationData, referenceDate: Date = Date()): PrayerProgressInfo? {
+    fun getPrayerTimesList(context: Context, location: LocationData, date: Date): List<PrayerTimeItem> {
+        val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
+        val methodId = prefs.getInt("calculation_method", 13)
+        val schoolId = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (methodId == 1) 1 else 0)
+        return getPrayerTimesList(location, date, methodId, schoolId)
+    }
+
+    fun getProgressInfo(
+        location: LocationData,
+        referenceDate: Date = Date(),
+        methodId: Int = 13,
+        schoolId: Int = if (methodId == 1) 1 else 0
+    ): PrayerProgressInfo? {
         val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
 
         val yesterdayCalendar = Calendar.getInstance(tz).apply {
             time = referenceDate
             add(Calendar.DAY_OF_YEAR, -1)
         }
-        val yesterdayTimes = calculatePrayerTimes(context, location, yesterdayCalendar.time)
-        val todayTimes = calculatePrayerTimes(context, location, referenceDate)
+        val yesterdayTimes = calculatePrayerTimes(location, yesterdayCalendar.time, methodId, schoolId)
+        val todayTimes = calculatePrayerTimes(location, referenceDate, methodId, schoolId)
         val tomorrowCalendar = Calendar.getInstance(tz).apply {
             time = referenceDate
             add(Calendar.DAY_OF_YEAR, 1)
         }
-        val tomorrowTimes = calculatePrayerTimes(context, location, tomorrowCalendar.time)
+        val tomorrowTimes = calculatePrayerTimes(location, tomorrowCalendar.time, methodId, schoolId)
 
         if (yesterdayTimes == null || todayTimes == null || tomorrowTimes == null) return null
 
@@ -267,10 +307,14 @@ object PrayerCalculator {
         return null
     }
 
-    /**
-     * Yerel Hicri tarih üretimi (örn: "24 Rebiülevvel 1448" / "24 Rabi' al-Awwal 1448").
-     */
-    fun getHijriDateString(context: Context, location: LocationData, date: Date = Date(), locale: Locale = Locale.getDefault()): String {
+    fun getProgressInfo(context: Context, location: LocationData, referenceDate: Date = Date()): PrayerProgressInfo? {
+        val prefs = context.getSharedPreferences("namaz_prefs", Context.MODE_PRIVATE)
+        val methodId = prefs.getInt("calculation_method", 13)
+        val schoolId = if (prefs.contains("asr_madhab")) prefs.getInt("asr_madhab", 0) else (if (methodId == 1) 1 else 0)
+        return getProgressInfo(location, referenceDate, methodId, schoolId)
+    }
+
+    fun getHijriDateString(location: LocationData, date: Date = Date(), locale: Locale = Locale.getDefault()): String {
         return try {
             val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
             val localDate = date.toInstant().atZone(tz.toZoneId()).toLocalDate()
@@ -320,9 +364,14 @@ object PrayerCalculator {
     }
 
     /**
-     * Yerel Miladi tarih formatı (örn: "6 Eylül 2026, Pazar" / "September 6, 2026, Sunday").
+     * Yerel Hicri tarih üretimi (örn: "24 Rebiülevvel 1448" / "24 Rabi' al-Awwal 1448").
      */
-    fun getGregorianDateString(context: Context, location: LocationData, date: Date = Date(), locale: Locale = Locale.getDefault()): String {
+    @Suppress("UNUSED_PARAMETER")
+    fun getHijriDateString(context: Context, location: LocationData, date: Date = Date(), locale: Locale = Locale.getDefault()): String {
+        return getHijriDateString(location, date, locale)
+    }
+
+    fun getGregorianDateString(location: LocationData, date: Date = Date(), locale: Locale = Locale.getDefault()): String {
         return try {
             val tz = TimeZone.getTimeZone(location.timezoneIdentifier)
             val formatter = SimpleDateFormat("d MMMM yyyy, EEEE", locale).apply {
@@ -335,7 +384,16 @@ object PrayerCalculator {
         }
     }
 
+    /**
+     * Yerel Miladi tarih formatı (örn: "6 Eylül 2026, Pazar" / "September 6, 2026, Sunday").
+     */
+    @Suppress("UNUSED_PARAMETER")
+    fun getGregorianDateString(context: Context, location: LocationData, date: Date = Date(), locale: Locale = Locale.getDefault()): String {
+        return getGregorianDateString(location, date, locale)
+    }
+
     fun clearCache(context: Context) {
+        invalidateTimesCache()
         try {
             val files = context.cacheDir.listFiles { _, name -> name.startsWith("namaz_cache_") }
             files?.forEach { it.delete() }

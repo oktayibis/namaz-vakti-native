@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Gebetszeiten</string>
-    <string name="widget_name">Gebetszeiten Widget</string>
+    <string name="app_name">Miqat</string>
+    <string name="widget_name">Miqat Widget</string>
 
     <!-- Gebete -->
     <string name="prayer_fajr">Fadschr</string>
@@ -74,7 +74,7 @@
     <!-- Standort- und Suchfehler -->
     <string name="current_location">Aktueller Standort</string>
     <string name="location_permission_denied_title">Standortzugriff verweigert</string>
-    <string name="location_permission_denied_desc">Gebetszeiten kann nicht auf Ihren Standort zugreifen. Aktivieren Sie ihn in den Einstellungen oder suchen Sie stattdessen nach Ihrer Stadt.</string>
+    <string name="location_permission_denied_desc">Miqat kann nicht auf Ihren Standort zugreifen. Aktivieren Sie ihn in den Einstellungen oder suchen Sie stattdessen nach Ihrer Stadt.</string>
     <string name="location_unavailable_title">Standort nicht verfügbar</string>
     <string name="location_unavailable_desc">Ihr Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut oder suchen Sie nach Ihrer Stadt.</string>
     <string name="search_error_offline">Keine Internetverbindung. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
@@ -83,5 +83,5 @@
     <string name="ok">OK</string>
     <!-- Über & Datenschutz -->
     <string name="about">Über</string>
-    <string name="about_desc">Gebetszeiten ist eine 100% offlinefähige, datenschutzorientierte und werbefreie Gebetszeiten-App.</string>
+    <string name="about_desc" formatted="false">Miqat ist eine 100% offlinefähige, datenschutzorientierte und werbefreie Gebetszeiten-App.</string>
 </resources>

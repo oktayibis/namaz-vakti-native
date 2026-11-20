@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">أوقات الصلاة</string>
-    <string name="widget_name">ودجت أوقات الصلاة</string>
+    <string name="app_name">ميقات</string>
+    <string name="widget_name">ودجت ميقات</string>
 
     <!-- الصلوات -->
     <string name="prayer_fajr">الفجر</string>
@@ -74,7 +74,7 @@
     <!-- حالات خطأ الموقع والبحث -->
     <string name="current_location">الموقع الحالي</string>
     <string name="location_permission_denied_title">تم رفض الوصول إلى الموقع</string>
-    <string name="location_permission_denied_desc">لا يمكن لتطبيق أوقats الصلاة الوصول إلى موقعك. يمكنك تفعيله من الإعدادات أو البحث عن مدينتك بدلاً من ذلك.</string>
+    <string name="location_permission_denied_desc">لا يمكن لتطبيق ميقات الوصول إلى موقعك. يمكنك تفعيله من الإعدادات أو البحث عن مدينتك بدلاً من ذلك.</string>
     <string name="location_unavailable_title">الموقع غير متاح</string>
     <string name="location_unavailable_desc">تعذّر تحديد موقعك. يرجى المحاولة مرة أخرى أو البحث عن مدينتك.</string>
     <string name="search_error_offline">لا يوجد اتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.</string>
@@ -83,5 +83,5 @@
     <string name="ok">حسناً</string>
     <!-- حول التطبيق والخصوصية -->
     <string name="about">حول التطبيق</string>
-    <string name="about_desc">تطبيق أوقات الصلاة يعمل بنسبة 100% دون اتصال بالإنترنت، بخصوصية تامة وخالٍ تماماً من الإعلانات.</string>
+    <string name="about_desc" formatted="false">ميقات هو تطبيق أوقات صلاة يعمل بنسبة 100% دون اتصال بالإنترنت، بخصوصية تامة وخالٍ تماماً من الإعلانات.</string>
 </resources>

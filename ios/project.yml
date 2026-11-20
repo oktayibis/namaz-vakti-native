@@ -32,10 +32,13 @@ schemes:
     build:
       targets:
         NamazVakti: all
+        NamazVaktiTests: [test]
     run:
       config: Debug
     test:
       config: Debug
+      targets:
+        - NamazVaktiTests
     profile:
       config: Release
     analyze:
@@ -52,6 +55,7 @@ targets:
       - path: NamazVakti/NamazVakti
     settings:
       base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.okib.NamazVakti
         INFOPLIST_FILE: NamazVakti/NamazVakti/Info.plist
         CODE_SIGN_ENTITLEMENTS: NamazVakti/NamazVakti/NamazVakti.entitlements
       # XcodeGen's application preset injects the legacy "iPhone Developer" identity at
@@ -102,5 +106,29 @@ targets:
         CODE_SIGN_ENTITLEMENTS: NamazVaktiWidget/NamazVaktiWidget.entitlements
         # Extension bundle ids must be prefixed by the host app's bundle id
         PRODUCT_BUNDLE_IDENTIFIER: com.okib.NamazVakti.NamazVaktiWidget
+      configs:
+        debug:
+          CODE_SIGN_IDENTITY: "Apple Development"
+        release:
+          CODE_SIGN_IDENTITY: "Apple Development"
     dependencies:
+      - package: Adhan
+
+  NamazVaktiTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: NamazVaktiTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.okib.NamazVaktiTests
+        GENERATE_INFOPLIST_FILE: YES
+      configs:
+        debug:
+          CODE_SIGN_IDENTITY: "Apple Development"
+        release:
+          CODE_SIGN_IDENTITY: "Apple Development"
+    dependencies:
+      - target: NamazVakti
       - package: Adhan

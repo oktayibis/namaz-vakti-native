@@ -79,6 +79,8 @@ fun OnboardingScreen(
     var searchQuery by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf<List<LocationData>>(emptyList()) }
     var isSearching by remember { mutableStateOf(false) }
+    var searchErrorTextRes by remember { mutableStateOf<Int?>(null) }
+    var hasCompletedSearch by remember { mutableStateOf(false) }
     
     val locationManager = remember { LocationManager(context) }
     
@@ -93,14 +95,31 @@ fun OnboardingScreen(
         }
     }
     
-    // Search query listener with debounce
+    // Search query listener with 300ms debounce and automatic cancellation on new keystroke
     LaunchedEffect(searchQuery) {
-        if (searchQuery.length >= 2) {
+        searchErrorTextRes = null
+        hasCompletedSearch = false
+        if (searchQuery.trim().length >= 2) {
             delay(300)
             isSearching = true
-            searchResults = locationManager.searchCity(searchQuery)
+            when (val res = locationManager.searchCityWithStatus(searchQuery)) {
+                is com.oktay.namaz.service.CitySearchResult.Success -> {
+                    searchResults = res.locations
+                    searchErrorTextRes = null
+                }
+                is com.oktay.namaz.service.CitySearchResult.Offline -> {
+                    searchResults = emptyList()
+                    searchErrorTextRes = R.string.search_error_offline
+                }
+                is com.oktay.namaz.service.CitySearchResult.Error -> {
+                    searchResults = emptyList()
+                    searchErrorTextRes = R.string.search_error_failed
+                }
+            }
             isSearching = false
+            hasCompletedSearch = true
         } else {
+            isSearching = false
             searchResults = emptyList()
         }
     }
@@ -287,6 +306,36 @@ fun OnboardingScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator(color = AmberAccent)
+                            }
+                        } else if (searchErrorTextRes != null) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                                    .padding(top = 20.dp),
+                                contentAlignment = Alignment.TopCenter
+                            ) {
+                                Text(
+                                    text = stringResource(searchErrorTextRes!!),
+                                    color = Color.White.copy(alpha = 0.75f),
+                                    fontSize = 14.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        } else if (hasCompletedSearch && searchResults.isEmpty() && searchQuery.trim().length >= 2) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                                    .padding(top = 20.dp),
+                                contentAlignment = Alignment.TopCenter
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.search_no_results),
+                                    color = Color.Gray,
+                                    fontSize = 14.sp,
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         } else {
                             LazyColumn(modifier = Modifier.weight(1f)) {

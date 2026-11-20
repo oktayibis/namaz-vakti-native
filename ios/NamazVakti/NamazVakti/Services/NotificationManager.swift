@@ -12,6 +12,11 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
     // Keys for local storage
     private let enabledPrayersKey = "enabledPrayers"
     private let reminderOffsetsKey = "reminderOffsets"
+
+    /// Serial background queue at `.utility` QoS so all solar calculations and
+    /// `UNUserNotificationCenter` requests stay off the main thread and never race
+    /// another `removeAllPendingNotificationRequests()` pass.
+    private let schedulingQueue = DispatchQueue(label: "com.okib.NamazVakti.notifications", qos: .utility)
     
     private override init() {
         super.init()
@@ -81,25 +86,39 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         defaults.set(trimmed, forKey: reminderOffsetsKey)
     }
     
-    // Schedules notifications for the next N days
-    func scheduleAllNotifications(for location: LocationData) {
+    // Schedules notifications for the next N days off the main thread
+    func scheduleAllNotifications(for location: LocationData, completion: (() -> Void)? = nil) {
+        schedulingQueue.async { [weak self] in
+            guard let self = self else {
+                completion?()
+                return
+            }
+            self.performScheduleAllNotifications(for: location)
+            completion?()
+        }
+    }
+
+    private func performScheduleAllNotifications(for location: LocationData) {
         // Cancel existing pending notifications first to prevent duplicates
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
         
         let enabledPrayers = getEnabledPrayers()
         let offsets = getReminderOffsets()
         
         guard !enabledPrayers.isEmpty && !offsets.isEmpty else { return }
 
-        let center = UNUserNotificationCenter.current()
-        let calendar = Calendar.current
         let now = Date()
         let languageCode = LanguageManager.resolvedLanguageCode()
 
-        // Fire at the tracked city's wall-clock time. Without an explicit timezone the
-        // trigger is matched in whatever zone the device is in when it fires, so a
-        // traveling user would get alerts at the wrong moment.
+        // Fire at the tracked city's wall-clock time. Anchor the calendar itself to the
+        // tracked city's timezone before extracting dateComponents; otherwise Calendar
+        // extracts device-local hours/minutes and re-tags them with triggerTimeZone.
         let triggerTimeZone = TimeZone(identifier: location.timezoneIdentifier)
+        var calendar = Calendar(identifier: .gregorian)
+        if let triggerTimeZone = triggerTimeZone {
+            calendar.timeZone = triggerTimeZone
+        }
 
         // iOS silently drops pending requests beyond 64 per app, so derive the window
         // from the actual configuration (e.g. 6 prayers x 3 alerts would overflow a
